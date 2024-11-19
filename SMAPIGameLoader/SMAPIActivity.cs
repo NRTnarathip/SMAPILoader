@@ -8,6 +8,7 @@ using Android.Views;
 using HarmonyLib;
 using Java.Util;
 using Microsoft.Xna.Framework;
+using SMAPIGameLoader.Mod;
 using StardewValley;
 using StardewValley.Mobile;
 using System;
@@ -71,14 +72,17 @@ public class SMAPIActivity : AndroidGameActivity
     void PrepareAssets()
     {
     }
-    //Assembly stardewAssembly;
     void LaunchGame()
     {
         //setup refernces assemblies
         PrepareAssemblies();
         PrepareAssets();
 
-        //ready to use all assemblies
+        //ready to use all assemblies & references
+        var harmony = new Harmony("SMAPIGameLoader");
+        harmony.PatchAll();
+        Console.WriteLine("harmony.PatchAll()");
+
 
         //setup Activity
         IntegrateStardewMainActivity();
@@ -328,6 +332,7 @@ public class SMAPIActivity : AndroidGameActivity
         }
     }
 
+    //Start Instance Game
     private void OnCreatePartTwo()
     {
         Log.It("MainActivity.OnCreatePartTwo");
@@ -337,6 +342,13 @@ public class SMAPIActivity : AndroidGameActivity
         const bool isRunSMAPI = false;
         Console.WriteLine("isRunWith SMAPI?: " + isRunSMAPI);
         if (isRunSMAPI)
+            StartGameWithSMAPI();
+        else
+            StartGameVanilla();
+    }
+    void StartGameWithSMAPI()
+    {
+        try
         {
             var smapi = Assembly.LoadFrom(FileTool.ExternalFilesDir + "/StardewModdingAPI.dll");
             Console.WriteLine(smapi);
@@ -345,27 +357,28 @@ public class SMAPIActivity : AndroidGameActivity
             var mainMethod = programType.GetMethod("Main", BindingFlags.Static | BindingFlags.Public);
             Console.WriteLine(mainMethod);
             var args = new object[] { new string[] { } };
-            try
-            {
-                mainMethod.Invoke(null, args);
-                Console.WriteLine("done run SMAPI Program.Main()");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+            mainMethod.Invoke(null, args);
+            Console.WriteLine("done run SMAPI Program.Main()");
         }
-        else
+        catch (Exception ex)
         {
-            var gameRunner = new GameRunner();
-            GameRunner.instance = gameRunner;
+            Console.WriteLine(ex);
         }
-
-        SetContentView((View)GameRunner.instance.Services.GetService(typeof(View)));
-        Console.WriteLine("done set content view");
-        Console.WriteLine("try run Game Runner: " + GameRunner.instance);
+    }
+    void StartGameVanilla()
+    {
         try
         {
+            //setup sdk vanila mods support
+            AssetsModsManager.Setup();
+            LocalizedModManager.Setup();
+
+            //ready create instance game
+            var gameRunner = new GameRunner();
+            GameRunner.instance = gameRunner;
+            SetContentView((View)GameRunner.instance.Services.GetService(typeof(View)));
+            Console.WriteLine("done set content view");
+            Console.WriteLine("try run Game Runner: " + GameRunner.instance);
             GameRunner.instance.Run();
             Console.WriteLine("done GameRunner.Run()");
         }
@@ -374,6 +387,7 @@ public class SMAPIActivity : AndroidGameActivity
             Console.WriteLine(ex);
         }
     }
+
     public int GetBuild()
     {
         Context context = Application.Context;
@@ -407,8 +421,6 @@ public class SMAPIActivity : AndroidGameActivity
             Game1.toolbarPaddingX = 20;
         }
     }
-
-    //MobileDisplay
     public static void SetupDisplaySettings()
     {
         var MobileDisplayType = typeof(MainActivity).Assembly.GetType("StardewValley.Mobile.MobileDisplay");

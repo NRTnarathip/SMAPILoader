@@ -25,7 +25,6 @@ internal class EntryActivity : Activity
 {
     static EntryActivity()
     {
-        Console.WriteLine("Init Type EntryActivity");
         //Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         //foreach (var asm in assemblies)
         //{
@@ -55,13 +54,9 @@ internal class EntryActivity : Activity
         GameAssetManager.VerifyAssets();
         GameAssemblyManager.VerifyAssemblies();
 
-        //load manual dependency game engine
+        //Load MonoGame.Framework.dll into reference
+        //StardewValley.dll wait load at SMAPIActivity
         GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameFrameworkDllFileName);
-
-        //setup harmony patcher
-        var harmony = new Harmony("SMAPIGameLoader");
-        harmony.PatchAll();
-
 
         LaunchGameActivity();
     }

@@ -30,12 +30,22 @@ static class GameAssetManager
             return _gameAssetDir;
         }
     }
+    public delegate Stream OnOpenStreamDelegate(string assetName);
+    public static OnOpenStreamDelegate OnOpenStream;
     static Stream FixOpenStream(string assetName)
     {
+        //example: Cotent\BigCraftables
+        assetName = assetName.Replace("//", "/"); //safePath
+        assetName = assetName.Replace("\\", "/"); //safePath
         try
         {
-            assetName = assetName.Replace("//", "/"); //safePath
-            assetName = assetName.Replace("\\", "/"); //safePath
+
+            //load form other stream
+            var hookOpenStream = OnOpenStream?.Invoke(assetName);
+            if (hookOpenStream != null)
+                return hookOpenStream;
+
+            //load vanila
             var rootDirectory = GetGameAssetsDir;
             string assetAbsolutePath = Path.Combine(rootDirectory, assetName);
             return File.OpenRead(assetAbsolutePath);
@@ -43,7 +53,7 @@ static class GameAssetManager
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            throw;
+            return null;
         }
     }
 

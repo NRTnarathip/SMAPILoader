@@ -26,6 +26,7 @@
 		<AndroidSigningKeyPass>android</AndroidSigningKeyPass>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.IO.Compression" Version="4.3.0" />
 	</ItemGroup>
 	<ItemGroup>
@@ -59,6 +60,9 @@
 		<Reference Include="StardewValley">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.dll</HintPath>
 			<Private>False</Private>
+		</Reference>
+		<Reference Include="StardewValley.GameData">
+		  <HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.GameData.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
