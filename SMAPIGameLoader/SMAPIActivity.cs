@@ -99,7 +99,7 @@ public class SMAPIActivity : AndroidGameActivity
     }
     static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
     {
-        Console.WriteLine("try resolve assembly name: " + args.Name);
+        Console.WriteLine("SMAPIActivity: try resolve assembly: " + args.Name);
         //manual load at external files dir
         var dllFileName = new AssemblyName(args.Name).Name + ".dll";
         string[] searchDirs = [
@@ -108,11 +108,17 @@ public class SMAPIActivity : AndroidGameActivity
 
         foreach (var dir in searchDirs)
         {
-            var asm = Assembly.LoadFrom(Path.Combine(dir, dllFileName));
-            if (asm != null)
-                return asm;
+            try
+            {
+                var asm = Assembly.LoadFrom(Path.Combine(dir, dllFileName));
+                if (asm != null)
+                    return asm;
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
-        Console.WriteLine("error can't resolve asm: " + args.Name);
         return null;
     }
     static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
@@ -339,34 +345,46 @@ public class SMAPIActivity : AndroidGameActivity
         SetupDisplaySettings();
         SetPaddingForMenus();
         //setup SMAPI & SGameRunner
-        const bool isRunSMAPI = false;
-        Console.WriteLine("isRunWith SMAPI?: " + isRunSMAPI);
-        if (isRunSMAPI)
-            StartGameWithSMAPI();
-        else
-            StartGameVanilla();
+        //StartGameVanilla();
+        StartGameWithSMAPI();
     }
-    void StartGameWithSMAPI()
+    static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
+    bool StartGameWithSMAPI()
     {
+        bool isRunSMAPI = false;
+        Console.WriteLine("try start game with SMAPI");
         try
         {
-            var smapi = Assembly.LoadFrom(FileTool.ExternalFilesDir + "/StardewModdingAPI.dll");
+            var smapiFilePath = GetSMAPIFilePath;
+            Console.WriteLine("smapi path to load: " + smapiFilePath);
+            if (File.Exists(smapiFilePath) == false)
+            {
+                isRunSMAPI = false;
+                Console.WriteLine("error StardewModdingAPI.dll file not found");
+                return false;
+            }
+
+            var smapi = Assembly.LoadFrom(smapiFilePath);
             Console.WriteLine(smapi);
             var programType = smapi.GetType("StardewModdingAPI.Program");
-            Console.WriteLine(programType);
             var mainMethod = programType.GetMethod("Main", BindingFlags.Static | BindingFlags.Public);
-            Console.WriteLine(mainMethod);
             var args = new object[] { new string[] { } };
+            Console.WriteLine("try invoke SMAPI Program.Main()");
             mainMethod.Invoke(null, args);
             Console.WriteLine("done run SMAPI Program.Main()");
+            isRunSMAPI = true;
+            return true;
         }
         catch (Exception ex)
         {
+            Console.WriteLine("failed start SMAPI");
             Console.WriteLine(ex);
         }
+        return isRunSMAPI;
     }
     void StartGameVanilla()
     {
+        Console.WriteLine("try start game with vanilla");
         try
         {
             //setup sdk vanila mods support

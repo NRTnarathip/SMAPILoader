@@ -25,7 +25,7 @@ internal class GameAssemblyManager
         foreach (var asm in store.Assemblies)
         {
             asm.ExtractImage(assembliesOutputDirPath);
-            Console.WriteLine("done save dll: " + asm.DllName);
+            //Console.WriteLine("done save dll: " + asm.DllName);
         }
     }
     public static Assembly LoadAssembly(string dllFileName)

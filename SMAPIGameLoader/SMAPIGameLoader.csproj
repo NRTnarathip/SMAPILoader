@@ -7,6 +7,7 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<SupportedOSPlatformVersion>23.0</SupportedOSPlatformVersion>
 		<AndroidSigningKeyStore>debug.keystore</AndroidSigningKeyStore>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
@@ -67,6 +68,12 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="libs\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Resources\Drawable\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 	<Target Name="RestoreDotnetTools" BeforeTargets="Restore">
 		<Message Text="Restoring dotnet tools" Importance="High" />
