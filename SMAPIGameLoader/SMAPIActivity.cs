@@ -342,32 +342,37 @@ public class SMAPIActivity : AndroidGameActivity
         Log.It("MainActivity.OnCreatePartTwo");
         SetupDisplaySettings();
         SetPaddingForMenus();
-        //setup SMAPI & SGameRunner
-        bool isRunSMAPI = true;
-        if (isRunSMAPI)
-            StartGameWithSMAPI();
+
+        bool launchWithSMAPI = true;
+        if (launchWithSMAPI)
+        {
+            var err = StartGameWithSMAPI();
+            if (err != null)
+            {
+                ToastNotifyTool.Notify(err.ToString());
+            }
+        }
         else
+        {
             StartGameVanilla();
+        }
     }
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
-    public bool StartGameWithSMAPI()
+    public Exception StartGameWithSMAPI()
     {
-        bool isRunSMAPI = false;
         Console.WriteLine("try start game with SMAPI");
+        Exception exOut = null;
         try
         {
             //setup patch game vanilla
-            AssetsModsManager.Setup();
-            LocalizedModManager.Setup();
             Log.Setup();
 
             var smapiFilePath = GetSMAPIFilePath;
             Console.WriteLine("smapi path to load: " + smapiFilePath);
             if (File.Exists(smapiFilePath) == false)
             {
-                isRunSMAPI = false;
                 Console.WriteLine("error StardewModdingAPI.dll file not found");
-                return false;
+                exOut = new Exception($"Error file: {smapiFilePath} not found");
             }
 
             var smapi = Assembly.LoadFrom(smapiFilePath);
@@ -378,15 +383,14 @@ public class SMAPIActivity : AndroidGameActivity
             Console.WriteLine("try invoke SMAPI Program.Main()");
             mainMethod.Invoke(null, args);
             Console.WriteLine("done run SMAPI Program.Main()");
-            isRunSMAPI = true;
-            return true;
         }
-        catch (Exception ex)
+        catch (Exception err)
         {
             Console.WriteLine("failed start SMAPI");
-            Console.WriteLine(ex);
+            Console.WriteLine(err);
+            exOut = err;
         }
-        return isRunSMAPI;
+        return exOut;
     }
     public void StartGameVanilla()
     {
