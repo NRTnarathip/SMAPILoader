@@ -36,15 +36,8 @@ public class SMAPIActivity : AndroidGameActivity
 {
     static SMAPIActivity()
     {
-        //Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        //foreach (var asm in assemblies)
-        //{
-        //    Console.WriteLine("already loaded in ctor: " + asm);
-        //}
-
-        AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         //AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
-
     }
     public static SMAPIActivity Instance { get; private set; }
 
@@ -99,7 +92,7 @@ public class SMAPIActivity : AndroidGameActivity
     }
     static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
     {
-        Console.WriteLine("SMAPIActivity: try resolve assembly: " + args.Name);
+        //Console.WriteLine("SMAPIActivity: try resolve assembly: " + args.Name);
         //manual load at external files dir
         var dllFileName = new AssemblyName(args.Name).Name + ".dll";
         string[] searchDirs = [

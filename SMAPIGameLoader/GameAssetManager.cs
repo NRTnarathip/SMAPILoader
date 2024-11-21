@@ -51,8 +51,8 @@ static class GameAssetManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            return null;
+            //Console.WriteLine(ex);
+            throw;
         }
     }
 
