@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SMAPIGameLoader;
 
-internal static class ApkTool
+internal static class StardewApkTool
 {
     public const string PackageName = "com.chucklefish.stardewvalley";
     public static PackageInfo PackageInfo => GetContext.PackageManager.GetPackageInfo(PackageName, 0);
@@ -45,8 +45,8 @@ internal static class ApkTool
         GetContext.StartActivity(intent);
     }
     public static Android.Content.Context GetContext => Application.Context;
-    public static string BaseApkPath => ApkTool.PackageInfo.ApplicationInfo.PublicSourceDir;
-    public static IList<string> SplitApks => ApkTool.PackageInfo.ApplicationInfo.SplitSourceDirs;
+    public static string BaseApkPath => StardewApkTool.PackageInfo.ApplicationInfo.PublicSourceDir;
+    public static IList<string> SplitApks => StardewApkTool.PackageInfo.ApplicationInfo.SplitSourceDirs;
     public static string ContentApkPath = SplitApks.First(path => path.Contains("split_content"));
     public static string ConfigApkPath => SplitApks.First(path => path.Contains("split_config"));
 }

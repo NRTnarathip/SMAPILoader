@@ -28,6 +28,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SkiaSharp" Version="2.88.9" />
 		<PackageReference Include="System.IO.Compression" Version="4.3.0" />
 	</ItemGroup>
 	<ItemGroup>
@@ -39,6 +40,7 @@
 		</Reference>
 		<Reference Include="MonoGame.Framework">
 		  <HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
+		  <Private>True</Private>
 		</Reference>
 		<Reference Include="MonoMod.Backports">
 		  <HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
@@ -64,6 +66,7 @@
 		</Reference>
 		<Reference Include="StardewValley.GameData">
 		  <HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.GameData.dll</HintPath>
+		  <Private>False</Private>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

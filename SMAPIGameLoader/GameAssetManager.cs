@@ -34,21 +34,20 @@ static class GameAssetManager
     public static OnOpenStreamDelegate OnOpenStream;
     static Stream FixOpenStream(string assetName)
     {
-        //example: Cotent\BigCraftables
-        assetName = assetName.Replace("//", "/"); //safePath
-        assetName = assetName.Replace("\\", "/"); //safePath
         try
         {
+            //example: Cotent\\BigCraftables
+            assetName = FileTool.SafePath(assetName);
 
             //load form other stream
             var hookOpenStream = OnOpenStream?.Invoke(assetName);
             if (hookOpenStream != null)
                 return hookOpenStream;
 
-            //load vanila
-            var rootDirectory = GetGameAssetsDir;
-            string assetAbsolutePath = Path.Combine(rootDirectory, assetName);
-            return File.OpenRead(assetAbsolutePath);
+            //load vanilla
+            string assetFullPath = Path.Combine(GetGameAssetsDir, assetName);
+            //Console.WriteLine("on OpenStream: " + assetName);
+            return File.OpenRead(assetFullPath);
         }
         catch (Exception ex)
         {
@@ -61,7 +60,7 @@ static class GameAssetManager
     public static void VerifyAssets()
     {
         //check & update game content
-        var baseContentApk = ApkTool.ContentApkPath;
+        var baseContentApk = StardewApkTool.ContentApkPath;
         using (FileStream apkFileStream = new FileStream(baseContentApk, FileMode.Open, FileAccess.Read))
         using (ZipArchive apkArchive = new ZipArchive(apkFileStream, ZipArchiveMode.Read))
         {

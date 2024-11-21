@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Android.App;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,15 +19,29 @@ internal class GameAssemblyManager
     public static string StardewValleyFilePath => Path.Combine(AssembliesDirPath, StardewDllName);
     public static void VerifyAssemblies()
     {
-        //unpack dlls from assembly store 
-        var store = new AssemblyStoreExplorer(ApkTool.BaseApkPath, keepStoreInMemory: true);
         var assembliesOutputDirPath = AssembliesDirPath;
         Directory.CreateDirectory(assembliesOutputDirPath);
-        foreach (var asm in store.Assemblies)
+
         {
-            asm.ExtractImage(assembliesOutputDirPath);
-            //Console.WriteLine("done save dll: " + asm.DllName);
+            //clone dlls Stardew Valley 
+            var store = new AssemblyStoreExplorer(StardewApkTool.BaseApkPath, keepStoreInMemory: true);
+            foreach (var asm in store.Assemblies)
+            {
+                asm.ExtractImage(assembliesOutputDirPath);
+            }
         }
+
+        {
+            //clone dll & no trimming from this app 
+            var appInfo = Application.Context.ApplicationInfo;
+            var baseApk = appInfo.PublicSourceDir;
+            var store = new AssemblyStoreExplorer(baseApk, keepStoreInMemory: true);
+            foreach (var asm in store.Assemblies)
+            {
+                asm.ExtractImage(assembliesOutputDirPath);
+            }
+        }
+
     }
     public static Assembly LoadAssembly(string dllFileName)
     {

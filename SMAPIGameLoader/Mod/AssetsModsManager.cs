@@ -38,7 +38,6 @@ internal class AssetsModsManager
         try
         {
             string assetFullPath = Path.Combine(AssetsModsDir, assetName);
-            Console.WriteLine("try open stream: " + assetName);
             if (File.Exists(assetFullPath) == false)
             {
                 return null;

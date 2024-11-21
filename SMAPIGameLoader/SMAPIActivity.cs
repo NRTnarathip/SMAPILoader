@@ -53,7 +53,7 @@ public class SMAPIActivity : AndroidGameActivity
     {
         Instance = this;
         currentBundle = bundle;
-        if (!ApkTool.IsInstalled)
+        if (!StardewApkTool.IsInstalled)
         {
             Finish();
             return;
@@ -103,22 +103,27 @@ public class SMAPIActivity : AndroidGameActivity
         //manual load at external files dir
         var dllFileName = new AssemblyName(args.Name).Name + ".dll";
         string[] searchDirs = [
-            FileTool.ExternalFilesDir,
+            GameAssemblyManager.AssembliesDirPath,
         ];
 
         foreach (var dir in searchDirs)
         {
+            var fullPath = Path.Combine(dir, dllFileName);
+            if (File.Exists(fullPath) == false)
+            {
+                continue;
+            }
             try
             {
-                var asm = Assembly.LoadFrom(Path.Combine(dir, dllFileName));
-                if (asm != null)
-                    return asm;
+                var asm = Assembly.LoadFrom(fullPath);
+                return asm;
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
             }
         }
+        //Console.WriteLine("Warn!! can't resolve asm: " + args.Name);
         return null;
     }
     static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
@@ -345,16 +350,24 @@ public class SMAPIActivity : AndroidGameActivity
         SetupDisplaySettings();
         SetPaddingForMenus();
         //setup SMAPI & SGameRunner
-        //StartGameVanilla();
-        StartGameWithSMAPI();
+        bool isRunSMAPI = true;
+        if (isRunSMAPI)
+            StartGameWithSMAPI();
+        else
+            StartGameVanilla();
     }
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
-    bool StartGameWithSMAPI()
+    public bool StartGameWithSMAPI()
     {
         bool isRunSMAPI = false;
         Console.WriteLine("try start game with SMAPI");
         try
         {
+            //setup patch game vanilla
+            AssetsModsManager.Setup();
+            LocalizedModManager.Setup();
+            Log.Setup();
+
             var smapiFilePath = GetSMAPIFilePath;
             Console.WriteLine("smapi path to load: " + smapiFilePath);
             if (File.Exists(smapiFilePath) == false)
@@ -382,7 +395,7 @@ public class SMAPIActivity : AndroidGameActivity
         }
         return isRunSMAPI;
     }
-    void StartGameVanilla()
+    public void StartGameVanilla()
     {
         Console.WriteLine("try start game with vanilla");
         try
@@ -390,6 +403,7 @@ public class SMAPIActivity : AndroidGameActivity
             //setup sdk vanila mods support
             AssetsModsManager.Setup();
             LocalizedModManager.Setup();
+            Log.Setup();
 
             //ready create instance game
             var gameRunner = new GameRunner();

@@ -14,7 +14,7 @@ using static StardewValley.LocalizedContentManager;
 
 namespace SMAPIGameLoader.Mod;
 
-[HarmonyPatch]
+//[HarmonyPatch]
 internal class LocalizedModManager
 {
     static LocalizedModManager Instance;
@@ -34,12 +34,12 @@ internal class LocalizedModManager
     }
     static Dictionary<string, TranslatorDictionary> TranslatorDictionaryMap = new();
 
-    [HarmonyPrefix]
-    [HarmonyPatch(
-        typeof(LocalizedContentManager),
-        "LoadStringReturnNullIfNotFound",
-        [typeof(string), typeof(bool)]
-    )]
+    //[HarmonyPrefix]
+    //[HarmonyPatch(
+    //    typeof(LocalizedContentManager),
+    //    "LoadStringReturnNullIfNotFound",
+    //    [typeof(string), typeof(bool)]
+    //)]
     static bool PrefixLoadStringReturnNullIfNotFound(
         LocalizedContentManager __instance,
         ref string __result,
@@ -57,7 +57,7 @@ internal class LocalizedModManager
         string text = GetString(translatorDict.strings, key) ?? (localeFallback ? LoadBaseStringOrNull(path) : null);
         __result = PreprocessString(text);
         Console.WriteLine("PrefixLoadStringReturnNullIfNotFound: result=" + __result + ", path: " + path);
-         
+
         return false;
     }
     public static string PreprocessString(string text)
@@ -79,15 +79,15 @@ internal class LocalizedModManager
         return null;
     }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(LocalizedContentManager), "LoadBaseStringOrNull", [typeof(string)])]
+    //[HarmonyPrefix]
+    //[HarmonyPatch(typeof(LocalizedContentManager), "LoadBaseStringOrNull", [typeof(string)])]
     static bool PrefixLoadBaseStringOrNull(ref string __result, string path)
     {
         var baseString = LoadBaseStringOrNull(path);
         if (baseString == null)
             return true;
         __result = baseString;
-        Console.WriteLine("PrefixLoadBaseStringOrNull: result=" +__result);
+        Console.WriteLine("PrefixLoadBaseStringOrNull: result=" + __result);
         return false;
     }
     static TranslatorDictionary LoadTranslatorDictionaryType(string assetName)
