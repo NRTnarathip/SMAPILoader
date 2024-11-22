@@ -5,7 +5,8 @@
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.VIBRATE"/>
 	<uses-feature android:glEsVersion="0x00020000" android:required="true" />
-	<application android:label="SMAPI Game Loader"></application>
+	<application android:label="SMAPI Launcher"></application>
+
 	<queries>
 		<package android:name="com.chucklefish.stardewvalley" />
 	</queries>

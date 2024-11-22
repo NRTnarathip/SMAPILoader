@@ -10,9 +10,9 @@ namespace SMAPIGameLoader;
 
 internal static class ToastNotifyTool
 {
-    public static void Notify(string message)
+    public static void Notify(string message, ToastLength duration = ToastLength.Long)
     {
         var ctx = Application.Context;
-        Toast.MakeText(ctx, message, ToastLength.Long).Show();
+        Toast.MakeText(ctx, message, duration).Show();
     }
 }
