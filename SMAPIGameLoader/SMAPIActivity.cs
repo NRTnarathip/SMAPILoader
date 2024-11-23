@@ -34,11 +34,6 @@ namespace SMAPIGameLoader;
         | ConfigChanges.UiMode))]
 public class SMAPIActivity : AndroidGameActivity
 {
-    static SMAPIActivity()
-    {
-        //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-        //AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
-    }
     public static SMAPIActivity Instance { get; private set; }
 
     Bundle currentBundle;
@@ -343,18 +338,11 @@ public class SMAPIActivity : AndroidGameActivity
         SetupDisplaySettings();
         SetPaddingForMenus();
 
-        bool launchWithSMAPI = true;
-        if (launchWithSMAPI)
+        var err = StartGameWithSMAPI();
+        if (err != null)
         {
-            var err = StartGameWithSMAPI();
-            if (err != null)
-            {
-                ToastNotifyTool.Notify(err.ToString());
-            }
-        }
-        else
-        {
-            StartGameVanilla();
+            ToastNotifyTool.Notify(err.ToString());
+            Finish();
         }
     }
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");

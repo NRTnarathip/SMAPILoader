@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Java.Lang;
 using MonoGame.Framework.Utilities;
+using SMAPIGameLoader.Launcher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,7 @@ internal class GameAssemblyManager
         //create dir path for copy file
         Directory.CreateDirectory(Path.GetDirectoryName(destLib_LWJGL_FilePath));
         Console.WriteLine("try extract to: " + destLib_LWJGL_FilePath);
-        liblwjgl_lz4SO.ExtractToFile(destLib_LWJGL_FilePath, true);
+        ZipFileTool.Extract(liblwjgl_lz4SO, destLib_LWJGL_FilePath);
         Console.WriteLine("done added lib: " + liblwjgl_lz4SO);
 
 

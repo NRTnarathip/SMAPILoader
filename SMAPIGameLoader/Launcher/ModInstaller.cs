@@ -49,7 +49,7 @@ internal static class ModInstaller
         }
         catch (Exception ex)
         {
-            ToastNotifyTool.Notify(ex.ToString(), Android.Widget.ToastLength.Long);
+            ToastNotifyTool.Notify(ex.ToString());
         }
     }
     public static string ReadManifest(ZipArchiveEntry entry)

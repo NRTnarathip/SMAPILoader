@@ -32,10 +32,11 @@ internal class EntryGameActivity : Activity
         Console.WriteLine("App is in Release mode");
 #endif
 
+        ToastNotifyTool.Notify("Starting Game..");
         //check game it's can launch with version
-        if (StardewApkTool.IsGameVersionSupport)
+        if (StardewApkTool.IsGameVersionSupport == false)
         {
-            ToastNotifyTool.Notify("Not support game version: " + StardewApkTool.GameVersion + ", please update game");
+            ToastNotifyTool.Notify("Not support game version: " + StardewApkTool.CurrentGameVersion + ", please update game");
             return;
         }
 

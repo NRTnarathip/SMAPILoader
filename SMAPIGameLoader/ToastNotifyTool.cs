@@ -11,7 +11,7 @@ namespace SMAPIGameLoader;
 internal static class ToastNotifyTool
 {
     static Toast LastToast;
-    public static void Notify(string message, ToastLength duration = ToastLength.Short)
+    public static void Notify(string message, ToastLength duration = ToastLength.Long)
     {
         if (LastToast != null)
             LastToast.Cancel();

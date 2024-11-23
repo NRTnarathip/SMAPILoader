@@ -51,6 +51,6 @@ internal static class StardewApkTool
     public static string ConfigApkPath => SplitApks.First(path => path.Contains("split_config"));
 
     public readonly static Version GameVersionSupport = new Version("1.6.14.3");
-    public readonly static Version GameVersion = new Version(PackageInfo.VersionName);
-    public static bool IsGameVersionSupport => GameVersion >= GameVersionSupport;
+    public readonly static Version CurrentGameVersion = new Version(PackageInfo.VersionName);
+    public static bool IsGameVersionSupport => CurrentGameVersion >= GameVersionSupport;
 }

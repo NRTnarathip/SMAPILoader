@@ -25,16 +25,15 @@ internal static class SMAPIInstaller
                 return;
             }
 
-            //var fileStream = await pick.OpenReadAsync();
+            ToastNotifyTool.Notify("Starting Install SMAPI");
             using var zip = ZipFile.OpenRead(pick.FullPath);
             foreach (var entry in zip.Entries)
             {
-                var baseFolderName = new DirectoryInfo(entry.FullName).Name;
+                string baseFolderName = Path.GetDirectoryName(entry.FullName).Split(Path.DirectorySeparatorChar)[0];
                 var destFilePath = entry.FullName.Replace(baseFolderName + "/", "");
                 destFilePath = Path.Combine(GameAssemblyManager.AssembliesDirPath, destFilePath);
                 FileTool.MakeSureFilePath(destFilePath);
-                entry.ExtractToFile(destFilePath, true);
-                Console.WriteLine("extract destFilePath:" + destFilePath);
+                ZipFileTool.Extract(entry, destFilePath);
             }
 
             ToastNotifyTool.Notify("Successfully Install SMAPI!");
