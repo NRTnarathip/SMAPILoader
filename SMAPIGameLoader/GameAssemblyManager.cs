@@ -1,15 +1,10 @@
 ﻿using Android.App;
-using Java.Lang;
-using MonoGame.Framework.Utilities;
 using SMAPIGameLoader.Launcher;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Android.AssemblyStore;
 
 namespace SMAPIGameLoader;
@@ -59,7 +54,11 @@ internal class GameAssemblyManager
         //clone libs
         //liblwjgl_lz4.so
         using var configApkZip = ZipFile.OpenRead(StardewApkTool.ConfigApkPath);
-        var liblwjgl_lz4SO = configApkZip.Entries.Single(lib => lib.Name == liblwjgl_lz4Name);
+        var liblwjgl_lz4SO = configApkZip.Entries.FirstOrDefault(lib => lib.Name == liblwjgl_lz4Name);
+        if (liblwjgl_lz4SO == null)
+        {
+            throw new System.Exception("not found lib: " + liblwjgl_lz4Name);
+        }
         Console.WriteLine("lib lwjgl: " + liblwjgl_lz4SO);
         string personalPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
         Console.WriteLine("personalPath: " + personalPath);

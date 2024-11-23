@@ -53,7 +53,7 @@ public class LauncherActivity : Activity
 
         //set support game version
         var supportGameVersionTextView = FindViewById<TextView>(Resource.Id.supportGameVersionTextView);
-        supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport}";
+        supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport} Or Above";
         var yourGameVersion = FindViewById<TextView>(Resource.Id.yourGameVersion);
         yourGameVersion.Text = "Your Game Version: " + StardewApkTool.CurrentGameVersion;
     }

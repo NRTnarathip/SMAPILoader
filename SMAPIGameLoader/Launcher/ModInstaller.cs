@@ -24,7 +24,7 @@ internal static class ModInstaller
 
             using var zip = ZipFile.OpenRead(pickFile.FullPath);
             var entries = zip.Entries;
-            var manifestEntry = entries.Single(file => file.Name == "manifest.json");
+            var manifestEntry = entries.FirstOrDefault(file => file.Name == "manifest.json");
             if (manifestEntry == null)
             {
                 ToastNotifyTool.Notify("Not found manifest.json");

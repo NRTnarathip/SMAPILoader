@@ -8,7 +8,6 @@ using Android.Views;
 using HarmonyLib;
 using Java.Util;
 using Microsoft.Xna.Framework;
-using SMAPIGameLoader.Mod;
 using StardewValley;
 using StardewValley.Mobile;
 using System;
@@ -385,9 +384,7 @@ public class SMAPIActivity : AndroidGameActivity
         Console.WriteLine("try start game with vanilla");
         try
         {
-            //setup sdk vanila mods support
-            AssetsModsManager.Setup();
-            LocalizedModManager.Setup();
+            //setup game patch
             Log.Setup();
 
             //ready create instance game
