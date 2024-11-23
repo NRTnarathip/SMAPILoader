@@ -52,7 +52,7 @@ public class SMAPIActivity : AndroidGameActivity
     {
         //patch rewrite
         var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
-        MainActivityRewriter.Rewrite(stardewDllFilePath, out var isRewrite);
+        StardewGameRewriter.Rewrite(stardewDllFilePath, out var isRewrite);
         //load dependencies with manual
         Assembly.LoadFrom(stardewDllFilePath);
     }

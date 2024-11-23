@@ -5,7 +5,7 @@ using System.IO;
 
 namespace SMAPIGameLoader;
 
-internal static class MainActivityRewriter
+internal static class StardewGameRewriter
 {
     public static TypeReference FindType(ModuleDefinition moduleDefinition, Type type)
     {
@@ -26,10 +26,12 @@ internal static class MainActivityRewriter
     public static void Rewrite(string stardewDllFilePath, out bool isRewrite)
     {
         isRewrite = false;
-        using var stardewDllStream = File.Open(stardewDllFilePath, FileMode.Open, FileAccess.ReadWrite);
-        var stardewModule = ReadModule(stardewDllStream);
+        ToastNotifyTool.Notify("Starting Game Rewriter...");
+
         try
         {
+            using var stardewDllStream = File.Open(stardewDllFilePath, FileMode.Open, FileAccess.ReadWrite);
+            var stardewModule = ReadModule(stardewDllStream);
             var mainActivityTypeDef = stardewModule.Types.First(t => t.Name == "MainActivity");
             var instance_FieldDef = mainActivityTypeDef.Fields.First(f => f.Name == "instance");
             //change FieldType MainActivity to SMAPIActivity;
@@ -46,5 +48,6 @@ internal static class MainActivityRewriter
         {
             Console.WriteLine(ex);
         }
+        ToastNotifyTool.Notify("Done Game Rewriter");
     }
 }
