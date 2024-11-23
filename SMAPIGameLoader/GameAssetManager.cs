@@ -98,6 +98,7 @@ static class GameAssetManager
         }
 
         Console.WriteLine("successfully verify & clone assets");
+        ToastNotifyTool.Notify("Done Setup Assets Content");
     }
 }
 

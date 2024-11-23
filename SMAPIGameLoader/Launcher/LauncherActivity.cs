@@ -60,6 +60,12 @@ public class LauncherActivity : Activity
 
     void OnClickStartGame()
     {
+        if (SMAPIInstaller.IsInstalled == false)
+        {
+            ToastNotifyTool.Notify("Please Install SMAPI!!!");
+            return;
+        }
+
         EntryGameActivity.LaunchGameActivity(this);
     }
 }

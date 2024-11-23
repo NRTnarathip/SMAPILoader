@@ -44,4 +44,7 @@ internal static class SMAPIInstaller
             Console.WriteLine(ex);
         }
     }
+    public const string StardewModdingAPIFileName = "StardewModdingAPI.dll";
+    public static bool IsInstalled =>
+         File.Exists(Path.Combine(GameAssemblyManager.AssembliesDirPath, StardewModdingAPIFileName));
 }
