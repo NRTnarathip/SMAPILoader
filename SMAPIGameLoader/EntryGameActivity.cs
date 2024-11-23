@@ -31,6 +31,15 @@ internal class EntryGameActivity : Activity
 #else
         Console.WriteLine("App is in Release mode");
 #endif
+
+        //check game it's can launch with version
+        if (StardewApkTool.IsGameVersionSupport)
+        {
+            ToastNotifyTool.Notify("Not support game version: " + StardewApkTool.GameVersion + ", please update game");
+            return;
+        }
+
+
         //clone game assets
         GameAssetManager.VerifyAssets();
         GameAssemblyManager.VerifyAssemblies();

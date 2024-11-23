@@ -18,4 +18,13 @@ internal static class FileTool
         path = path.Replace("//", "/");
         return path;
     }
+
+    internal static void MakeSureDirectory(string filePath)
+    {
+        Directory.CreateDirectory(filePath);
+    }
+    internal static void MakeSureFilePath(string filePath)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+    }
 }

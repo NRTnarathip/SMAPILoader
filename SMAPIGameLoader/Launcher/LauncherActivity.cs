@@ -6,12 +6,14 @@ using Android.Widget;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using Xamarin.Essentials;
+
 
 namespace SMAPIGameLoader.Launcher;
 
 [Activity(
-    Label = "Launcher",
+    Label = "SMAPI Launcher",
     MainLauncher = true,
     AlwaysRetainTaskState = true,
     LaunchMode = LaunchMode.SingleInstance,
@@ -22,61 +24,41 @@ public class LauncherActivity : Activity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        Platform.Init(this, savedInstanceState);
 
         SetContentView(Resource.Layout.layout1);
 
-        Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-
         // Create your application here
-        Button installSMAPIBtn = FindViewById<Button>(Resource.Id.InstallSMAPI);
+        var installSMAPIBtn = FindViewById<Button>(Resource.Id.InstallSMAPI);
         installSMAPIBtn.Click += (sender, e) =>
         {
-            OnClickInstallSMAPI();
+            SMAPIInstaller.OnClickInstall();
         };
         var startGameBtn = FindViewById<Button>(Resource.Id.StartGame);
         startGameBtn.Click += (sender, e) =>
         {
             OnClickStartGame();
         };
+        var installModZipBtn = FindViewById<Button>(Resource.Id.InstallMod);
+        installModZipBtn.Click += (sender, e) =>
+        {
+            ModInstaller.OnClickInstallMod();
+        };
+
+        //set app version
+        var appVersionTextView = FindViewById<TextView>(Resource.Id.appVersionTextView);
+        PackageInfo packageInfo = PackageManager.GetPackageInfo(this.PackageName, 0);
+        Version appVersion = new(packageInfo.VersionName);
+        appVersionTextView.Text = "App Version: " + appVersion;
+
+        //set support game version
+        var supportGameVersionTextView = FindViewById<TextView>(Resource.Id.supportGameVersionTextView);
+        supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport}";
     }
 
     void OnClickStartGame()
     {
         ToastNotifyTool.Notify("Try Start Game!");
         EntryGameActivity.LaunchGameActivity(this);
-    }
-
-    void InstallSMAPIInternal(FileResult pick)
-    {
-    }
-    async void OnClickInstallSMAPI()
-    {
-        try
-        {
-            ToastNotifyTool.Notify("Please Pick File SMAPI-4.x.x.zip");
-            var pick = await FilePicker.PickAsync();
-            if (pick.FileName.StartsWith("SMAPI") == false || pick.FileName.EndsWith(".zip") == false)
-            {
-                throw new Exception("Please select file SMAPI Android.zip!!");
-            }
-
-            var zip = ZipFile.OpenRead(pick.FullPath);
-            foreach (var entry in zip.Entries)
-            {
-                Console.WriteLine("entry : " + entry.FullName);
-                var destFilePath = entry.FullName.Replace("SMAPI Android/", "");
-                destFilePath = Path.Combine(GameAssemblyManager.AssembliesDirPath, destFilePath);
-                //make sure have dir
-                Directory.CreateDirectory(Path.GetDirectoryName(destFilePath));
-                entry.ExtractToFile(destFilePath, true);
-                Console.WriteLine("extract file: " + destFilePath);
-            }
-
-            ToastNotifyTool.Notify("Successfully Install SMAPI!");
-        }
-        catch (Exception ex)
-        {
-            ToastNotifyTool.Notify(ex.ToString());
-        }
     }
 }

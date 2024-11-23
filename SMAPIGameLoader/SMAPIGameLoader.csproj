@@ -33,64 +33,64 @@
 		<PackageReference Include="Xamarin.Essentials" Version="1.7.7" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\AssemblyStore\AssemblyStore.csproj" />
+		<ProjectReference Include="..\AssemblyStore\AssemblyStore.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="0Harmony">
-		  <HintPath>..\SharedLibs\0Harmony.dll</HintPath>
+			<HintPath>..\SharedLibs\0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoGame.Framework">
-		  <HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
-		  <Private>True</Private>
+			<HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
+			<Private>True</Private>
 		</Reference>
 		<Reference Include="MonoMod.Backports">
-		  <HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Core">
-		  <HintPath>..\SharedLibs\MonoMod.Core.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Iced">
-		  <HintPath>..\SharedLibs\MonoMod.Iced.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Iced.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.ILHelpers">
-		  <HintPath>..\SharedLibs\MonoMod.ILHelpers.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.ILHelpers.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.RuntimeDetour">
-		  <HintPath>..\SharedLibs\MonoMod.RuntimeDetour.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.RuntimeDetour.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Utils">
-		  <HintPath>..\SharedLibs\MonoMod.Utils.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Utils.dll</HintPath>
 		</Reference>
 		<Reference Include="StardewValley">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="StardewValley.GameData">
-		  <HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.GameData.dll</HintPath>
-		  <Private>False</Private>
+			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.GameData.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="libs\" />
+		<Folder Include="libs\" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Compile Update="Resource1.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Resource1.resx</DependentUpon>
-	  </Compile>
+		<Compile Update="Resource1.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resource1.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Update="Resource1.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Resource1.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="Resources\Drawable\icon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Update="Resources\Drawable\icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 	<Target Name="RestoreDotnetTools" BeforeTargets="Restore">
 		<Message Text="Restoring dotnet tools" Importance="High" />
