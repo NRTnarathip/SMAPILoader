@@ -28,6 +28,17 @@ public class LauncherActivity : Activity
 
         SetContentView(Resource.Layout.layout1);
 
+        try
+        {
+            var support = StardewApkTool.GameVersionSupport;
+            var current = StardewApkTool.CurrentGameVersion;
+            ToastNotifyTool.Notify("your game version;" + current);
+        }
+        catch (Exception ex)
+        {
+            ToastNotifyTool.Notify("err;" + ex);
+        }
+
         // Create your application here
         var installSMAPIBtn = FindViewById<Button>(Resource.Id.InstallSMAPI);
         installSMAPIBtn.Click += (sender, e) =>
