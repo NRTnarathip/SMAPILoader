@@ -29,8 +29,11 @@ internal static class StardewApkTool
         {
             try
             {
+                //check if found package
                 var version = PackageInfo.VersionName;
-                return true;
+                //check if we have 3 apks: [base, split_content & split_config]
+                bool haveApksValid = SplitApks?.Count == 2;
+                return haveApksValid;
             }
             catch (Exception e)
             {
@@ -44,12 +47,13 @@ internal static class StardewApkTool
         GetContext.StartActivity(intent);
     }
     public static Android.Content.Context GetContext => Application.Context;
-    public static string BaseApkPath => StardewApkTool.PackageInfo.ApplicationInfo.PublicSourceDir;
-    public static IList<string> SplitApks => StardewApkTool.PackageInfo.ApplicationInfo.SplitSourceDirs;
-    public static string ContentApkPath => SplitApks.First(path => path.Contains("split_content"));
-    public static string ConfigApkPath => SplitApks.First(path => path.Contains("split_config"));
+    public static string? BaseApkPath => PackageInfo?.ApplicationInfo?.PublicSourceDir;
+    public static IList<string>? SplitApks => PackageInfo?.ApplicationInfo?.SplitSourceDirs;
+
+    public static string? ContentApkPath => SplitApks.First(path => path.Contains("split_content"));
+    public static string? ConfigApkPath => SplitApks.First(path => path.Contains("split_config"));
 
     public readonly static Version GameVersionSupport = new Version("1.6.14.3");
-    public static Version CurrentGameVersion => new Version(PackageInfo.VersionName);
+    public static Version CurrentGameVersion => new Version(PackageInfo?.VersionName);
     public static bool IsGameVersionSupport => CurrentGameVersion >= GameVersionSupport;
 }

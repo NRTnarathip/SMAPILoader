@@ -21,6 +21,24 @@ namespace SMAPIGameLoader.Launcher;
 )]
 public class LauncherActivity : Activity
 {
+    bool AssetGameVerify()
+    {
+        try
+        {
+            if (StardewApkTool.IsInstalled == false)
+            {
+                ToastNotifyTool.Notify("Please Download Game From Play Store");
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastNotifyTool.Notify("err;" + ex);
+            return false;
+        }
+
+        return true;
+    }
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -28,15 +46,10 @@ public class LauncherActivity : Activity
 
         SetContentView(Resource.Layout.layout1);
 
-        try
+        if (AssetGameVerify() == false)
         {
-            var support = StardewApkTool.GameVersionSupport;
-            var current = StardewApkTool.CurrentGameVersion;
-            ToastNotifyTool.Notify("your game version;" + current);
-        }
-        catch (Exception ex)
-        {
-            ToastNotifyTool.Notify("err;" + ex);
+            Finish();
+            return;
         }
 
         // Create your application here
