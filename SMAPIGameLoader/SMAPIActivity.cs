@@ -40,11 +40,6 @@ public class SMAPIActivity : AndroidGameActivity
     {
         Instance = this;
         currentBundle = bundle;
-        if (!StardewApkTool.IsInstalled)
-        {
-            Finish();
-            return;
-        }
 
         LaunchGame();
     }

@@ -40,18 +40,24 @@ internal class EntryGameActivity : Activity
             return;
         }
 
+        try
+        {
+            //clone game assets
+            GameAssetManager.VerifyAssets();
+            GameAssemblyManager.VerifyAssemblies();
 
-        //clone game assets
-        GameAssetManager.VerifyAssets();
-        GameAssemblyManager.VerifyAssemblies();
+            //Load MonoGame.Framework.dll into reference
+            //StardewValley.dll wait load at SMAPIActivity
+            GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameFrameworkDllFileName);
 
-        //Load MonoGame.Framework.dll into reference
-        //StardewValley.dll wait load at SMAPIActivity
-        GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameFrameworkDllFileName);
-
-        var intent = new Intent(activity, typeof(SMAPIActivity));
-        activity.StartActivity(intent);
-        //close this activity
-        activity.Finish();
+            var intent = new Intent(activity, typeof(SMAPIActivity));
+            activity.StartActivity(intent);
+            //close this activity
+            activity.Finish();
+        }
+        catch (Exception ex)
+        {
+            ToastNotifyTool.Notify("Error:LaunchGameActivity: " + ex.ToString());
+        }
     }
 }
