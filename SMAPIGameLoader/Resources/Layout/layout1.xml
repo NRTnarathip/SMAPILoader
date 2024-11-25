@@ -13,24 +13,30 @@
     />
         <TextView
             android:id="@+id/supportGameVersionTextView"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:text="Support Game Version: x.x.x++"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/yourGameVersion"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:text="Your Game Version: x.x"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/appVersionTextView"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:text="App Version: x.x"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+         <TextView
+            android:id="@+id/appBuildDate"
+            android:textSize="18sp"
+            android:text="App Build Date: xx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
         <TextView
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:text="SMAPI Port By NRTnarathip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

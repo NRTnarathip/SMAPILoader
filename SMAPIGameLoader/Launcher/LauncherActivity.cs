@@ -69,17 +69,27 @@ public class LauncherActivity : Activity
             ModInstaller.OnClickInstallMod();
         };
 
-        //set app version
-        var appVersionTextView = FindViewById<TextView>(Resource.Id.appVersionTextView);
-        PackageInfo packageInfo = PackageManager.GetPackageInfo(this.PackageName, 0);
-        Version appVersion = new(packageInfo.VersionName);
-        appVersionTextView.Text = "App Version: " + appVersion;
+        try
+        {
 
-        //set support game version
-        var supportGameVersionTextView = FindViewById<TextView>(Resource.Id.supportGameVersionTextView);
-        supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport} Or Above";
-        var yourGameVersion = FindViewById<TextView>(Resource.Id.yourGameVersion);
-        yourGameVersion.Text = "Your Game Version: " + StardewApkTool.CurrentGameVersion;
+            //set app version
+            var appVersionTextView = FindViewById<TextView>(Resource.Id.appVersionTextView);
+            appVersionTextView.Text = "Launcher Version: " + AppInfo.VersionString;
+            DateTimeOffset buildDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(int.Parse(AppInfo.BuildString));
+            var localDateTimeOffset = buildDateTimeOffset.ToLocalTime();
+            var localDateTimeString = localDateTimeOffset.ToString("HH:mm:ss dd/MM/yyyy");
+            FindViewById<TextView>(Resource.Id.appBuildDate).Text = $"Build: {localDateTimeString} (Day/Month/Year)";
+
+            //set support game version
+            var supportGameVersionTextView = FindViewById<TextView>(Resource.Id.supportGameVersionTextView);
+            supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport} Or Above";
+            var yourGameVersion = FindViewById<TextView>(Resource.Id.yourGameVersion);
+            yourGameVersion.Text = "Your Game Version: " + StardewApkTool.CurrentGameVersion;
+        }
+        catch (Exception ex)
+        {
+            ToastNotifyTool.Notify("Error:Try setup app text info: " + ex);
+        }
     }
 
     void OnClickStartGame()

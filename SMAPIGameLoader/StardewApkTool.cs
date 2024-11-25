@@ -12,16 +12,7 @@ namespace SMAPIGameLoader;
 internal static class StardewApkTool
 {
     public const string PackageName = "com.chucklefish.stardewvalley";
-    public static PackageInfo PackageInfo
-    {
-        get
-        {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
-                return GetContext.PackageManager.GetPackageInfo(PackageName, PackageManager.PackageInfoFlags.Of(PackageInfoFlagsLong.None));
-            else
-                return GetContext.PackageManager.GetPackageInfo(PackageName, 0);
-        }
-    }
+    public static PackageInfo PackageInfo => ApkTool.GetPackageInfo(PackageName);
 
     public static bool IsInstalled
     {
