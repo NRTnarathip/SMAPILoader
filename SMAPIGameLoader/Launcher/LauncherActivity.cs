@@ -39,9 +39,11 @@ public class LauncherActivity : Activity
 
         return true;
     }
+    public static LauncherActivity Instance { get; private set; }
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        Instance = this;
         Platform.Init(this, savedInstanceState);
 
         SetContentView(Resource.Layout.layout1);
@@ -89,11 +91,13 @@ public class LauncherActivity : Activity
         catch (Exception ex)
         {
             ToastNotifyTool.Notify("Error:Try setup app text info: " + ex);
+            ErrorDialogTool.Show(ex, this);
         }
     }
 
     void OnClickStartGame()
     {
-        EntryGameActivity.LaunchGameActivity(this);
+        EntryGame.LaunchGameActivity(this);
+        Console.WriteLine("done continue UI runner");
     }
 }

@@ -6,24 +6,20 @@ using Android.OS;
 using Android.Widget;
 using HarmonyLib;
 using System;
-using System.IO;
 using System.Reflection;
 
 namespace SMAPIGameLoader;
-//[Activity(
-//    Label = "@string/app_name",
-//    Icon = "@drawable/icon",
-//    Theme = "@style/Theme.Splash",
-//    AlwaysRetainTaskState = true,
-//    LaunchMode = LaunchMode.SingleInstance,
-//    ScreenOrientation = ScreenOrientation.SensorLandscape,
-//    ConfigurationChanges = (ConfigChanges.Keyboard
-//        | ConfigChanges.KeyboardHidden | ConfigChanges.Orientation
-//        | ConfigChanges.ScreenLayout | ConfigChanges.ScreenSize
-//        | ConfigChanges.UiMode))]
-internal class EntryGameActivity : Activity
+internal static class EntryGame
 {
-    public static void LaunchGameActivity(Activity activity)
+    public static void LaunchGameActivity(Activity launcherActivity)
+    {
+        TaskTool.Run(() =>
+        {
+            LaunchGameActivityInternal(launcherActivity);
+        });
+    }
+
+    static void LaunchGameActivityInternal(Activity launcherActivity)
     {
 #if DEBUG
         ToastNotifyTool.Notify("Error can't start game on Debug Mode");
@@ -47,13 +43,17 @@ internal class EntryGameActivity : Activity
             GameAssemblyManager.VerifyAssemblies();
 
             //Load MonoGame.Framework.dll into reference
-            //StardewValley.dll wait load at SMAPIActivity
             GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameFrameworkDllFileName);
 
-            var intent = new Intent(activity, typeof(SMAPIActivity));
-            activity.StartActivity(intent);
-            //close this activity
-            activity.Finish();
+            //patch rewrite StardewValley.dll & Load
+            var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
+            StardewGameRewriter.Rewrite(stardewDllFilePath, out var isRewrite);
+            Assembly.LoadFrom(stardewDllFilePath);
+
+
+            var intent = new Intent(launcherActivity, typeof(SMAPIActivity));
+            launcherActivity.StartActivity(intent);
+            launcherActivity.Finish();
         }
         catch (Exception ex)
         {

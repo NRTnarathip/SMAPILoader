@@ -43,23 +43,9 @@ public class SMAPIActivity : AndroidGameActivity
 
         LaunchGame();
     }
-    void PrepareAssemblies()
-    {
-        //patch rewrite
-        var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
-        StardewGameRewriter.Rewrite(stardewDllFilePath, out var isRewrite);
-        //load dependencies with manual
-        Assembly.LoadFrom(stardewDllFilePath);
-    }
-    void PrepareAssets()
-    {
-    }
     void LaunchGame()
     {
-        //setup refernces assemblies
-        PrepareAssemblies();
-        PrepareAssets();
-
+        Console.WriteLine("Launch Game On MainThread?: " + Xamarin.Essentials.MainThread.IsMainThread);
         //ready to use all assemblies & references
         var harmony = new Harmony("SMAPIGameLoader");
         harmony.PatchAll();
@@ -70,6 +56,7 @@ public class SMAPIActivity : AndroidGameActivity
         IntegrateStardewMainActivity();
 
         //ready
+        Console.WriteLine("Stardew Activity Ready");
         Stardew_OnCreate();
     }
     void IntegrateStardewMainActivity()
@@ -79,41 +66,8 @@ public class SMAPIActivity : AndroidGameActivity
         Console.WriteLine("done setup MainActivity.instance with: " + instance_Field.GetValue(null));
         MainActivityPatcher.Apply();
     }
-    static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-    {
-        //Console.WriteLine("SMAPIActivity: try resolve assembly: " + args.Name);
-        //manual load at external files dir
-        var dllFileName = new AssemblyName(args.Name).Name + ".dll";
-        string[] searchDirs = [
-            GameAssemblyManager.AssembliesDirPath,
-        ];
 
-        foreach (var dir in searchDirs)
-        {
-            var fullPath = Path.Combine(dir, dllFileName);
-            if (File.Exists(fullPath) == false)
-            {
-                continue;
-            }
-            try
-            {
-                var asm = Assembly.LoadFrom(fullPath);
-                return asm;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-        //Console.WriteLine("Warn!! can't resolve asm: " + args.Name);
-        return null;
-    }
-    static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
-    {
-        Console.WriteLine("on asm loaded: " + args.LoadedAssembly.FullName);
-    }
-
-    //simulate override method
+    //override method
     void Stardew_OnCreate()
     {
         Log.It("MainActivity.OnCreate");
@@ -335,8 +289,8 @@ public class SMAPIActivity : AndroidGameActivity
         var err = StartGameWithSMAPI();
         if (err != null)
         {
-            ToastNotifyTool.Notify(err.ToString());
-            Finish();
+            ToastNotifyTool.Notify("error try run SMAPI: " + err.ToString());
+            ErrorDialogTool.Show(err, this);
         }
     }
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
