@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
-namespace SMAPIGameLoader.Launcher;
+namespace SMAPIGameLoader;
 
-internal static class FilePickerHelper
+internal static class FilePickerTool
 {
     public static FilePickerFileType FileTypeZip = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
     {
@@ -17,6 +17,8 @@ internal static class FilePickerHelper
     {
         if (title == null)
             title = "Please select zip file";
+
+        //TODO check permission
 
         var options = new PickOptions
         {

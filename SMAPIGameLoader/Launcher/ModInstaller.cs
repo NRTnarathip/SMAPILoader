@@ -18,7 +18,7 @@ internal static class ModInstaller
     {
         try
         {
-            var pickFile = await FilePickerHelper.PickZipFile();
+            var pickFile = await FilePickerTool.PickZipFile();
             if (pickFile == null)
                 return;
 

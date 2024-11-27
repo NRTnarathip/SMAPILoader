@@ -15,7 +15,7 @@ internal static class SMAPIInstaller
         try
         {
 
-            var pick = await FilePickerHelper.PickZipFile(title: "Please Pick File SMAPI-4.x.x.x.zip");
+            var pick = await FilePickerTool.PickZipFile(title: "Please Pick File SMAPI-4.x.x.x.zip");
             if (pick == null)
                 return;
 

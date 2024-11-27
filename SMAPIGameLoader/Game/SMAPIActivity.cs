@@ -38,9 +38,9 @@ public class SMAPIActivity : AndroidGameActivity
     Bundle currentBundle;
     protected override void OnCreate(Bundle bundle)
     {
+        ToastNotifyTool.Notify("SMAPI Activity OnCreate()");
         Instance = this;
         currentBundle = bundle;
-
         LaunchGame();
     }
     void LaunchGame()
@@ -292,6 +292,7 @@ public class SMAPIActivity : AndroidGameActivity
             ToastNotifyTool.Notify("error try run SMAPI: " + err.ToString());
             ErrorDialogTool.Show(err, this);
         }
+        ToastNotifyTool.Notify("Done CreatePartTwo()");
     }
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
     public Exception StartGameWithSMAPI()
