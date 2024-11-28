@@ -22,52 +22,67 @@ internal static class SMAPIInstaller
         {
             TaskTool.Run(ActivityTool.CurrentActivity, async () =>
             {
-                TaskTool.SetTitle("Install SMAPI Online");
-                var github = new GitHubClient(new ProductHeaderValue("SMPAI-Installer"));
-                var releases = await github.Repository.Release.GetAll(GithubOwner, GithubRepoName);
-                ReleaseAsset smapiAssetFile = null;
-                foreach (var release in releases)
+                try
                 {
-                    smapiAssetFile = release.Assets.FirstOrDefault(asset => asset.Name.StartsWith("SMAPI-"));
+                    TaskTool.SetTitle("Install SMAPI Online");
+                    var github = new GitHubClient(new ProductHeaderValue("SMPAI-Installer"));
+                    TaskTool.AddNewLine("try get all release..");
+                    var releases = await github.Repository.Release.GetAll(GithubOwner, GithubRepoName);
+                    TaskTool.AddNewLine("found release count: " + releases.Count);
+                    var latestRelease = releases.FirstOrDefault();
+                    if (latestRelease is null)
+                    {
+                        ErrorDialogTool.Show(new Exception("Failed install SMAPI, not found any release file"));
+                        return;
+                    }
+
+                    var smapiAssetFile = latestRelease.Assets.FirstOrDefault(
+                         asset => asset.Name.StartsWith("SMAPI-")
+                         && asset.Name.EndsWith(".zip"));
+
                     if (smapiAssetFile != null)
                     {
-                        break;
+                        TaskTool.AddNewLine("found SMAPI latest file: " + smapiAssetFile.Name);
+                        var smapiZipFilePath = Path.Combine(FileTool.ExternalFilesDir, smapiAssetFile.Name);
+                        TaskTool.AddNewLine("starting download & install");
+                        TaskTool.AddNewLine($"file size: {FileTool.ConvertBytesToMB(smapiAssetFile.Size):F2} MB");
+
+                        using (var netClient = new HttpClient())
+                        {
+                            Console.WriteLine($"Retrieving {smapiAssetFile.Name}");
+                            var fileData = await netClient.GetByteArrayAsync(smapiAssetFile.BrowserDownloadUrl);
+                            File.WriteAllBytes(smapiZipFilePath, fileData);
+                            Console.WriteLine("done save zip file at: " + smapiZipFilePath + ", file size: " + fileData.Length);
+                        }
+
+                        InstallSMAPIFromZipFile(smapiZipFilePath);
+
+                        //cleanup
+                        File.Delete(smapiZipFilePath);
+
+                        TaskTool.AddNewLine("Successfully install SMAPI: " + smapiAssetFile.Name);
+                        DialogTool.Show("Successfully Install SMAPI",
+                            $"done install zip: {smapiAssetFile.Name}." +
+                            $"\nyou can close this");
                     }
-                }
-
-                if (smapiAssetFile != null)
-                {
-                    TaskTool.AddNewLine("Found SMAPI latest file: " + smapiAssetFile.Name);
-                    var smapiZipFilePath = Path.Combine(FileTool.ExternalFilesDir, smapiAssetFile.Name);
-                    TaskTool.AddNewLine("Starting download & install");
-                    TaskTool.AddNewLine($"File size: {FileTool.ConvertBytesToMB(smapiAssetFile.Size):F2} MB");
-
-                    using (var netClient = new HttpClient())
+                    else
                     {
-                        Console.WriteLine($"Retrieving {smapiAssetFile.Name}");
-                        var fileData = await netClient.GetByteArrayAsync(smapiAssetFile.BrowserDownloadUrl);
-                        File.WriteAllBytes(smapiZipFilePath, fileData);
-                        Console.WriteLine("done save zip file at: " + smapiZipFilePath + ", file size: " + fileData.Length);
+                        TaskTool.AddNewLine("Not found any SMAPI");
                     }
 
-                    InstallSMAPIFromZipFile(smapiZipFilePath);
-
-                    //cleanup
-                    File.Delete(smapiZipFilePath);
-
-                    TaskTool.AddNewLine("Successfully install SMAPI: " + smapiAssetFile.Name);
+                    await Task.Delay(1000);
                 }
-                else
+                catch (Exception ex)
                 {
-                    TaskTool.AddNewLine("Not found any SMAPI");
+                    ErrorDialogTool.Show(ex);
+                    Console.WriteLine("error try to install SMAPI Zip: " + ex);
                 }
-
-                await Task.Delay(3000);
             });
         }
         catch (Exception ex)
         {
             ErrorDialogTool.Show(ex);
+            Console.WriteLine("error try to install SMAPI Zip: " + ex);
         }
     }
     public static async void OnClickInstallOld()
