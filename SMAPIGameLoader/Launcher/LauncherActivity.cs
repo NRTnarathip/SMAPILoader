@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Widget;
+using SMAPIGameLoader.Tool;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -45,7 +46,7 @@ public class LauncherActivity : Activity
         base.OnCreate(savedInstanceState);
         Instance = this;
         Platform.Init(this, savedInstanceState);
-
+        ActivityTool.Init(this);
         SetContentView(Resource.Layout.layout1);
 
         if (AssetGameVerify() == false)
@@ -91,7 +92,7 @@ public class LauncherActivity : Activity
         catch (Exception ex)
         {
             ToastNotifyTool.Notify("Error:Try setup app text info: " + ex);
-            ErrorDialogTool.Show(ex, this);
+            ErrorDialogTool.Show(ex);
         }
     }
 

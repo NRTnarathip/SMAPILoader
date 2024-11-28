@@ -18,6 +18,10 @@ internal static class FileTool
         path = path.Replace("//", "/");
         return path;
     }
+    public static float ConvertBytesToMB(long bytes)
+    {
+        return bytes / (1024f * 1024f);
+    }
 
     internal static void MakeSureDirectory(string filePath)
     {

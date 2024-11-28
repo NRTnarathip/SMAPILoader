@@ -23,9 +23,8 @@ internal static class StardewGameRewriter
     {
         return ModuleDefinition.ReadModule(stream, MonoCecilReaderConfig);
     }
-    public static void Rewrite(string stardewDllFilePath, out bool isRewrite)
+    public static void Rewrite(string stardewDllFilePath)
     {
-        isRewrite = false;
         ToastNotifyTool.Notify("Starting Game Rewriter...");
 
         try
@@ -40,14 +39,14 @@ internal static class StardewGameRewriter
                 instance_FieldDef.FieldType = stardewModule.ImportReference(typeof(SMAPIActivity));
                 Console.WriteLine("done change field type MainActivity to SMAPIActivity");
                 stardewModule.Write();
-                isRewrite = true;
                 Console.WriteLine("Successfully Rewrite StardewValley.dll");
             }
+            ToastNotifyTool.Notify("Done Game Rewriter");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
+            ErrorDialogTool.Show(ex);
         }
-        ToastNotifyTool.Notify("Done Game Rewriter");
     }
 }

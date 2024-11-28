@@ -64,7 +64,6 @@ static class GameAssetManager
         using (FileStream apkFileStream = new FileStream(baseContentApk, FileMode.Open, FileAccess.Read))
         using (ZipArchive apkArchive = new ZipArchive(apkFileStream, ZipArchiveMode.Read))
         {
-            //Console.WriteLine("Contents of APK:");
             var externalAssetsDir = Path.Combine(FileTool.ExternalFilesDir, StardewAssetFolderName);
             foreach (ZipArchiveEntry entry in apkArchive.Entries)
             {
@@ -80,20 +79,8 @@ static class GameAssetManager
                     Directory.CreateDirectory(destFolderFullPath);
                 }
                 using var entryStream = entry.Open();
-                //if (File.Exists(destFilePath))
-                //{
-                //check if same file don't clone just skip
-                //using var destFileStreamCheck = File.OpenRead(destFilePath);
-                //if (FileTool.IsSameFile(entryStream, destFileStreamCheck))
-                //{
-                //    Console.WriteLine("skip file: " + destFilePath);
-                //    continue;
-                //}
-                //}
-
                 using var destFileStream = new FileStream(destFilePath, FileMode.Create, FileAccess.ReadWrite);
                 entryStream.CopyTo(destFileStream);
-                //Console.WriteLine("done clone file to: " + destFilePath);
             }
         }
 

@@ -8,6 +8,7 @@ using Android.Views;
 using HarmonyLib;
 using Java.Util;
 using Microsoft.Xna.Framework;
+using SMAPIGameLoader.Tool;
 using StardewValley;
 using StardewValley.Mobile;
 using System;
@@ -38,9 +39,13 @@ public class SMAPIActivity : AndroidGameActivity
     Bundle currentBundle;
     protected override void OnCreate(Bundle bundle)
     {
-        ToastNotifyTool.Notify("SMAPI Activity OnCreate()");
+        //init sdk
         Instance = this;
         currentBundle = bundle;
+        ActivityTool.Init(this);
+
+        //ready
+        ToastNotifyTool.Notify("SMAPI Activity OnCreate()");
         LaunchGame();
     }
     void LaunchGame()
@@ -290,7 +295,7 @@ public class SMAPIActivity : AndroidGameActivity
         if (err != null)
         {
             ToastNotifyTool.Notify("error try run SMAPI: " + err.ToString());
-            ErrorDialogTool.Show(err, this);
+            ErrorDialogTool.Show(err);
         }
         ToastNotifyTool.Notify("Done CreatePartTwo()");
     }

@@ -26,10 +26,4 @@ internal class Log
     {
         Console.WriteLine($"LogImpl(level: {level}, msg: {message})");
     }
-    //[HarmonyPrefix]
-    //[HarmonyPatch(typeof(LocalizedContentManager), "GetFileInManifest")]
-    //static void GetFileInManifest(string assetName, ref bool exists)
-    //{
-    //    Console.WriteLine($"prefix GetFileInManifest(assetName: {assetName}, exits: {exists})");
-    //}
 }

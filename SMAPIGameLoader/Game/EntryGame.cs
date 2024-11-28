@@ -15,13 +15,8 @@ internal static class EntryGame
 {
     public static void LaunchGameActivity(Activity launcherActivity)
     {
-        TaskTool.Run(launcherActivity, () =>
+        TaskTool.Run(launcherActivity, async () =>
         {
-            ////debug
-            //ToastNotifyTool.Notify("Start sleep 8 sec");
-            //Thread.Sleep(8000);
-            //ToastNotifyTool.Notify("Done sleep.");
-
             LaunchGameActivityInternal(launcherActivity);
         });
     }
@@ -51,7 +46,7 @@ internal static class EntryGame
             //patch rewrite StardewValley.dll & Load
             TaskTool.AddNewLine("Try rewrite StardewValley.dll");
             var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
-            StardewGameRewriter.Rewrite(stardewDllFilePath, out var isRewrite);
+            StardewGameRewriter.Rewrite(stardewDllFilePath);
             TaskTool.AddNewLine("Done rewriter");
             Assembly.LoadFrom(stardewDllFilePath);
 

@@ -12,8 +12,7 @@ internal static class TaskTool
     public static Task LastTask { get; private set; }
     public static bool IsBusy => LastTask?.IsCompleted == false;
     public static Activity LastActivity { get; private set; }
-
-    public static void Run(Activity activity, Action func)
+    public static void Run(Activity activity, Func<Task> func)
     {
         if (IsBusy)
         {
@@ -23,15 +22,15 @@ internal static class TaskTool
 
         //ready
         LastActivity = activity;
-        LastTask = Task.Run(() =>
+        LastTask = Task.Run(async () =>
         {
             ShowBusyDialog();
-            func();
+            await func();
             CloseBusyDialog();
         });
     }
 
-    static void CloseBusyDialog()
+    public static void CloseBusyDialog()
     {
         if (MainThread.IsMainThread == false)
         {
@@ -50,7 +49,7 @@ internal static class TaskTool
     }
     static AlertDialog busyDialog;
     static string busyMessage;
-    static void RunMainThread(Action func)
+    public static void RunMainThread(Action func)
     {
         bool doneMainThread = false;
         if (MainThread.IsMainThread == false)
@@ -74,7 +73,6 @@ internal static class TaskTool
     }
     static void SetMessage(string msg)
     {
-        Console.WriteLine("try set msg: " + msg);
         if (MainThread.IsMainThread == false)
         {
             RunMainThread(() =>
@@ -88,7 +86,6 @@ internal static class TaskTool
         {
             busyMessage = msg;
             busyDialog.SetMessage(msg);
-            Console.WriteLine("done set msg: " + msg);
         }
     }
     public static void AddNewLine(string msg)
@@ -97,6 +94,22 @@ internal static class TaskTool
         {
             SetMessage(busyMessage + "\n" + msg);
         });
+    }
+    public static void SetTitle(string title)
+    {
+
+        if (MainThread.IsMainThread == false)
+        {
+            RunMainThread(() =>
+            {
+                SetTitle(title);
+            });
+            return;
+        }
+
+        if (busyDialog is null)
+            return;
+        busyDialog.SetTitle(title);
     }
     static void ShowBusyDialog()
     {
@@ -115,10 +128,22 @@ internal static class TaskTool
         var dialogBuilder = new AlertDialog.Builder(LastActivity);
         busyDialog = dialogBuilder.Create();
         busyDialog.SetTitle("Busy Task");
+
         SetMessage("please wait...");
         busyDialog.SetCancelable(false);
         busyDialog.Show();
         Console.WriteLine("done set busy dialog");
     }
 
+    internal static void ShowCloseButton(string buttonName = "OK", Action callback = null)
+    {
+        if (MainThread.IsMainThread == false)
+        {
+            RunMainThread(() =>
+            {
+                ShowCloseButton(buttonName, callback);
+            });
+            return;
+        }
+    }
 }
