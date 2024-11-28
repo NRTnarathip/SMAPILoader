@@ -5,6 +5,7 @@ using Android.Content.PM;
 using Android.OS;
 using Android.Widget;
 using HarmonyLib;
+using SMAPIGameLoader.Launcher;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -25,14 +26,21 @@ internal static class EntryGame
     {
         ToastNotifyTool.Notify("Starting Game..");
         //check game it's can launch with version
-        if (StardewApkTool.IsGameVersionSupport == false)
-        {
-            ToastNotifyTool.Notify("Not support game version: " + StardewApkTool.CurrentGameVersion + ", please update game");
-            return;
-        }
 
         try
         {
+            if (StardewApkTool.IsGameVersionSupport == false)
+            {
+                ToastNotifyTool.Notify("Not support game version: " + StardewApkTool.CurrentGameVersion + ", please update game");
+                return;
+            }
+
+            if (SMAPIInstaller.IsInstalled is false)
+            {
+                ToastNotifyTool.Notify("Please install SMAPI zip!!");
+                return;
+            }
+
             //clone game assets
             TaskTool.AddNewLine("Try clone game assets");
             GameAssetManager.VerifyAssets();
