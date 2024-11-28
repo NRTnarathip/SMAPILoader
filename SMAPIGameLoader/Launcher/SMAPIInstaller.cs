@@ -16,6 +16,27 @@ internal static class SMAPIInstaller
 {
     public const string GithubOwner = "NRTnarathip";
     public const string GithubRepoName = "SMAPI-Android-1.6";
+    public static Version GetCurrentVersion()
+    {
+        try
+        {
+            if (IsInstalled is false)
+            {
+                return null;
+            }
+
+            var assembly = Mono.Cecil.AssemblyDefinition.ReadAssembly(GetInstallFilePath);
+            var constantsType = assembly.MainModule.Types.Single(t => t.FullName == "StardewModdingAPI.EarlyConstants");
+            var RawApiVersionForAndroidField = constantsType.Fields.Single(p => p.Name == "RawApiVersionForAndroid");
+            string version = RawApiVersionForAndroidField.Constant as string;
+            return new Version(version);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static async void OnClickInstall()
     {
         try
@@ -125,6 +146,6 @@ internal static class SMAPIInstaller
         }
     }
     public const string StardewModdingAPIFileName = "StardewModdingAPI.dll";
-    public static bool IsInstalled =>
-         File.Exists(Path.Combine(GameAssemblyManager.AssembliesDirPath, StardewModdingAPIFileName));
+    public static string GetInstallFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, StardewModdingAPIFileName);
+    public static bool IsInstalled => File.Exists(GetInstallFilePath);
 }

@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Newtonsoft.Json.Linq;
+using SMAPIGameLoader.Tool;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,55 @@ namespace SMAPIGameLoader.Launcher;
 internal static class ModInstaller
 {
     public static string ModDir = Path.Combine(FileTool.ExternalFilesDir, "Mods");
+    public static Version GetMinGameVersion(JObject manifest)
+    {
+        try
+        {
+            return new Version(manifest["MinimumGameVersion"].ToString());
+        }
+        catch
+        {
+            return null;
+        }
+    }
+    public static Version GetMinSMAPIVersion(JObject manifest)
+    {
+        try
+        {
+            return new Version(manifest["MinimumApiVersion"].ToString());
+        }
+        catch
+        {
+            return null;
+        }
+    }
+    public static bool AssertModISupport(JObject manifest)
+    {
+        if (SMAPIInstaller.IsInstalled is false)
+        {
+            ToastNotifyTool.Notify("Can't check mod, please install SMAPI first!!");
+            return false;
+        }
+
+        //must be 1.6++
+        var minGameVersion = GetMinGameVersion(manifest);
+        if (minGameVersion != null && minGameVersion < new Version(1, 6, 0))
+        {
+            ToastNotifyTool.Notify("Not support for game version 1.6");
+            return false;
+        }
+
+        //check smapi must be 4.0.00++
+        var minSMAPIVersion = GetMinSMAPIVersion(manifest);
+        if (minSMAPIVersion != null & minSMAPIVersion < new Version(4, 0, 0))
+        {
+            ToastNotifyTool.Notify("Not support for game version 1.6");
+            return false;
+        }
+
+        bool isContentPack = manifest.ContainsKey("ContentPackFor");
+        return true;
+    }
     public static async void OnClickInstallMod()
     {
         try
@@ -32,24 +82,41 @@ internal static class ModInstaller
             }
 
             //try unpack into mods dir
-            ToastNotifyTool.Notify("Wait for install...");
             var manifestText = ReadManifest(manifestEntry);
-            var manifestJsonObject = JObject.Parse(manifestText);
-            string modName = manifestJsonObject["Name"]?.ToString();
-            if (modName == null)
-                throw new Exception("Error manifest key Name is null");
+            var manifestJson = JObject.Parse(manifestText);
+            string modName = manifestJson["Name"].ToString();
+            //check mod support
+            if (AssertModISupport(manifestJson) is false)
+            {
+                return;
+            }
+
 
             var extractDestDir = Path.Combine(ModDir, modName);
             FileTool.MakeSureDirectory(extractDestDir);
             zip.ExtractToDirectory(extractDestDir, true);
             zip.Dispose();
 
-            var modVersion = manifestJsonObject["Version"]?.ToString();
-            ToastNotifyTool.Notify("Installed mod" + $" Name:{modName}" + $" Version:{modVersion}");
+            var modVersion = manifestJson["Version"].ToString();
+            var author = manifestJson["Author"].ToString();
+            var modLogBuilder = new StringBuilder();
+            modLogBuilder.AppendLine($"Name: {modName}");
+            modLogBuilder.AppendLine($"Version: {modVersion}");
+            modLogBuilder.AppendLine($"Author: {author}");
+
+            var minGameVersion = GetMinGameVersion(manifestJson);
+            if(minGameVersion != null)
+                modLogBuilder.AppendLine($"Minimum Game Version: " + minGameVersion);
+
+            var minSMAPIVersion = GetMinSMAPIVersion(manifestJson);
+            if (minSMAPIVersion != null)
+                modLogBuilder.AppendLine($"Minimum SMAPI Version: " + minSMAPIVersion);
+
+            DialogTool.Show("Successfully Install Mod", modLogBuilder.ToString());
         }
         catch (Exception ex)
         {
-            ToastNotifyTool.Notify(ex.ToString());
+            ErrorDialogTool.Show(ex);
         }
     }
     public static string ReadManifest(ZipArchiveEntry entry)
