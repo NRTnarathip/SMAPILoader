@@ -39,34 +39,53 @@ public class SMAPIActivity : AndroidGameActivity
     Bundle currentBundle;
     protected override void OnCreate(Bundle bundle)
     {
+        base.OnCreate(currentBundle);
+
+        Console.WriteLine("SMAPIActivity.OnCreate()");
+
         //init sdk
         Instance = this;
         currentBundle = bundle;
+        Console.WriteLine("try init ActivityTool");
         ActivityTool.Init(this);
 
         //ready
+        Console.WriteLine("try toast notify OnCreate()");
         ToastNotifyTool.Notify("SMAPI Activity OnCreate()");
+
         LaunchGame();
     }
     void LaunchGame()
     {
-        Console.WriteLine("Launch Game On MainThread?: " + Xamarin.Essentials.MainThread.IsMainThread);
-        //ready to use all assemblies & references
-        var harmony = new Harmony("SMAPIGameLoader");
-        harmony.PatchAll();
-        Console.WriteLine("harmony.PatchAll()");
+        Console.WriteLine("try launch game");
+        try
+        {
+            //ready to use all assemblies & references
+            var harmony = new Harmony("SMAPIGameLoader");
+            harmony.PatchAll();
+            Console.WriteLine("harmony.PatchAll()");
 
+            //Prepare Assemblies && fix bug
+            GameAssemblyManager.LoadAssembly(GameAssemblyManager.StardewDllName);
 
-        //setup Activity
-        IntegrateStardewMainActivity();
+            //setup Activity
+            Console.WriteLine("try integrate main activity");
+            IntegrateStardewMainActivity();
 
-        //ready
-        Console.WriteLine("Stardew Activity Ready");
-        Stardew_OnCreate();
+            //ready
+            Console.WriteLine("Stardew Activity Ready");
+            Stardew_OnCreate();
+        }
+        catch (Exception ex)
+        {
+            ErrorDialogTool.Show(ex);
+        }
     }
     void IntegrateStardewMainActivity()
     {
+        Console.WriteLine("try get instance field");
         var instance_Field = typeof(MainActivity).GetField("instance", BindingFlags.Static | BindingFlags.Public);
+        Console.WriteLine("try set field");
         instance_Field.SetValue(null, this);
         Console.WriteLine("done setup MainActivity.instance with: " + instance_Field.GetValue(null));
         MainActivityPatcher.Apply();
@@ -83,7 +102,7 @@ public class SMAPIActivity : AndroidGameActivity
         }
         Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
         Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
-        base.OnCreate(currentBundle);
+        //base.OnCreate(currentBundle);
         CheckAppPermissions();
     }
 

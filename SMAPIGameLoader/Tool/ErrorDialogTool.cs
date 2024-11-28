@@ -16,6 +16,8 @@ internal static class ErrorDialogTool
         if (exception is null)
             return;
 
+        Console.WriteLine("try show error dialog: " + exception);
+
         if (MainThread.IsMainThread == false)
         {
             TaskTool.RunMainThread(() =>
