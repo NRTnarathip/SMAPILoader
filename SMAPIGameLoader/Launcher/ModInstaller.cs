@@ -92,8 +92,7 @@ internal static class ModInstaller
             }
 
 
-            var extractDestDir = Path.Combine(ModDir, modName);
-            FileTool.MakeSureDirectory(extractDestDir);
+            var extractDestDir = Path.Combine(ModDir);
             zip.ExtractToDirectory(extractDestDir, true);
             zip.Dispose();
 
@@ -105,7 +104,7 @@ internal static class ModInstaller
             modLogBuilder.AppendLine($"Author: {author}");
 
             var minGameVersion = GetMinGameVersion(manifestJson);
-            if(minGameVersion != null)
+            if (minGameVersion != null)
                 modLogBuilder.AppendLine($"Minimum Game Version: " + minGameVersion);
 
             var minSMAPIVersion = GetMinSMAPIVersion(manifestJson);
