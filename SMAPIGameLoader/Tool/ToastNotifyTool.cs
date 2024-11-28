@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Widget;
+using SMAPIGameLoader.Tool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,7 @@ internal static class ToastNotifyTool
         if (LastToast is not null)
             LastToast?.Cancel();
 
-        var ctx = Application.Context;
-        LastToast = Toast.MakeText(ctx, message, duration);
+        LastToast = Toast.MakeText(Application.Context, message, duration);
         LastToast.Show();
     }
 }

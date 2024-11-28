@@ -48,8 +48,10 @@ internal static class EntryGame
             var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
             StardewGameRewriter.Rewrite(stardewDllFilePath);
             TaskTool.AddNewLine("Done rewriter");
-            Assembly.LoadFrom(stardewDllFilePath);
 
+            //Don't load StardewValley assembly here
+            //you should load at SMAPIActivity
+            //Assembly.LoadFrom(stardewDllFilePath);
 #if DEBUG
             ToastNotifyTool.Notify("Error can't start game on Debug Mode");
             return;

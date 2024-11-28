@@ -40,18 +40,15 @@ public class SMAPIActivity : AndroidGameActivity
     protected override void OnCreate(Bundle bundle)
     {
         base.OnCreate(currentBundle);
-
         Console.WriteLine("SMAPIActivity.OnCreate()");
 
         //init sdk
         Instance = this;
         currentBundle = bundle;
-        Console.WriteLine("try init ActivityTool");
         ActivityTool.Init(this);
 
         //ready
-        Console.WriteLine("try toast notify OnCreate()");
-        ToastNotifyTool.Notify("SMAPI Activity OnCreate()");
+        ToastNotifyTool.Notify("On SMAPIActivity.OnCreate(bundle)");
 
         LaunchGame();
     }
@@ -104,6 +101,22 @@ public class SMAPIActivity : AndroidGameActivity
         Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
         //base.OnCreate(currentBundle);
         CheckAppPermissions();
+    }
+
+    //Start Instance Game
+    void OnCreatePartTwo()
+    {
+        Log.It("MainActivity.OnCreatePartTwo");
+        SetupDisplaySettings();
+        SetPaddingForMenus();
+
+        var err = StartGameWithSMAPI();
+        if (err != null)
+        {
+            ToastNotifyTool.Notify("error try run SMAPI: " + err.ToString());
+            ErrorDialogTool.Show(err);
+        }
+        ToastNotifyTool.Notify("Done OnCreatePartTwo()");
     }
 
     Game1 _game1 => Game1.game1;
@@ -303,21 +316,6 @@ public class SMAPIActivity : AndroidGameActivity
         }
     }
 
-    //Start Instance Game
-    private void OnCreatePartTwo()
-    {
-        Log.It("MainActivity.OnCreatePartTwo");
-        SetupDisplaySettings();
-        SetPaddingForMenus();
-
-        var err = StartGameWithSMAPI();
-        if (err != null)
-        {
-            ToastNotifyTool.Notify("error try run SMAPI: " + err.ToString());
-            ErrorDialogTool.Show(err);
-        }
-        ToastNotifyTool.Notify("Done CreatePartTwo()");
-    }
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
     public Exception StartGameWithSMAPI()
     {
