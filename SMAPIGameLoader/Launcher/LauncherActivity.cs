@@ -7,6 +7,7 @@ using SMAPIGameLoader.Tool;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Reflection;
 using Xamarin.Essentials;
 
@@ -41,6 +42,7 @@ public class LauncherActivity : Activity
         return true;
     }
     public static LauncherActivity Instance { get; private set; }
+    static bool IsDeviceSupport => IntPtr.Size == 8;
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
@@ -51,6 +53,14 @@ public class LauncherActivity : Activity
 
         if (AssetGameVerify() == false)
         {
+            Finish();
+            return;
+        }
+
+        //check if 32bit not support
+        if (IsDeviceSupport is false)
+        {
+            ToastNotifyTool.Notify("Device not supported, This app requires a 64-bit device");
             Finish();
             return;
         }

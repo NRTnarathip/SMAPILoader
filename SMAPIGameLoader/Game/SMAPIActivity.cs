@@ -99,7 +99,6 @@ public class SMAPIActivity : AndroidGameActivity
         }
         Window.SetFlags(WindowManagerFlags.Fullscreen, WindowManagerFlags.Fullscreen);
         Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
-        //base.OnCreate(currentBundle);
         CheckAppPermissions();
     }
 
