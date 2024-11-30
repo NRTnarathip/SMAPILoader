@@ -12,5 +12,8 @@
 - Mod Manager
 - Save Import & Export
 
+# How To Install Wiki
+https://github.com/NRTnarathip/SMAPILoader/wiki/How-To-Install-SMAPI
+
 # Discord Server SMAPI Thailand
 https://discord.com/invite/ETtycvcJjr
