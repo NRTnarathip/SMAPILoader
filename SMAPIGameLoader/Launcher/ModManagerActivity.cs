@@ -39,6 +39,11 @@ internal class ModManagerActivity : Activity
         {
             OnClickModItemView(e);
         };
+        var installModBtn = FindViewById<Button>(Resource.Id.InstallModBtn);
+        installModBtn.Click += (sender, e) =>
+        {
+            ModInstaller.OnClickInstallMod();
+        };
 
         //ready
         RefreshMods();
@@ -66,6 +71,8 @@ internal class ModManagerActivity : Activity
         }
 
         modAdapter.RefreshMods(mods);
+        var foundModsText = FindViewById<TextView>(Resource.Id.foundModsText);
+        foundModsText.Text = "Found Mods: " + mods.Count;
     }
 
     void OnClickModItemView(AdapterView.ItemClickEventArgs e)
@@ -95,5 +102,6 @@ internal class ModManagerActivity : Activity
             RefreshMods();
         }
     }
+
 }
 

@@ -66,13 +66,6 @@
                 android:layout_marginVertical="10dp"
                 />
 
-            <Button
-                android:id="@+id/InstallMod"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Install Mod Zip" 
-                android:layout_marginVertical="10dp"
-                />
 			<Button
 			   android:id="@+id/ModManagerBtn"
 			   android:layout_width="match_parent"

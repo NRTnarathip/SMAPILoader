@@ -82,11 +82,6 @@ public class LauncherActivity : Activity
         {
             OnClickStartGame();
         };
-        var installModZipBtn = FindViewById<Button>(Resource.Id.InstallMod);
-        installModZipBtn.Click += (sender, e) =>
-        {
-            ModInstaller.OnClickInstallMod();
-        };
         var modManagerBtn = FindViewById<Button>(Resource.Id.ModManagerBtn);
         modManagerBtn.Click += (sender, e) =>
         {

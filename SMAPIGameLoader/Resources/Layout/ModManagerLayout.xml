@@ -3,12 +3,44 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+    >
+        <TextView
+            android:gravity="center"
+            android:id="@+id/foundModsText"
+            android:textSize="20sp"
+            android:text="Found Mods: "
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    
+    </LinearLayout>
 
-	<ListView
-	   android:id="@+id/modsListViews"
-	   android:layout_width="match_parent"
-	   android:layout_height="match_parent"
-	   android:divider="@android:color/darker_gray"
-	   android:dividerHeight="2dp" />
-	
+    <ListView
+        android:id="@+id/modsListViews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="2dp" 
+        android:layout_weight="1"
+    />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="40dp"
+        >
+        <Button
+            android:id="@+id/InstallModBtn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Install Mod"
+            android:layout_marginBottom="30dp"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
 </LinearLayout>
