@@ -10,15 +10,27 @@ namespace SMAPIGameLoader.Tool;
 
 internal class DialogTool
 {
-    internal static void Show(string title, string msg)
+    internal static void Show(string title, string msg,
+        string buttonOKName = "OK",
+        string buttonCancelName = "Cancel",
+        Action onClickYes = null, Action onClickCancel = null)
     {
         TaskTool.RunMainThread(() =>
         {
             var builder = new AlertDialog.Builder(ActivityTool.CurrentActivity);
-            builder.SetPositiveButton("OK", (sender, e) =>
+            builder.SetPositiveButton(buttonOKName, (sender, e) =>
             {
-
+                onClickYes?.Invoke();
             });
+
+            if (onClickCancel != null)
+            {
+                builder.SetNegativeButton(buttonCancelName, (sender, e) =>
+                {
+                    onClickCancel();
+                });
+            }
+
             builder.SetMessage(msg);
             builder.SetTitle(title);
 

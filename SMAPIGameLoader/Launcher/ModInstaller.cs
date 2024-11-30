@@ -127,4 +127,20 @@ internal static class ModInstaller
         }
         return result;
     }
+
+    internal static bool TryDeleteMod(string folderPath)
+    {
+        try
+        {
+            if (Directory.Exists(folderPath) is false)
+                return false;
+
+            Directory.Delete(folderPath, true);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
 }

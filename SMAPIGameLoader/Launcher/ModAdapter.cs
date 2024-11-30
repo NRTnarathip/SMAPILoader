@@ -4,13 +4,6 @@ using System.Collections.Generic;
 
 namespace SMAPIGameLoader.Launcher;
 
-public class ModItemView
-{
-    public string Name { get; set; }
-    public string Version { get; set; }
-    public string FolderPath { get; set; }
-}
-
 public class ModAdapter : BaseAdapter<ModItemView>
 {
     private readonly Activity context;
@@ -33,8 +26,9 @@ public class ModAdapter : BaseAdapter<ModItemView>
         var item = items[position];
         var view = convertView ?? context.LayoutInflater.Inflate(Resource.Layout.ModItemViewLayout, null);
 
-        view.FindViewById<TextView>(Resource.Id.modName).Text = $"Mod Name: {item.Name}";
-        view.FindViewById<TextView>(Resource.Id.version).Text = $"Version: {item.Version}";
+        view.FindViewById<TextView>(Resource.Id.modName).Text = item.NameText;
+        view.FindViewById<TextView>(Resource.Id.version).Text = item.VersionText;
+        view.FindViewById<TextView>(Resource.Id.folderPath).Text = item.FolderPathText;
 
         return view;
     }

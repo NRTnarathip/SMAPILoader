@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.OS;
 using Android.Widget;
+using Newtonsoft.Json.Linq;
 using SMAPIGameLoader.Tool;
 using System;
 using System.Collections.Generic;
@@ -25,8 +26,6 @@ internal class ModManagerActivity : Activity
         ActivityTool.Init(this);//debug
 
         //ready
-        ToastNotifyTool.Notify("OnCreate ModManager");
-
         SetupPage();
     }
 
@@ -52,10 +51,18 @@ internal class ModManagerActivity : Activity
         var folders = Directory.GetDirectories(ModInstaller.ModDir);
         foreach (var folderPath in folders)
         {
-            var mod = new ModItemView();
-            mod.FolderPath = folderPath;
-            mod.Name = Path.GetDirectoryName(folderPath);
-            mod.Version = "unknow";
+
+            var directoryInfo = new DirectoryInfo(folderPath);
+            //find manfiest single
+            var files = Directory.GetFiles(folderPath);
+            var manifestFiles = files.Where(file => file.Contains("manifest.json")).ToArray();
+            if (manifestFiles.Length == 1)
+            {
+                var manifestText = File.ReadAllText(manifestFiles[0]);
+                var manifest = JObject.Parse(manifestText);
+                var mod = new ModItemView(manifest, folderPath);
+                mods.Add(mod);
+            }
         }
 
         modAdapter.RefreshMods(mods);
@@ -64,7 +71,29 @@ internal class ModManagerActivity : Activity
     void OnClickModItemView(AdapterView.ItemClickEventArgs e)
     {
         var mod = modAdapter.GetModOnClick(e);
-        ToastNotifyTool.Notify($"Clicked on {mod.Name} (Version: {mod.Version}");
+        var text = new StringBuilder();
+        text.AppendLine($"Mod: {mod.NameText}");
+        text.AppendLine($"{mod.VersionText}");
+        text.AppendLine();
+        text.AppendLine("Are you sure to delete this mod?");
+        DialogTool.Show(
+            "❌Delete: " + mod.NameText,
+            text.ToString(),
+            buttonOKName: "Yes Delete It!",
+            onClickYes: () =>
+            {
+                DeleteMod(mod);
+            }
+        );
+    }
+    void DeleteMod(ModItemView mod)
+    {
+        Console.WriteLine("try delete mod: " + mod.modName);
+        if (ModInstaller.TryDeleteMod(mod.modFolderPath))
+        {
+            ToastNotifyTool.Notify("Done delete mod: " + mod.modName);
+            RefreshMods();
+        }
     }
 }
 
