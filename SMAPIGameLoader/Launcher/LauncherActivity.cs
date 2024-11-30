@@ -66,7 +66,7 @@ public class LauncherActivity : Activity
         //check if 32bit not support
         if (IsDeviceSupport is false)
         {
-            ToastNotifyTool.Notify("Device not supported, This app requires a 64-bit device");
+            ToastNotifyTool.Notify("Not support on device 32bit");
             Finish();
             return;
         }
