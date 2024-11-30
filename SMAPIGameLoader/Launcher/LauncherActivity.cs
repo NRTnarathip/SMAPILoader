@@ -46,7 +46,7 @@ public class LauncherActivity : Activity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-        SetContentView(Resource.Layout.layout1);
+        SetContentView(Resource.Layout.LauncherLayout);
         Platform.Init(this, savedInstanceState);
 
         //setu my sdk

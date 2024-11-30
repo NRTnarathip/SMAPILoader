@@ -64,6 +64,7 @@
                 android:layout_height="match_parent"
                 android:text="Install SMAPI Zip" 
                 android:layout_marginVertical="10dp"
+				android:textAllCaps="false"
                 />
 
 			<Button
@@ -72,6 +73,7 @@
 			   android:layout_height="match_parent"
 			   android:text="Mod Manager"
 			   android:layout_marginVertical="10dp"
+				android:textAllCaps="false"
                 />
 
             <Button
@@ -79,6 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Start Game" 
+				android:textAllCaps="false"
                 android:layout_marginVertical="10dp"
                 />
         </LinearLayout>
