@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+	
+	<!-- Mod Name -->
+	<TextView
+        android:id="@+id/modName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mod Name: Example"
+        android:textSize="16sp"
+        android:paddingBottom="4dp"
+        android:fontFamily="sans-serif-medium" />
+
+	<!-- Version -->
+	<TextView
+        android:id="@+id/version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Version: 1.0.0"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif" />
+
+</LinearLayout>

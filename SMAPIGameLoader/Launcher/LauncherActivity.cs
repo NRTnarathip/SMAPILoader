@@ -46,10 +46,16 @@ public class LauncherActivity : Activity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-        Instance = this;
-        Platform.Init(this, savedInstanceState);
-        ActivityTool.Init(this);
         SetContentView(Resource.Layout.layout1);
+        Platform.Init(this, savedInstanceState);
+
+        //setu my sdk
+        Instance = this;
+        ActivityTool.Init(this);
+
+        //ready
+        ToastNotifyTool.Notify("on Create Launcher Activity");
+
 
         if (AssetGameVerify() == false)
         {
@@ -80,6 +86,11 @@ public class LauncherActivity : Activity
         installModZipBtn.Click += (sender, e) =>
         {
             ModInstaller.OnClickInstallMod();
+        };
+        var modManagerBtn = FindViewById<Button>(Resource.Id.ModManagerBtn);
+        modManagerBtn.Click += (sender, e) =>
+        {
+            ActivityTool.SwapActivity<ModManagerActivity>(this, false);
         };
 
         try
