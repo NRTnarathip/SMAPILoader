@@ -64,7 +64,7 @@ internal static class ModInstaller
         bool isContentPack = manifest.ContainsKey("ContentPackFor");
         return true;
     }
-    public static async void OnClickInstallMod()
+    public static async void OnClickInstallMod(Action OnInstalledCallback = null)
     {
         try
         {
@@ -112,6 +112,7 @@ internal static class ModInstaller
                 modLogBuilder.AppendLine($"Minimum SMAPI Version: " + minSMAPIVersion);
 
             DialogTool.Show("Successfully Install Mod", modLogBuilder.ToString());
+            OnInstalledCallback?.Invoke();
         }
         catch (Exception ex)
         {
@@ -127,7 +128,6 @@ internal static class ModInstaller
         }
         return result;
     }
-
     internal static bool TryDeleteMod(string folderPath)
     {
         try

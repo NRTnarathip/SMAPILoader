@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace SMAPIGameLoader.Launcher;
 [Activity(
@@ -20,6 +21,7 @@ internal class ModManagerActivity : Activity
     {
         //setup base
         base.OnCreate(savedInstanceState);
+        Platform.Init(this, savedInstanceState);
         SetContentView(Resource.Layout.ModManagerLayout);
 
         //setup my sdk
@@ -40,9 +42,12 @@ internal class ModManagerActivity : Activity
             OnClickModItemView(e);
         };
         var installModBtn = FindViewById<Button>(Resource.Id.InstallModBtn);
-        installModBtn.Click += (sender, e) =>
+        installModBtn.Click += async (sender, e) =>
         {
-            ModInstaller.OnClickInstallMod();
+            ModInstaller.OnClickInstallMod(OnInstalledCallback: () =>
+            {
+                RefreshMods();
+            });
         };
 
         //ready
