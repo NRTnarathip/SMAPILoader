@@ -1,0 +1,1451 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MonoMod.RuntimeDetour</name>
+    </assembly>
+    <members>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+                Reserved to be used by the compiler for tracking metadata.
+                This class should not be used by developers in source code.
+            </summary>
+            <remarks>
+                This definition is provided by the <i>IsExternalInit</i> NuGet package (https://www.nuget.org/packages/IsExternalInit).
+                Please see https://github.com/manuelroemer/IsExternalInit for more information.
+            </remarks>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourConfig">
+            <summary>
+            A configuration for detours, which allows for the ordering of detours relative to each other.
+            </summary>
+            <remarks>
+            See the detailed documentation on detour order calculation for specifics on how this affects relative ordering.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourConfig.Id">
+            <summary>
+            Gets the ID of the detours represented by this config. Typically, this will be the name of the mod which creates this detour.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourConfig.Priority">
+            <summary>
+            Gets the priority of the detours represented by this config, if present.
+            </summary>
+            <remarks>
+            The priority only affects the relative ordering of detours which are not otherwise ordered by e.g. <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> or <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.
+            Detours with no priority are ordered <i>after</i> all detours which have a priority.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourConfig.Before">
+            <summary>
+            Gets the detour IDs to run before this detour.
+            </summary>
+            <remarks>
+            This takes takes priority over <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/>.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourConfig.After">
+            <summary>
+            Gets the detour IDs to run after this detour.
+            </summary>
+            <remarks>
+            This takes takes priority over <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/>.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourConfig.SubPriority">
+            <summary>
+            Gets the sub-priority of the detours represented by this config, which controls the order of hooks with the same priority.
+            </summary>
+            <remarks>
+            This is only intended to be used for advanced applications - you should use <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/> for almost all regular use cases.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.#ctor(System.String,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> with a specific ID, and any of the ordering options.
+            </summary>
+            <param name="id">The ID of the detour config.</param>
+            <param name="priority">The priority of the detour config. Refer to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/> for details.</param>
+            <param name="before">An enumerable containing the list of IDs of detours to run before detours with this config.</param>
+            <param name="after">An enumerable containing the list of IDs of detours to run after detours with this config.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.#ctor(System.String,System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Int32)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> with a specific ID, and any of the ordering options (including advanced options).
+            </summary>
+            <param name="id">The ID of the detour config.</param>
+            <param name="priority">The priority of the detour config. Refer to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/> for details.</param>
+            <param name="before">An enumerable containing the list of IDs of detours to run before detours with this config.</param>
+            <param name="after">An enumerable containing the list of IDs of detours to run after detours with this config.</param>
+            <param name="subPriority">The sub-priority of the detour config. Refer to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.SubPriority"/> for details.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.WithPriority(System.Nullable{System.Int32})">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/> equal to <paramref name="priority"/>.
+            </summary>
+            <param name="priority">The priority of the new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Priority"/> equal to <paramref name="priority"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.WithBefore(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> equal to <paramref name="before"/>.
+            </summary>
+            <param name="before">The <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> list for the new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> equal to <paramref name="before"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.WithBefore(System.String[])">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> equal to <paramref name="before"/>.
+            </summary>
+            <param name="before">The <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> list for the new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/> equal to <paramref name="before"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.WithAfter(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/> equal to <paramref name="after"/>.
+            </summary>
+            <param name="after">The <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/> list for the new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/> equal to <paramref name="after"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.WithAfter(System.String[])">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/> equal to <paramref name="after"/>.
+            </summary>
+            <param name="after">The <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/> list for the new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> identical to this one, but with <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/> equal to <paramref name="after"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.AddBefore(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <paramref name="before"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/>.
+            </summary>
+            <param name="before">The list of IDs to add to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> with <paramref name="before"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.AddBefore(System.String[])">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <paramref name="before"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/>.
+            </summary>
+            <param name="before">The list of IDs to add to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> with <paramref name="before"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.Before"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.AddAfter(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <paramref name="after"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.
+            </summary>
+            <param name="after">The list of IDs to add to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> with <paramref name="after"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfig.AddAfter(System.String[])">
+            <summary>
+            Creates a new <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> which is identical to this one, but with <paramref name="after"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.
+            </summary>
+            <param name="after">The list of IDs to add to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.</param>
+            <returns>A <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> with <paramref name="after"/> added to <see cref="P:MonoMod.RuntimeDetour.DetourConfig.After"/>.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourContext">
+            <summary>
+            A persistent context which may be used to configure all detours created while active.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.SetGlobalContext(MonoMod.RuntimeDetour.DetourContext)">
+            <summary>
+            Sets the global <see cref="T:MonoMod.RuntimeDetour.DetourContext"/>, returning the old global context, if any.
+            </summary>
+            <param name="context">The <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> to make global.</param>
+            <returns>The <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> which was previously global, if any.</returns>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourContext.Current">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> which is most local at the point which this is accessed.
+            </summary>
+            <remarks>
+            <para>This will return the <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> which is on top of the context stack for the current thread,
+            and if there are no contexts for the current thread, it will return the current global context, if any.</para>
+            <para>This property has very limited use. Consider using <see cref="P:MonoMod.RuntimeDetour.DetourContext.CurrentConfig"/>, <see cref="M:MonoMod.RuntimeDetour.DetourContext.GetDefaultConfig"/>, 
+            <see cref="P:MonoMod.RuntimeDetour.DetourContext.CurrentFactory"/>, or <see cref="M:MonoMod.RuntimeDetour.DetourContext.GetDefaultFactory"/> instead of this property.</para>
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.Use">
+            <summary>
+            Pushes this detour context to the top of this thread's context stack, and returns a <see cref="T:MonoMod.Utils.DataScope"/>
+            which can be used in a <see langword="using"/> block to automatically pop it from the context stack.
+            </summary>
+            <returns>A <see cref="T:MonoMod.Utils.DataScope"/> which manages the lifetime of this context on the context stack.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.GetDefaultConfig">
+            <summary>
+            Gets the default <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> at this location, if any.
+            </summary>
+            <remarks>
+            This method behaves similarly to <see cref="P:MonoMod.RuntimeDetour.DetourContext.CurrentConfig"/>, but may fall back to some default value
+            when no context provides a config.
+            </remarks>
+            <returns>The default <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>, if any.</returns>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.GetDefaultFactory">
+            <summary>
+            Gets the default <see cref="T:MonoMod.Core.IDetourFactory"/> at this location.
+            </summary>
+            <remarks>
+            This method behaves similarly to <see cref="P:MonoMod.RuntimeDetour.DetourContext.CurrentFactory"/>, except that it returns <see cref="P:MonoMod.Core.DetourFactory.Current"/>
+            when no context provides a factory.
+            </remarks>
+            <returns>The default <see cref="T:MonoMod.Core.IDetourFactory"/>.</returns>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourContext.Config">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> provided by this <see cref="T:MonoMod.RuntimeDetour.DetourContext"/>, if any.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.TryGetConfig(MonoMod.RuntimeDetour.DetourConfig@)">
+            <summary>
+            Tries to get the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> provided by this context.
+            </summary>
+            <remarks>
+            A context may return <see langword="true"/>, but return a <see langword="null"/> config. This is valid. This will cause config lookup to
+            stop at this context, and return <see langword="null"/>, even if a later context would return one.
+            </remarks>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> provided by this context.</param>
+            <returns><see langword="true"/> if this context was able to provide a <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourContext.CurrentConfig">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> active at the current location, if any.
+            </summary>
+            <remarks>
+            This property is equivalent to the result of <see cref="M:MonoMod.RuntimeDetour.DetourContext.TryGetCurrentConfig(MonoMod.RuntimeDetour.DetourConfig@)"/>, except
+            that it returns <see langword="null"/> when no context provides a config.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.TryGetCurrentConfig(MonoMod.RuntimeDetour.DetourConfig@)">
+            <summary>
+            Tries to get the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> active at the current location.
+            </summary>
+            <remarks>
+            This method walks up the context stack, calling <see cref="M:MonoMod.RuntimeDetour.DetourContext.TryGetConfig(MonoMod.RuntimeDetour.DetourConfig@)"/> on each context it encounters.
+            It then returns the result that the first context which returned <see langword="true"/> returned. If none did, it checks
+            the global context.
+            </remarks>
+            <param name="config">The active <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.</param>
+            <returns><see langword="true"/> if a <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> was found; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourContext.Factory">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.IDetourFactory"/> provided by this <see cref="T:MonoMod.RuntimeDetour.DetourContext"/>, if any.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.TryGetFactory(MonoMod.Core.IDetourFactory@)">
+            <summary>
+            Tries to get the <see cref="T:MonoMod.Core.IDetourFactory"/> provided by this context.
+            </summary>
+            <param name="detourFactory">The provided factory, if any.</param>
+            <returns><see langword="true"/> if this context was able to provide a <see cref="T:MonoMod.Core.IDetourFactory"/>; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourContext.CurrentFactory">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.IDetourFactory"/> active at the current location, if any.
+            </summary>
+            <remarks>
+            This property is equivalent to the result of <see cref="M:MonoMod.RuntimeDetour.DetourContext.TryGetCurrentFactory(MonoMod.Core.IDetourFactory@)"/>, except
+            that it returns <see langword="null"/> when no context provides a factory.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourContext.TryGetCurrentFactory(MonoMod.Core.IDetourFactory@)">
+            <summary>
+            Tries to get the <see cref="T:MonoMod.Core.IDetourFactory"/> active at the current location.
+            </summary>
+            <remarks>
+            This method walks up the context stack, calling <see cref="M:MonoMod.RuntimeDetour.DetourContext.TryGetFactory(MonoMod.Core.IDetourFactory@)"/> on each context it encounters.
+            It then returns the result that the first context which returned <see langword="true"/> returned. If none did, it checks
+            the global context.
+            </remarks>
+            <param name="detourFactory">The active <see cref="T:MonoMod.Core.IDetourFactory"/>.</param>
+            <returns><see langword="true"/> if an <see cref="T:MonoMod.Core.IDetourFactory"/> was found; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.EmptyDetourContext">
+            <summary>
+            A <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> base class which does not resolve any values for the context.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.EmptyDetourContext.TryGetConfig(MonoMod.RuntimeDetour.DetourConfig@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.EmptyDetourContext.TryGetFactory(MonoMod.Core.IDetourFactory@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourConfigContext">
+            <summary>
+            A <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> which unconditionally resolves a <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfigContext.#ctor(MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.DetourConfigContext"/> which resolves the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="cfg">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to resolve. If this is <see langword="null"/>, the resolved config is <see langword="null"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourConfigContext.TryGetConfig(MonoMod.RuntimeDetour.DetourConfig@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourFactoryContext">
+            <summary>
+            A <see cref="T:MonoMod.RuntimeDetour.DetourContext"/> which unconditionally resolves a <see cref="T:MonoMod.Core.IDetourFactory"/>.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourFactoryContext.#ctor(MonoMod.Core.IDetourFactory)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.DetourFactoryContext"/> which resolves the provided <see cref="T:MonoMod.Core.IDetourFactory"/>.
+            </summary>
+            <param name="fac">The <see cref="T:MonoMod.Core.IDetourFactory"/> to resolve.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourFactoryContext.TryGetFactory(MonoMod.Core.IDetourFactory@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourManager">
+            <summary>
+            The entry point for introspection of active detours, and the type which manages their application.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourManager.GetDetourInfo(System.Reflection.MethodBase)">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.MethodDetourInfo"/> for the provided method.
+            </summary>
+            <param name="method">The <see cref="T:System.Reflection.MethodBase"/> to get a <see cref="T:MonoMod.RuntimeDetour.MethodDetourInfo"/> for.</param>
+            <returns>The <see cref="T:MonoMod.RuntimeDetour.MethodDetourInfo"/> for <paramref name="method"/>.</returns>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.DetourManager.DetourApplied">
+            <summary>
+            An event which is invoked whenever a detour is applied.
+            </summary>
+            <remarks>
+            <see cref="T:MonoMod.RuntimeDetour.Hook"/> is the only kind of detour, at present.
+            </remarks>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.DetourManager.DetourUndone">
+            <summary>
+            An event which is invoked whenever a detour is undone.
+            </summary>
+            <remarks>
+            <see cref="T:MonoMod.RuntimeDetour.Hook"/> is the only kind of detour, at present.
+            </remarks>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.DetourManager.ILHookApplied">
+            <summary>
+            An event which is invoked whenever an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> is applied.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.DetourManager.ILHookUndone">
+            <summary>
+            An event which is invoked whenever an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> is undone.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourManager.GetNativeDetourInfo(System.IntPtr)">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.FunctionDetourInfo"/> for a native function pointed to by <paramref name="function"/>.
+            </summary>
+            <param name="function">A pointer to the native function to get the <see cref="T:MonoMod.RuntimeDetour.FunctionDetourInfo"/> of.</param>
+            <returns>The <see cref="T:MonoMod.RuntimeDetour.FunctionDetourInfo"/> for <paramref name="function"/>.</returns>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.DetourManager.NativeDetourApplied">
+            <summary>
+            An event which is invoked whenever a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> is applied.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.DetourManager.NativeDetourUndone">
+            <summary>
+            An event which is invoked whenever a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> is undone.
+            </summary>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.Hook">
+            <summary>
+            A single method hook from a source to a target, optionally allowing the target to call the original method.
+            </summary>
+            <remarks>
+            <see cref="T:MonoMod.RuntimeDetour.Hook"/>s, like other kinds of detours, are automatically undone when the garbage collector collects the object,
+            or the object is disposed. Use <see cref="P:MonoMod.RuntimeDetour.Hook.DetourInfo"/> to get an object which represents the hook without
+            extending its lifetime.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> and methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> and methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> and methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> and methods specified by expression trees. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,MonoMod.Core.IDetourFactory,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>
+            and <see cref="T:MonoMod.Core.IDetourFactory"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use when manipulating this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},System.Object)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees, and specified target object. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Object)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees, and specified target object. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,System.Object)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, calling <paramref name="target"/> on <paramref name="targetObj"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},System.Object,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees, and specified target object. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Object,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the methods specified by expression trees, and specified target object. Each expression tree must consist only of
+            a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,System.Object,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, calling <paramref name="target"/> on <paramref name="targetObj"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},System.Object,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>, methods specified by expression trees, and specified target object.
+            Each expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Object,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>, methods specified by expression trees, and specified target object.
+            Each expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,System.Object,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, calling <paramref name="target"/> on <paramref name="targetObj"/>,
+            using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>..
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Linq.Expressions.Expression{System.Action},System.Object,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>, methods specified by expression trees, and specified target object.
+            Each expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Object,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>, methods specified by expression trees, and specified target object.
+            Each expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,System.Object,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring <paramref name="source"/> to <paramref name="target"/>, calling <paramref name="target"/> on <paramref name="targetObj"/>,
+            using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObj">The <see langword="this"/> object to call the target method on.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Delegate)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Delegate)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the provided method to the provided delegate.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Delegate,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Delegate,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Delegate,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the provided method to the provided delegate.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Delegate,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Delegate,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Delegate,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the provided method to the provided delegate, using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression{System.Action},System.Delegate,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Linq.Expressions.Expression,System.Delegate,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the method specified by the provided expression tree to the provided delegate.
+            The expression tree must consist only of a single methodcall, which will be the method used for that parameter.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Delegate,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the provided method to the provided delegate, using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Delegate,MonoMod.Core.IDetourFactory,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> detouring the provided method to the provided delegate, using the provided <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>
+            and <see cref="T:MonoMod.Core.IDetourFactory"/>.
+            </summary>
+            <param name="source">The method to detour.</param>
+            <param name="target">The target delegate.</param>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use when manipulating this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.Hook.Config">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> associated with this <see cref="T:MonoMod.RuntimeDetour.Hook"/>, if any.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.Hook.Source">
+            <summary>
+            Gets the method which is being hooked.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.Hook.Target">
+            <summary>
+            Gets the method which is the target of the hook.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.#ctor(System.Reflection.MethodBase,System.Reflection.MethodInfo,System.Object,MonoMod.Core.IDetourFactory,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.Hook"/> using the specified source and target methods, specified target object, specified <see cref="T:MonoMod.Core.IDetourFactory"/> and <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>,
+            specifying whether or not the hook should be applied when the constructor exits.
+            </summary>
+            <param name="source">The source method.</param>
+            <param name="target">The target method.</param>
+            <param name="targetObject">The <see langword="this"/> object to call the target method on.</param>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use when manipulating this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.Hook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.Apply">
+            <summary>
+            Applies this hook if it was not already applied.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.Undo">
+            <summary>
+            Undoes this hook if it was applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.Hook.IsValid">
+            <summary>
+            Gets whether or not this hook is valid and can be manipulated.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.Hook.IsApplied">
+            <summary>
+            Gets whether or not this hook is currently applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.Hook.DetourInfo">
+            <summary>
+            Gets the <see cref="P:MonoMod.RuntimeDetour.Hook.DetourInfo"/> associated with this hook.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.Finalize">
+            <summary>
+            Cleans up and undoes the hook, if needed.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.Hook.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.HookGen.HookEndpointManager">
+            <summary>
+            Provided for back-compat with old versions of HookGen
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Add``1(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Adds a hook (implemented by <paramref name="hookDelegate"/>) to <paramref name="method"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="method">The method to hook.</param>
+            <param name="hookDelegate">The hook delegate to use.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Add(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Adds a hook (implemented by <paramref name="hookDelegate"/>) to <paramref name="method"/>.
+            </summary>
+            <param name="method">The method to hook.</param>
+            <param name="hookDelegate">The hook delegate to use.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Remove``1(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Removes the hook implemented by <paramref name="hookDelegate"/> from <paramref name="method"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="method">The method to hook.</param>
+            <param name="hookDelegate">The hook delegate which was used.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Remove(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Removes the hook implemented by <paramref name="hookDelegate"/> from <paramref name="method"/>.
+            </summary>
+            <param name="method">The method to hook.</param>
+            <param name="hookDelegate">The hook delegate which was used.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify``1(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Adds an IL hook (implemented by <paramref name="callback"/>) to <paramref name="method"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="method">The method to hook.</param>
+            <param name="callback">The hook delegate to use.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Modify(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Adds an IL hook (implemented by <paramref name="callback"/>) to <paramref name="method"/>.
+            </summary>
+            <param name="method">The method to hook.</param>
+            <param name="callback">The hook delegate to use.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Unmodify``1(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Removes the IL hook implemented by <paramref name="callback"/> from <paramref name="method"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="method">The method to hook.</param>
+            <param name="callback">The hook delegate which was used.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Unmodify(System.Reflection.MethodBase,System.Delegate)">
+            <summary>
+            Removes the IL hook implemented by <paramref name="callback"/> from <paramref name="method"/>.
+            </summary>
+            <param name="method">The method to hook.</param>
+            <param name="callback">The hook delegate which was used.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.HookGen.HookEndpointManager.Clear">
+            <summary>
+            Clears all hooks an IL hooks applied to methods via this type.
+            </summary>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.ILHook">
+            <summary>
+            A detour type which allows the manipulation of the IL of a method, instead of merely changing its target.
+            </summary>
+            <remarks>
+            <see cref="T:MonoMod.RuntimeDetour.ILHook"/>s, like other kinds of detours, are automatically undone when the garbage collector collects the object,
+            or the object is disposed. Use <see cref="P:MonoMod.RuntimeDetour.ILHook.HookInfo"/> to get an object which represents the hook without
+            extending its lifetime.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression{System.Action},MonoMod.Cil.ILContext.Manipulator)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression,MonoMod.Cil.ILContext.Manipulator)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Reflection.MethodBase,MonoMod.Cil.ILContext.Manipulator)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the provided method using the provided manipulator.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression{System.Action},MonoMod.Cil.ILContext.Manipulator,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression,MonoMod.Cil.ILContext.Manipulator,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Reflection.MethodBase,MonoMod.Cil.ILContext.Manipulator,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the provided method using the provided manipulator.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression{System.Action},MonoMod.Cil.ILContext.Manipulator,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator,
+            using the specified <see cref="T:MonoMod.RuntimeDetour.DetourContext"/>.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression,MonoMod.Cil.ILContext.Manipulator,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator and <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Reflection.MethodBase,MonoMod.Cil.ILContext.Manipulator,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the provided method using the provided manipulator and <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression{System.Action},MonoMod.Cil.ILContext.Manipulator,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator,
+            using the specified <see cref="T:MonoMod.RuntimeDetour.DetourContext"/>.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Linq.Expressions.Expression,MonoMod.Cil.ILContext.Manipulator,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the method specified by the provided expression tree using the provided manipulator,
+            using the specified <see cref="T:MonoMod.RuntimeDetour.DetourContext"/>.
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Reflection.MethodBase,MonoMod.Cil.ILContext.Manipulator,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the provided method using the provided manipulator and <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>
+            </summary>
+            <param name="source">The method to modify the IL of.</param>
+            <param name="manip">The manipulator to use to modify the method's IL.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHook.Method">
+            <summary>
+            Gets the method which this <see cref="T:MonoMod.RuntimeDetour.ILHook"/> modifies.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHook.Manipulator">
+            <summary>
+            Gets the <see cref="T:MonoMod.Cil.ILContext.Manipulator"/> used by this <see cref="T:MonoMod.RuntimeDetour.ILHook"/> to modify <see cref="P:MonoMod.RuntimeDetour.ILHook.Method"/>'s IL.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHook.Config">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> used by this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>, if any.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.#ctor(System.Reflection.MethodBase,MonoMod.Cil.ILContext.Manipulator,MonoMod.Core.IDetourFactory,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> for the provided method using the provided manipulator and <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/>
+            </summary>
+            <param name="method">The method to modify the IL of.</param>
+            <param name="manipulator">The manipulator to use to modify the method's IL.</param>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use when manipulating this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHook.IsValid">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.RuntimeDetour.ILHook"/> is valid and can be used.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHook.IsApplied">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.RuntimeDetour.ILHook"/> is applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHook.HookInfo">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.ILHookInfo"/> for this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.Apply">
+            <summary>
+            Applies this <see cref="T:MonoMod.RuntimeDetour.ILHook"/> if it was not already applied.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.Undo">
+            <summary>
+            Undoes this <see cref="T:MonoMod.RuntimeDetour.ILHook"/> if it was applied.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.Finalize">
+            <summary>
+            Cleans up and undoes the hook, if needed.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHook.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourBase">
+            <summary>
+            The base class for detours associated with a <see cref="T:MonoMod.RuntimeDetour.MethodDetourInfo"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourBase.Method">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.MethodDetourInfo"/> this detour is associated with.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourBase.IsApplied">
+            <summary>
+            Gets whether or not this detour is applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourBase.Config">
+            <summary>
+            Gets the config associated with this detour, if any.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourBase.Apply">
+            <summary>
+            Applies this detour.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourBase.Undo">
+            <summary>
+            Undoes this detour.
+            </summary>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourCollection">
+            <summary>
+            A collection of <see cref="T:MonoMod.RuntimeDetour.DetourInfo"/> objects associated with a method.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourCollection.GetEnumerator">
+            <summary>
+            Gets an enumerator for this collection.
+            </summary>
+            <returns>An enumerator which enumterates the <see cref="T:MonoMod.RuntimeDetour.DetourInfo"/> associated with this collection.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourCollection.Enumerator">
+            <summary>
+            An enumerator for a <see cref="T:MonoMod.RuntimeDetour.DetourCollection"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourCollection.Enumerator.Current">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourCollection.Enumerator.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourCollection.Enumerator.Reset">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.DetourCollection.Enumerator.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.DetourInfo">
+            <summary>
+            An object which represents a detour, without extending its lifetime.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourInfo.Entry">
+            <summary>
+            Gets the entrypoint of the detour. This corresponds with <see cref="P:MonoMod.RuntimeDetour.Hook.Target"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.DetourInfo.Next">
+            <summary>
+            Gets the next detour in the detour chain, if there is one.
+            </summary>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.FunctionDetourInfo">
+            <summary>
+            A type which represents a single native function, and permits access to the detours applied to that function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.FunctionDetourInfo.Function">
+            <summary>
+            Gets a pointer to the function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.FunctionDetourInfo.HasActiveCall">
+            <summary>
+            Gets whether or not there are any active calls to this function.
+            </summary>
+            <remarks>
+            This will only ever return true when there are detours applied.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.FunctionDetourInfo.Detours">
+            <summary>
+            Gets the detours applied to this function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.FunctionDetourInfo.FirstDetour">
+            <summary>
+            Gets the first detour in the detour chain.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.FunctionDetourInfo.IsDetoured">
+            <summary>
+            Gets whether or not this function is currently detoured.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.FunctionDetourInfo.DetourApplied">
+            <summary>
+            An event which is invoked whenever a detour is applied to this function.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.FunctionDetourInfo.DetourUndone">
+            <summary>
+            An event which is invoked whenver a detour is undone on this function.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.FunctionDetourInfo.EnterLock(System.Boolean@)">
+            <summary>
+            Takes the lock for this function. The detour chain will not be modified by other threads while this is held.
+            </summary>
+            <param name="lockTaken">A boolean which, when this method returns, holds whether or not the method took the
+            lock and should release the lock in its <see langword="finally"/> block.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.FunctionDetourInfo.ExitLock">
+            <summary>
+            Releases the lock for this function. Must be called only if <see cref="M:MonoMod.RuntimeDetour.FunctionDetourInfo.EnterLock(System.Boolean@)"/>'s <c>lockTaken</c>
+            was <see langword="true"/>
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.FunctionDetourInfo.WithLock">
+            <summary>
+            Takes the lock for this function, and returns a disposable object to automatically release the lock as needed
+            in a <see langword="using"/> block.
+            </summary>
+            <returns>A disposable object which manages the lock.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.FunctionDetourInfo.Lock">
+            <summary>
+            A struct which is used to hold the function's lock.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.FunctionDetourInfo.Lock.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.ILHookCollection">
+            <summary>
+            A collection of <see cref="T:MonoMod.RuntimeDetour.ILHookInfo"/> associated with a method.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHookCollection.GetEnumerator">
+            <summary>
+            Gets an enumerator for this collection.
+            </summary>
+            <returns>An enumerator which enumterates the <see cref="T:MonoMod.RuntimeDetour.ILHookInfo"/> associated with this collection.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.ILHookCollection.Enumerator">
+            <summary>
+            An enumerator for an <see cref="T:MonoMod.RuntimeDetour.ILHookCollection"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHookCollection.Enumerator.Current">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHookCollection.Enumerator.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHookCollection.Enumerator.Reset">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.ILHookCollection.Enumerator.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.ILHookInfo">
+            <summary>
+            An object which represents an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> without extending its lifetime.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.ILHookInfo.ManipulatorMethod">
+            <summary>
+            Gets the manipulator method used by this <see cref="T:MonoMod.RuntimeDetour.ILHook"/>.
+            </summary>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.MethodDetourInfo">
+            <summary>
+            A type which represents a single method, and permits access to the detours applied to that method.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.MethodDetourInfo.Method">
+            <summary>
+            Gets the method which this object represents.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.MethodDetourInfo.HasActiveCall">
+            <summary>
+            Gets whether or not there are any active calls to this function.
+            </summary>
+            <remarks>
+            This will only ever return true when there are detours applied.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.MethodDetourInfo.Detours">
+            <summary>
+            Gets the detours applied to this function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.MethodDetourInfo.ILHooks">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.ILHook"/>s applied to this function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.MethodDetourInfo.FirstDetour">
+            <summary>
+            Gets the first detour in the detour chain.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.MethodDetourInfo.IsDetoured">
+            <summary>
+            Gets whether or not this function is currently detoured.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.MethodDetourInfo.DetourApplied">
+            <summary>
+            An event which is invoked whenever a detour is applied to this function.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.MethodDetourInfo.DetourUndone">
+            <summary>
+            An event which is invoked whenver a detour is undone on this function.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.MethodDetourInfo.ILHookApplied">
+            <summary>
+            An event which is invoked whenever an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> is applied to this function.
+            </summary>
+        </member>
+        <member name="E:MonoMod.RuntimeDetour.MethodDetourInfo.ILHookUndone">
+            <summary>
+            An event which is invoked whenver an <see cref="T:MonoMod.RuntimeDetour.ILHook"/> is undone on this function.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.MethodDetourInfo.EnterLock(System.Boolean@)">
+            <summary>
+            Takes the lock for this method. The detour chain will not be modified by other threads while this is held.
+            </summary>
+            <param name="lockTaken">A boolean which, when this method returns, holds whether or not the method took the
+            lock and should release the lock in its <see langword="finally"/> block.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.MethodDetourInfo.ExitLock">
+            <summary>
+            Releases the lock for this method. Must be called only if <see cref="M:MonoMod.RuntimeDetour.MethodDetourInfo.EnterLock(System.Boolean@)"/>'s <c>lockTaken</c>
+            was <see langword="true"/>
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.MethodDetourInfo.WithLock">
+            <summary>
+            Takes the lock for this function, and returns a disposable object to automatically release the lock as needed
+            in a <see langword="using"/> block.
+            </summary>
+            <returns>A disposable object which manages the lock.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.MethodDetourInfo.Lock">
+            <summary>
+            A struct which is used to hold the function's lock.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.MethodDetourInfo.Lock.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.NativeDetourCollection">
+            <summary>
+            A collection of <see cref="T:MonoMod.RuntimeDetour.NativeDetourInfo"/> objects associated with a native function.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeDetourCollection.GetEnumerator">
+            <summary>
+            Gets an enumerator for this collection.
+            </summary>
+            <returns>An enumerator which enumterates the <see cref="T:MonoMod.RuntimeDetour.NativeDetourInfo"/> associated with this collection.</returns>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.NativeDetourCollection.Enumerator">
+            <summary>
+            An enumerator for a <see cref="T:MonoMod.RuntimeDetour.DetourCollection"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeDetourCollection.Enumerator.Current">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeDetourCollection.Enumerator.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeDetourCollection.Enumerator.Reset">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeDetourCollection.Enumerator.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.NativeDetourInfo">
+            <summary>
+            An object which represents a native detour, without extending its lifetime.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeDetourInfo.Function">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.FunctionDetourInfo"/> for the function this detour is attached to.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeDetourInfo.IsApplied">
+            <summary>
+            Gets whether or not this detour is currently applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeDetourInfo.Config">
+            <summary>
+            Gets the config associated with this detour, if any.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeDetourInfo.Apply">
+            <summary>
+            Applies this detour.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeDetourInfo.Undo">
+            <summary>
+            Undoes this detour.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeDetourInfo.Entry">
+            <summary>
+            Gets the entrypoint of the detour. This is the method which implements the delegate passed into <see cref="T:MonoMod.RuntimeDetour.NativeHook"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeDetourInfo.Next">
+            <summary>
+            Gets the next detour in the detour chain, if any.
+            </summary>
+        </member>
+        <member name="T:MonoMod.RuntimeDetour.NativeHook">
+            <summary>
+            A single hook from a native function to a target delegate, optionally allowing the target to call the original function.
+            </summary>
+            <remarks>
+            <see cref="T:MonoMod.RuntimeDetour.NativeHook"/>s, like other kinds of detours, are automatically undone when the garbage collector collects the object,
+            or the object is disposed. Use <see cref="P:MonoMod.RuntimeDetour.NativeHook.DetourInfo"/> to get an object which represents the hook without
+            extending its lifetime.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.#ctor(System.IntPtr,System.Delegate)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> of <paramref name="function"/>, detouring it to <paramref name="hook"/>.
+            </summary>
+            <param name="function">A pointer to the native function to hook.</param>
+            <param name="hook">The delegate which acts as the target of the hook.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.#ctor(System.IntPtr,System.Delegate,MonoMod.RuntimeDetour.DetourConfig)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> of <paramref name="function"/>, detouring it to <paramref name="hook"/> using the provided config.
+            </summary>
+            <param name="function">A pointer to the native function to hook.</param>
+            <param name="hook">The delegate which acts as the target of the hook.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this detour.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.#ctor(System.IntPtr,System.Delegate,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> of <paramref name="function"/>, detouring it to <paramref name="hook"/>.
+            </summary>
+            <param name="function">A pointer to the native function to hook.</param>
+            <param name="hook">The delegate which acts as the target of the hook.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.#ctor(System.IntPtr,System.Delegate,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> of <paramref name="function"/>, detouring it to <paramref name="hook"/> using the provided config.
+            </summary>
+            <param name="function">A pointer to the native function to hook.</param>
+            <param name="hook">The delegate which acts as the target of the hook.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this detour.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeHook.Config">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> associated with this <see cref="T:MonoMod.RuntimeDetour.NativeHook"/>, if any.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeHook.Function">
+            <summary>
+            Gets a pointer to the function which this <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> hooks.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.#ctor(System.IntPtr,System.Delegate,MonoMod.Core.IDetourFactory,MonoMod.RuntimeDetour.DetourConfig,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.RuntimeDetour.NativeHook"/> of <paramref name="function"/>, detouring it to <paramref name="hook"/> using the provided config and detour factory.
+            </summary>
+            <param name="function">A pointer to the native function to hook.</param>
+            <param name="hook">The delegate which acts as the target of the hook.</param>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use to interact with this hook.</param>
+            <param name="config">The <see cref="T:MonoMod.RuntimeDetour.DetourConfig"/> to use for this detour.</param>
+            <param name="applyByDefault">Whether or not this hook should be applied when the constructor finishes.</param>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.Apply">
+            <summary>
+            Applies the hook, if it was not already applied.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.Undo">
+            <summary>
+            Undoes the hook, if it was applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeHook.IsValid">
+            <summary>
+            Gets whether or not this hook is valid.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeHook.IsApplied">
+            <summary>
+            Gets whether or not this hook is currently applied.
+            </summary>
+        </member>
+        <member name="P:MonoMod.RuntimeDetour.NativeHook.DetourInfo">
+            <summary>
+            Gets the <see cref="T:MonoMod.RuntimeDetour.NativeDetourInfo"/> representing this hook.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.Finalize">
+            <summary>
+            Cleans up and undoes the hook, if needed.
+            </summary>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.NativeHook.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.RuntimeDetour.TrampolinePool.StubCriticalDetour(MonoMod.Utils.DynamicMethodDefinition)">
+            <summary>
+            Fill the DynamicMethodDefinition with a throw.
+            </summary>
+        </member>
+    </members>
+</doc>

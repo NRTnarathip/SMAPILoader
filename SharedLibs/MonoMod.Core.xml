@@ -1,0 +1,2178 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MonoMod.Core</name>
+    </assembly>
+    <members>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+                Reserved to be used by the compiler for tracking metadata.
+                This class should not be used by developers in source code.
+            </summary>
+            <remarks>
+                This definition is provided by the <i>IsExternalInit</i> NuGet package (https://www.nuget.org/packages/IsExternalInit).
+                Please see https://github.com/manuelroemer/IsExternalInit for more information.
+            </remarks>
+        </member>
+        <member name="T:MonoMod.Core.ICoreDetour">
+            <summary>
+            A single method-to-method managed detour.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.ICoreDetour.Source">
+            <summary>
+            The source method.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.ICoreDetour.Target">
+            <summary>
+            The target method.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.ICoreDetourBase">
+            <summary>
+            A single detour. This is the base type of both <see cref="T:MonoMod.Core.ICoreDetour"/> and <see cref="T:MonoMod.Core.ICoreNativeDetour"/>.
+            </summary>
+            <remarks>
+            <para>When disposed or collected by GC, detours will be automatically undone and any associated memory freed.</para>
+            </remarks>
+            <seealso cref="T:MonoMod.Core.ICoreDetour"/>
+            <seealso cref="T:MonoMod.Core.ICoreNativeDetour"/>
+        </member>
+        <member name="P:MonoMod.Core.ICoreDetourBase.IsApplied">
+            <summary>
+            Gets whether or not this detour is currently applied.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.ICoreDetourBase.Apply">
+            <summary>
+            Applies this detour.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.ICoreDetourBase.Undo">
+            <summary>
+            Undoes this detour. Once a detour is undone, it is no longer valid, and may not be used further.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.ICoreNativeDetour">
+            <summary>
+            Represents a single function-to-function native detour, with an alternate entry point.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.ICoreNativeDetour.Source">
+            <summary>
+            Gets a pointer to the source function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.ICoreNativeDetour.Target">
+            <summary>
+            Gets a pointer to the target function.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.ICoreNativeDetour.HasOrigEntrypoint">
+            <summary>
+            Gets whether or not an alternate entrypoint for the original function is available in <see cref="P:MonoMod.Core.ICoreNativeDetour.OrigEntrypoint"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.ICoreNativeDetour.OrigEntrypoint">
+            <summary>
+            Gets the alternate entrypoint for the original function.
+            </summary>
+            <remarks>
+            It is only valid to access this property if <see cref="P:MonoMod.Core.ICoreNativeDetour.HasOrigEntrypoint"/> is <see langword="true"/>
+            </remarks>
+        </member>
+        <member name="T:MonoMod.Core.IDetourFactory">
+            <summary>
+            A factory for creating <see cref="T:MonoMod.Core.ICoreDetour"/>s and <see cref="T:MonoMod.Core.ICoreNativeDetour"/>s.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.IDetourFactory.CreateDetour(MonoMod.Core.CreateDetourRequest)">
+            <summary>
+            Creates an <see cref="T:MonoMod.Core.ICoreDetour"/> according to the arguments specified in <paramref name="request"/>.
+            </summary>
+            <param name="request">The <see cref="T:MonoMod.Core.CreateDetourRequest"/> containing detour creation options.</param>
+            <returns>The created <see cref="T:MonoMod.Core.ICoreDetour"/>.</returns>
+        </member>
+        <member name="M:MonoMod.Core.IDetourFactory.CreateNativeDetour(MonoMod.Core.CreateNativeDetourRequest)">
+            <summary>
+            Creates an <see cref="T:MonoMod.Core.ICoreNativeDetour"/> according to the arguments specified in <paramref name="request"/>.
+            </summary>
+            <param name="request">The <see cref="T:MonoMod.Core.CreateNativeDetourRequest"/> containing detour creation options.</param>
+            <returns>The created <see cref="T:MonoMod.Core.ICoreNativeDetour"/>.</returns>
+        </member>
+        <member name="T:MonoMod.Core.CreateDetourRequest">
+            <summary>
+            A request to create an <see cref="T:MonoMod.Core.ICoreDetour"/>.
+            </summary>
+            <param name="Source">The source method for the detour.</param>
+            <param name="Target">The target method for the detour.</param>
+            <seealso cref="M:MonoMod.Core.IDetourFactory.CreateDetour(MonoMod.Core.CreateDetourRequest)"/>
+        </member>
+        <member name="M:MonoMod.Core.CreateDetourRequest.#ctor(System.Reflection.MethodBase,System.Reflection.MethodBase)">
+            <summary>
+            A request to create an <see cref="T:MonoMod.Core.ICoreDetour"/>.
+            </summary>
+            <param name="Source">The source method for the detour.</param>
+            <param name="Target">The target method for the detour.</param>
+            <seealso cref="M:MonoMod.Core.IDetourFactory.CreateDetour(MonoMod.Core.CreateDetourRequest)"/>
+        </member>
+        <member name="P:MonoMod.Core.CreateDetourRequest.Source">
+            <summary>The source method for the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.CreateDetourRequest.Target">
+            <summary>The target method for the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.CreateDetourRequest.ApplyByDefault">
+            <summary>
+            Gets or sets whether or not the detour should be applied when <see cref="M:MonoMod.Core.IDetourFactory.CreateDetour(MonoMod.Core.CreateDetourRequest)"/> returns.
+            Defaults to <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.CreateNativeDetourRequest">
+            <summary>
+            A request to create an <see cref="T:MonoMod.Core.ICoreNativeDetour"/>.
+            </summary>
+            <param name="Source">The source function for the detour.</param>
+            <param name="Target">The target function for the detour.</param>
+            <seealso cref="M:MonoMod.Core.IDetourFactory.CreateNativeDetour(MonoMod.Core.CreateNativeDetourRequest)"/>
+        </member>
+        <member name="M:MonoMod.Core.CreateNativeDetourRequest.#ctor(System.IntPtr,System.IntPtr)">
+            <summary>
+            A request to create an <see cref="T:MonoMod.Core.ICoreNativeDetour"/>.
+            </summary>
+            <param name="Source">The source function for the detour.</param>
+            <param name="Target">The target function for the detour.</param>
+            <seealso cref="M:MonoMod.Core.IDetourFactory.CreateNativeDetour(MonoMod.Core.CreateNativeDetourRequest)"/>
+        </member>
+        <member name="P:MonoMod.Core.CreateNativeDetourRequest.Source">
+            <summary>The source function for the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.CreateNativeDetourRequest.Target">
+            <summary>The target function for the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.CreateNativeDetourRequest.ApplyByDefault">
+            <summary>
+            Gets or sets whether or not the detour should be applied when <see cref="M:MonoMod.Core.IDetourFactory.CreateNativeDetour(MonoMod.Core.CreateNativeDetourRequest)"/> returns.
+            Defaults to <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.DetourFactory">
+            <summary>
+            Provides access to a default, <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>-based <see cref="T:MonoMod.Core.IDetourFactory"/>, as well as extension methods to make
+            using <see cref="T:MonoMod.Core.IDetourFactory"/> easier.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.DetourFactory.Current">
+            <summary>
+            Gets the current (default) <see cref="T:MonoMod.Core.IDetourFactory"/>. This is always the <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>-based <see cref="T:MonoMod.Core.IDetourFactory"/>.
+            </summary>
+            <remarks>
+            The default <see cref="T:MonoMod.Core.IDetourFactory"/> is created the first time this property is accessed, using the value of <see cref="P:MonoMod.Core.Platforms.PlatformTriple.Current"/>
+            at that point in time. After it is constructed, the <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/> implementation cannot be replaced.
+            </remarks>
+            <seealso cref="P:MonoMod.Core.Platforms.PlatformTriple.Current"/>
+        </member>
+        <member name="M:MonoMod.Core.DetourFactory.CreateDetour(MonoMod.Core.IDetourFactory,System.Reflection.MethodBase,System.Reflection.MethodBase,System.Boolean)">
+            <summary>
+            Creates a managed detour from <paramref name="source"/> to <paramref name="target"/>.
+            </summary>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use to perform the operation.</param>
+            <param name="source">The source method for the detour.</param>
+            <param name="target">The target method for the detour.</param>
+            <param name="applyByDefault"><see langword="true"/> if the detour should be applied when this method returns;
+            <see langword="false"/> if the caller must apply it themselves.</param>
+            <returns>The created <see cref="T:MonoMod.Core.ICoreDetour"/>.</returns>
+        </member>
+        <member name="M:MonoMod.Core.DetourFactory.CreateNativeDetour(MonoMod.Core.IDetourFactory,System.IntPtr,System.IntPtr,System.Boolean)">
+            <summary>
+            Creates a native detour from <paramref name="source"/> to <paramref name="target"/>.
+            </summary>
+            <param name="factory">The <see cref="T:MonoMod.Core.IDetourFactory"/> to use to perform the operation.</param>
+            <param name="source">The source function for the detour.</param>
+            <param name="target">The target function for the detour.</param>
+            <param name="applyByDefault"><see langword="true"/> if the detour should be applied when this method returns;
+            <see langword="false"/> if the caller must apply it themselves.</param>
+            <returns>The created <see cref="T:MonoMod.Core.ICoreNativeDetour"/>.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Interop.OSX.mach_vm_allocate(System.Int32,System.UInt64*,System.UInt64,MonoMod.Core.Interop.OSX.vm_flags)">
+            <summary>
+            Allocate zero-filled memory in the address space of the target task, either at the specified addres, or wherever space can be found (controlled by flags),
+            of the specified size. The address at which the allocation actually took place is returned.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Interop.OSX.mach_vm_map(System.Int32,System.UInt64*,System.UInt64,System.UInt64,MonoMod.Core.Interop.OSX.vm_flags,System.Int32,System.UInt64,MonoMod.Core.Interop.OSX.boolean_t,MonoMod.Core.Interop.OSX.vm_prot_t,MonoMod.Core.Interop.OSX.vm_prot_t,MonoMod.Core.Interop.OSX.vm_inherit_t)">
+            <summary>
+            Map a user-supplie memory object into the virtual address
+            space of the target task.  If desired (anywhere is TRUE),
+            the kernel will find a suitable address range of the
+            specified size; else, the specific address will be allocated.
+            
+            The beginning address of the range will be aligned on a virtual
+            page boundary, be at or beyond the address specified, and
+            meet the mask requirements (bits turned on in the mask must not
+            be turned on in the result); the size of the range, in bytes,
+            will be rounded up to an integral number of virtual pages.
+            
+            The memory in the resulting range will be associated with the
+            specified memory object, with the beginning of the memory range
+            referring to the specified offset into the memory object.
+            
+            The mapping will take the current and maximum protections and
+            the inheritance attributes specified; see the vm_protect and
+            vm_inherit calls for a description of these attributes.
+            
+            If desired (copy is TRUE), the memory range will be filled
+            with a copy of the data from the memory object; this copy will
+            be private to this mapping in this target task.  Otherwise,
+            the memory in this mapping will be shared with other mappings
+            of the same memory object at the same offset (in this task or
+            in other tasks).  [The Mach kernel only enforces shared memory
+            consistency among mappings on one host with similar page alignments.
+            The user-defined memory manager for this object is responsible
+            for further consistency.]
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Interop.OSX.mach_make_memory_entry_64(System.Int32,System.UInt64*,System.UInt64,MonoMod.Core.Interop.OSX.vm_prot_t,System.Int32*,System.Int32)">
+             <summary>
+             Allow application level processes to create named entries which
+             correspond to mapped portions of their address space.  These named
+             entries can then be manipulated, shared with other processes in
+             other address spaces and ultimately mapped in ohter address spaces
+            
+             THIS INTERFACE IS STILL EVOLVING.
+             </summary>
+        </member>
+        <member name="T:MonoMod.Core.Interop.PCSTR">
+            <summary>
+            A pointer to a constant character string.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Interop.PCSTR.Value">
+            <summary>
+            A pointer to the first character in the string. The content should be considered readonly, as it was typed as constant in the SDK.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Interop.PCSTR.Length">
+            <summary>
+            Gets the number of characters up to the first null character (exclusive).
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Interop.PCSTR.ToString">
+            <summary>
+            Returns a <see langword="string"/> with a copy of this character array, decoding as UTF-8.
+            </summary>
+            <returns>A <see langword="string"/>, or <see langword="null"/> if <see cref="F:MonoMod.Core.Interop.PCSTR.Value"/> is <see langword="null"/>.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Interop.PCSTR.AsSpan">
+            <summary>
+            Returns a span of the characters in this string.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.TypeClassification">
+            <summary>
+            The ABI classification of a type.
+            </summary>
+            <seealso cref="T:MonoMod.Core.Platforms.Abi"/>
+            <seealso cref="T:MonoMod.Core.Platforms.Classifier"/>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.TypeClassification.InRegister">
+            <summary>
+            The type is passed by value in a register.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.TypeClassification.ByReference">
+            <summary>
+            The type is passed by reference.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.TypeClassification.OnStack">
+            <summary>
+            The type is passed by value on the stack.
+            </summary>
+            <remarks>
+            <para>On Windows's AMD64 ABI, parameters are never passed <see cref="F:MonoMod.Core.Platforms.TypeClassification.OnStack"/>. They are either passed
+            <see cref="F:MonoMod.Core.Platforms.TypeClassification.InRegister"/> or <see cref="F:MonoMod.Core.Platforms.TypeClassification.ByReference"/>.</para>
+            <para>Return values are never passed <see cref="F:MonoMod.Core.Platforms.TypeClassification.OnStack"/>, and a classifier should never return <see cref="F:MonoMod.Core.Platforms.TypeClassification.OnStack"/>
+            for a return classification.</para>
+            </remarks>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Classifier">
+            <summary>
+            A delegate which classifies a type according to its ABI.
+            </summary>
+            <remarks>
+            <para>Return values are never passed <see cref="F:MonoMod.Core.Platforms.TypeClassification.OnStack"/>, and a classifier should never return <see cref="F:MonoMod.Core.Platforms.TypeClassification.OnStack"/>
+            for a return classification.</para>
+            </remarks>
+            <param name="type">The type to classify.</param>
+            <param name="isReturn"><see langword="true"/> if this classification is being done for a return value; <see langword="false"/> otherwise.</param>
+            <returns>The <see cref="T:MonoMod.Core.Platforms.TypeClassification"/> for the type.</returns>
+            <seealso cref="T:MonoMod.Core.Platforms.Abi"/>
+            <seealso cref="T:MonoMod.Core.Platforms.TypeClassification"/>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.SpecialArgumentKind">
+            <summary>
+            A kind of special argument used in the ABI. Used to specify argument order.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SpecialArgumentKind.ThisPointer">
+            <summary>
+            The this pointer, when one is present.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SpecialArgumentKind.ReturnBuffer">
+            <summary>
+            The return buffer pointer, when one is present.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SpecialArgumentKind.GenericContext">
+            <summary>
+            The generic context pointer, when one is present.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SpecialArgumentKind.UserArguments">
+            <summary>
+            User arguments.
+            </summary>
+            <remarks>
+            This is needed to be able to specify all known CLR ABIs. This is because on some architectures,
+            notably x86, CoreCLR uses a very strange ABI which places the generic context pointer <i>after</i>
+            user arguments.
+            </remarks>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Abi">
+            <summary>
+            An ABI descriptor.
+            </summary>
+            <param name="ArgumentOrder">A sequence of <see cref="T:MonoMod.Core.Platforms.SpecialArgumentKind"/> indicating the ABI's argument order.</param>
+            <param name="Classifier">A <see cref="T:MonoMod.Core.Platforms.Classifier"/> which classifies value types according to the ABI.</param>
+            <param name="ReturnsReturnBuffer"><see langword="true"/> if functions are expected to return the return buffer pointer they are passed;
+            <see langword="false"/> otherwise.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Abi.#ctor(System.ReadOnlyMemory{MonoMod.Core.Platforms.SpecialArgumentKind},MonoMod.Core.Platforms.Classifier,System.Boolean)">
+            <summary>
+            An ABI descriptor.
+            </summary>
+            <param name="ArgumentOrder">A sequence of <see cref="T:MonoMod.Core.Platforms.SpecialArgumentKind"/> indicating the ABI's argument order.</param>
+            <param name="Classifier">A <see cref="T:MonoMod.Core.Platforms.Classifier"/> which classifies value types according to the ABI.</param>
+            <param name="ReturnsReturnBuffer"><see langword="true"/> if functions are expected to return the return buffer pointer they are passed;
+            <see langword="false"/> otherwise.</param>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Abi.ArgumentOrder">
+            <summary>A sequence of <see cref="T:MonoMod.Core.Platforms.SpecialArgumentKind"/> indicating the ABI's argument order.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Abi.Classifier">
+            <summary>A <see cref="T:MonoMod.Core.Platforms.Classifier"/> which classifies value types according to the ABI.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Abi.ReturnsReturnBuffer">
+            <summary><see langword="true"/> if functions are expected to return the return buffer pointer they are passed;
+            <see langword="false"/> otherwise.</summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Abi.Classify(System.Type,System.Boolean)">
+            <summary>
+            Classifies a type according to the ABI.
+            </summary>
+            <remarks>
+            <para>Prefer using this over the <see cref="P:MonoMod.Core.Platforms.Abi.Classifier"/> member.</para>
+            <para>This method does some preliminary universal classifications, to make it easier for ABI implementers. Notably, 
+            reference types, pointer types, and byref types are all implicitly classified as <see cref="F:MonoMod.Core.Platforms.TypeClassification.InRegister"/>
+            since they are always exactly one machine word. <see cref="T:System.Void"/> is also automatically handled.</para>
+            </remarks>
+            <param name="type">The type to classify.</param>
+            <param name="isReturn"><see langword="true"/> if the classification is being done for a return value; <see langword="false"/> otherwise.</param>
+            <returns>The <see cref="T:MonoMod.Core.Platforms.TypeClassification"/> for the type.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.ArchitectureFeature">
+            <summary>
+            A set of features which may be provided by an <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> implementation.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.ArchitectureFeature.None">
+            <summary>
+            No features are implemented.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.ArchitectureFeature.FixedInstructionSize">
+            <summary>
+            The architecture has a fixed instruction size.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.ArchitectureFeature.Immediate64">
+            <summary>
+            The architecture has the ability to encode 64-bit immediate values.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.ArchitectureFeature.CreateAltEntryPoint">
+            <summary>
+            The architecture implements <see cref="P:MonoMod.Core.Platforms.IArchitecture.AltEntryFactory"/> to allow the creation
+            of alternate entry points.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.FeatureFlags">
+            <summary>
+            A collection of feature flags for a particular <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.FeatureFlags.Architecture">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.ArchitectureFeature"/> flags for the architecture.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.FeatureFlags.System">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.SystemFeature"/> flags for the operating system.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.FeatureFlags.Runtime">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.RuntimeFeature"/> flags for the runtime.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.#ctor(MonoMod.Core.Platforms.ArchitectureFeature,MonoMod.Core.Platforms.SystemFeature,MonoMod.Core.Platforms.RuntimeFeature)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Platforms.FeatureFlags"/> object from the provided flags.
+            </summary>
+            <param name="archFlags">The <see cref="T:MonoMod.Core.Platforms.ArchitectureFeature"/> flags.</param>
+            <param name="sysFlags">The <see cref="T:MonoMod.Core.Platforms.SystemFeature"/> flags.</param>
+            <param name="runtimeFlags">The <see cref="T:MonoMod.Core.Platforms.RuntimeFeature"/> flags.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.Has(MonoMod.Core.Platforms.RuntimeFeature)">
+            <summary>
+            Checks whether or not this collection has the provided set of <see cref="T:MonoMod.Core.Platforms.RuntimeFeature"/> flags.
+            </summary>
+            <param name="feature">The feature flags to check.</param>
+            <returns><see langword="true"/> if this collection has all requested flags; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.Has(MonoMod.Core.Platforms.ArchitectureFeature)">
+            <summary>
+            Checks whether or not this collection has the provided set of <see cref="T:MonoMod.Core.Platforms.ArchitectureFeature"/> flags.
+            </summary>
+            <param name="feature">The feature flags to check.</param>
+            <returns><see langword="true"/> if this collection has all requested flags; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.Has(MonoMod.Core.Platforms.SystemFeature)">
+            <summary>
+            Checks whether or not this collection has the provided set of <see cref="T:MonoMod.Core.Platforms.SystemFeature"/> flags.
+            </summary>
+            <param name="feature">The feature flags to check.</param>
+            <returns><see langword="true"/> if this collection has all requested flags; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.Equals(MonoMod.Core.Platforms.FeatureFlags)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.op_Equality(MonoMod.Core.Platforms.FeatureFlags,MonoMod.Core.Platforms.FeatureFlags)">
+            <summary>
+            Compares two <see cref="T:MonoMod.Core.Platforms.FeatureFlags"/> instances for equality.
+            </summary>
+            <param name="left">The first instance to compare.</param>
+            <param name="right">The second instance to compare.</param>
+            <returns><see langword="true"/> if the two instances contain exactly the same set of flags; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.FeatureFlags.op_Inequality(MonoMod.Core.Platforms.FeatureFlags,MonoMod.Core.Platforms.FeatureFlags)">
+            <summary>
+            Compares two <see cref="T:MonoMod.Core.Platforms.FeatureFlags"/> instances for inequality.
+            </summary>
+            <param name="left">The first instance to compare.</param>
+            <param name="right">The second instance to compare.</param>
+            <returns><see langword="true"/> if the two instances do not contain exactly the same set of flags; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.IAltEntryFactory">
+            <summary>
+            A factory for construction native alternate entrypoints for functions.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IAltEntryFactory.CreateAlternateEntrypoint(System.IntPtr,System.Int32,System.IDisposable@)">
+            <summary>
+            Creates an alternate entrypoint for the function at <paramref name="entrypoint"/>, ensuring that changes to the first <paramref name="minLength"/>
+            bytes of that function will not interfere with the alternate entrypoint.
+            </summary>
+            <remarks>
+            <para>This method only guarantees that the alternate entrypoint will be valid as long as no more than <paramref name="minLength"/> bytes of
+            the original entrypoint are changed. While in practice more bytes may be safe, it is is not safe in general to write more bytes. There is currently
+            not an API which is capable of expanding this space, which means that detours which use this to create an alternate entrypoint cannot be safely
+            retargeted in general.</para>
+            </remarks>
+            <param name="entrypoint">The main entrypoint of the function to create an alternate entrypoint for.</param>
+            <param name="minLength">The minimum number of bytes of code that should be safe to replace.</param>
+            <param name="handle">A handle to any memory allocations made for this alternate entrypoint.</param>
+            <returns>A pointer to the created alternate entry point.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.IArchitecture">
+            <summary>
+            Represents a host architecture.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IArchitecture.Target">
+            <summary>
+            Gets the <see cref="T:MonoMod.Utils.ArchitectureKind"/> that this instance represents.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IArchitecture.Features">
+            <summary>
+            Gets the set of <see cref="T:MonoMod.Core.Platforms.ArchitectureFeature"/>s that this instance supports. Some members may only be available with certain feature flags set.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IArchitecture.KnownMethodThunks">
+            <summary>
+            Gets a <see cref="T:MonoMod.Core.Utils.BytePatternCollection"/> containing known method thunks for this architecture. These are used to locate the real method entry point.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IArchitecture.AltEntryFactory">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.IAltEntryFactory"/> for this architecture.
+            </summary>
+            <remarks>
+            <para>This must only be accessed if <see cref="P:MonoMod.Core.Platforms.IArchitecture.Features"/> includes <see cref="F:MonoMod.Core.Platforms.ArchitectureFeature.CreateAltEntryPoint"/>.</para>
+            </remarks>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IArchitecture.ComputeDetourInfo(System.IntPtr,System.IntPtr,System.Int32)">
+            <summary>
+            Computes a <see cref="T:MonoMod.Core.Platforms.NativeDetourInfo"/> which can be used to patch the instructions at <paramref name="from"/> to jump to <paramref name="target"/>.
+            </summary>
+            <remarks>
+            <para>
+            The typical calling sequence is <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeDetourInfo(System.IntPtr,System.IntPtr,System.Int32)"/>, allocate a buffer, <see cref="M:MonoMod.Core.Platforms.IArchitecture.GetDetourBytes(MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@)"/>,
+            then <see cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/> to apply the detour.
+            </para>
+            <para>Usually, callers should use <see cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateSimpleDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/> or
+            <see cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/> instead.</para>
+            </remarks>
+            <param name="from">The address to detour from.</param>
+            <param name="target">The address to detour to.</param>
+            <param name="maxSizeHint">The maximum amount of readable/writable memory at <paramref name="from"/>, or -1. This is to be used as a hint, and may be ignored.</param>
+            <returns>The computed <see cref="T:MonoMod.Core.Platforms.NativeDetourInfo"/>.</returns>
+            <seealso cref="M:MonoMod.Core.Platforms.IArchitecture.GetDetourBytes(MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateSimpleDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IArchitecture.GetDetourBytes(MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@)">
+            <summary>
+            Gets the actual bytes making up the specified detour.
+            </summary>
+            <param name="info">The <see cref="T:MonoMod.Core.Platforms.NativeDetourInfo"/> representing the detour.</param>
+            <param name="buffer">A buffer which will hold the byte sequence. It must be at least <see cref="P:MonoMod.Core.Platforms.NativeDetourInfo.Size"/> bytes in length.</param>
+            <param name="allocationHandle">A handle to any allocation which must stay alive with the detour.</param>
+            <returns>The number of bytes written to the buffer.</returns>
+            <seealso cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeDetourInfo(System.IntPtr,System.IntPtr,System.Int32)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateSimpleDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)">
+            <summary>
+            Computes a <see cref="T:MonoMod.Core.Platforms.NativeDetourInfo"/> which can be used to retarget <paramref name="detour"/> to instead jump to <paramref name="target"/>.
+            </summary>
+            <remarks>
+            <para>
+            The typical calling sequence is <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)"/>, allocate a buffer,
+            <see cref="M:MonoMod.Core.Platforms.IArchitecture.GetRetargetBytes(MonoMod.Core.Platforms.NativeDetourInfo,MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@,System.Boolean@,System.Boolean@)"/>,
+            then if (and ONLY if) <c>needsRepatch</c> is <see langword="true"/>, <see cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/>
+            to patch the data in. Then, if <c>disposeOldAlloc</c> is <see langword="true"/>, dispose the allocations associated with the original detour.
+            </para>
+            <para>Usually, callers should use <see cref="M:MonoMod.Core.Platforms.SimpleNativeDetour.ChangeTarget(System.IntPtr)"/> instead.</para>
+            </remarks>
+            <param name="detour">The detour to retarget.</param>
+            <param name="target">The new target of the detour.</param>
+            <param name="maxSizeHint">The maximum amount of readable/writable memory at the detour site, or -1. This is to be used as a hint, and may be ignored.</param>
+            <returns>The computed <see cref="T:MonoMod.Core.Platforms.NativeDetourInfo"/>.</returns>
+            <seealso cref="M:MonoMod.Core.Platforms.IArchitecture.GetRetargetBytes(MonoMod.Core.Platforms.NativeDetourInfo,MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@,System.Boolean@,System.Boolean@)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/>
+            <seealso cref="M:MonoMod.Core.Platforms.SimpleNativeDetour.ChangeTarget(System.IntPtr)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IArchitecture.GetRetargetBytes(MonoMod.Core.Platforms.NativeDetourInfo,MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@,System.Boolean@,System.Boolean@)">
+            <summary>
+            Gets the actual bytes to apply to perform the retarget.
+            </summary>
+            <param name="original">The original detour being retargeted.</param>
+            <param name="retarget">The <see cref="T:MonoMod.Core.Platforms.NativeDetourInfo"/> returned by <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)"/> for this retarget.</param>
+            <param name="buffer">The buffer to write the patch data into. This must be at least <see cref="P:MonoMod.Core.Platforms.NativeDetourInfo.Size"/> (of <paramref name="retarget"/> bytes in length.</param>
+            <param name="allocationHandle">A handle to any allocation which must stay alive with the detour.</param>
+            <param name="needsRepatch"><see langword="true"/> if the data in <paramref name="buffer"/> should be patched into source location. If this is <see langword="false"/>,
+            the data should not be patched in.</param>
+            <param name="disposeOldAlloc"><see langword="true"/> if allocations associated with the old detour should be disposed. If this is <see langword="false"/>, then the old
+            allocations should not be disposed, but do not necessarily need to be kept alive.</param>
+            <returns>The number of bytes written to the buffer.</returns>
+            <seealso cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/>
+            <seealso cref="M:MonoMod.Core.Platforms.SimpleNativeDetour.ChangeTarget(System.IntPtr)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IArchitecture.CreateNativeVtableProxyStubs(System.IntPtr,System.Int32)">
+            <summary>
+            Populates a native vtable with proxy stubs to an object with the same vtable shape.
+            </summary>
+            <remarks>
+            <para>
+            The expected layout for the proxy object is this:
+            <list type="u">
+                <item><c><see cref="P:System.IntPtr.Size"/> * 0</c></item><description><c> = pVtbl</c> A pointer to the vtable generated by this method.</description>
+                <item><c><see cref="P:System.IntPtr.Size"/> * 1</c></item><description><c> = pWrapped</c> A pointer to the wrapped object.</description>
+            </list>
+            </para>
+            </remarks>
+            <param name="vtableBase">The base pointer for the vtable to fill. This must be large enough to hold <paramref name="vtableSize"/> entries.</param>
+            <param name="vtableSize">The number of vtable entries to fill.</param>
+            <returns>A collection of <see cref="T:MonoMod.Core.Platforms.IAllocatedMemory"/> which contain the stubs referenced by the generated vtable.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IArchitecture.CreateSpecialEntryStub(System.IntPtr,System.IntPtr)">
+            <summary>
+            Creates an architecture-specific special entry stub, that passes an extra argument not in the normal calling convention.
+            </summary>
+            <param name="target">The target to call.</param>
+            <param name="argument">The extra argument for that target.</param>
+            <returns>An <see cref="T:MonoMod.Core.Platforms.IAllocatedMemory"/> containing the generated stub.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.INativeDetourKind">
+            <summary>
+            A native detour kind. The implementation is provided by the <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> instance, and exposes only its size, in bytes.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.INativeDetourKind.Size">
+            <summary>
+            Gets the size, in bytes, of this native detour.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.NativeDetourInfo">
+            <summary>
+            An aggregate which represents a native detour, as returned from <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeDetourInfo(System.IntPtr,System.IntPtr,System.Int32)"/> and
+            <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)"/> and consumed by their duals.
+            </summary>
+            <param name="From">The source address of the detour.</param>
+            <param name="To">The target address of the detour.</param>
+            <param name="InternalKind">The <see cref="T:MonoMod.Core.Platforms.INativeDetourKind"/> for the detour.</param>
+            <param name="InternalData">A data field which allows the <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> instance to persist data through calls. Often, this is a memory allocation handle.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.NativeDetourInfo.#ctor(System.IntPtr,System.IntPtr,MonoMod.Core.Platforms.INativeDetourKind,System.IDisposable)">
+            <summary>
+            An aggregate which represents a native detour, as returned from <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeDetourInfo(System.IntPtr,System.IntPtr,System.Int32)"/> and
+            <see cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)"/> and consumed by their duals.
+            </summary>
+            <param name="From">The source address of the detour.</param>
+            <param name="To">The target address of the detour.</param>
+            <param name="InternalKind">The <see cref="T:MonoMod.Core.Platforms.INativeDetourKind"/> for the detour.</param>
+            <param name="InternalData">A data field which allows the <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> instance to persist data through calls. Often, this is a memory allocation handle.</param>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.NativeDetourInfo.From">
+            <summary>The source address of the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.NativeDetourInfo.To">
+            <summary>The target address of the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.NativeDetourInfo.InternalKind">
+            <summary>The <see cref="T:MonoMod.Core.Platforms.INativeDetourKind"/> for the detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.NativeDetourInfo.InternalData">
+            <summary>A data field which allows the <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> instance to persist data through calls. Often, this is a memory allocation handle.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.NativeDetourInfo.Size">
+            <summary>
+            Gets the size, in bytes, of the detour this represents.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.IMemoryAllocator">
+            <summary>
+            A native memory allocator, capable of allocating memory within certain bounds.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IMemoryAllocator.MaxSize">
+            <summary>
+            Gets the maximum size of allocation that this allocator is able to allocate.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IMemoryAllocator.TryAllocate(MonoMod.Core.Platforms.AllocationRequest,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <summary>
+            Tries to allocate memory according to the provided <see cref="T:MonoMod.Core.Platforms.AllocationRequest"/>.
+            </summary>
+            <param name="request">The <see cref="T:MonoMod.Core.Platforms.AllocationRequest"/> specifying the requested properties of the allocation.</param>
+            <param name="allocated">The <see cref="T:MonoMod.Core.Platforms.IAllocatedMemory"/> instance representing the allocation.</param>
+            <returns><see langword="true"/> if the allocator was able to allocate memory according to the request; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IMemoryAllocator.TryAllocateInRange(MonoMod.Core.Platforms.PositionedAllocationRequest,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <summary>
+            Tries to allocate memory according to the provided <see cref="T:MonoMod.Core.Platforms.PositionedAllocationRequest"/>.
+            </summary>
+            <param name="request">The <see cref="T:MonoMod.Core.Platforms.PositionedAllocationRequest"/> specifying the requested properties of the allocation.</param>
+            <param name="allocated">The <see cref="T:MonoMod.Core.Platforms.IAllocatedMemory"/> instance representing the allocation.</param>
+            <returns><see langword="true"/> if the allocator was able to allocate memory according to the request; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.AllocationRequest">
+            <summary>
+            A memory allocation request.
+            </summary>
+            <param name="Size">The size of the requested allocation.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.AllocationRequest.#ctor(System.Int32)">
+            <summary>
+            A memory allocation request.
+            </summary>
+            <param name="Size">The size of the requested allocation.</param>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.AllocationRequest.Size">
+            <summary>The size of the requested allocation.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.AllocationRequest.Alignment">
+            <summary>
+            Gets or sets the alignment of the requested allocation. Default is 8.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.AllocationRequest.Executable">
+            <summary>
+            Gets or dets whether the allocation should be executable. Default is <see langword="false"/>.
+            </summary>
+            <remarks>
+            If an allocation is executable, then it should not be written to directly. Instead, <see cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/>
+            should be used to atomically write a sequence of bytes to that memory.
+            </remarks>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.PositionedAllocationRequest">
+            <summary>
+            A memory allocation request which specifies a set of bounds which the allocation must fall into.
+            </summary>
+            <param name="Target">The target address for the allocation. The allocator will attempt to allocate memory as close to this address as it can.</param>
+            <param name="LowBound">The lower bound of allowed addresses that the allocation may be placed at.</param>
+            <param name="HighBound">The upper bound of allowed addresses that the allocation may be placed at.</param>
+            <param name="Base">The <see cref="T:MonoMod.Core.Platforms.AllocationRequest"/> specifying all other allocation parameters.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PositionedAllocationRequest.#ctor(System.IntPtr,System.IntPtr,System.IntPtr,MonoMod.Core.Platforms.AllocationRequest)">
+            <summary>
+            A memory allocation request which specifies a set of bounds which the allocation must fall into.
+            </summary>
+            <param name="Target">The target address for the allocation. The allocator will attempt to allocate memory as close to this address as it can.</param>
+            <param name="LowBound">The lower bound of allowed addresses that the allocation may be placed at.</param>
+            <param name="HighBound">The upper bound of allowed addresses that the allocation may be placed at.</param>
+            <param name="Base">The <see cref="T:MonoMod.Core.Platforms.AllocationRequest"/> specifying all other allocation parameters.</param>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PositionedAllocationRequest.Target">
+            <summary>The target address for the allocation. The allocator will attempt to allocate memory as close to this address as it can.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PositionedAllocationRequest.LowBound">
+            <summary>The lower bound of allowed addresses that the allocation may be placed at.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PositionedAllocationRequest.HighBound">
+            <summary>The upper bound of allowed addresses that the allocation may be placed at.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PositionedAllocationRequest.Base">
+            <summary>The <see cref="T:MonoMod.Core.Platforms.AllocationRequest"/> specifying all other allocation parameters.</summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.IAllocatedMemory">
+            <summary>
+            A single memory allocation from an <see cref="T:MonoMod.Core.Platforms.IMemoryAllocator"/>.
+            </summary>
+            <remarks>
+            When this object is disposed, the allocation is freed. Similarly, when the GC collects this object, the allocation is freed.
+            </remarks>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IAllocatedMemory.IsExecutable">
+            <summary>
+            Gets whether or not this allocation is executable.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IAllocatedMemory.BaseAddress">
+            <summary>
+            Gets the base address of this allocation.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IAllocatedMemory.Size">
+            <summary>
+            Gets the size of this allocation.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IAllocatedMemory.Memory">
+            <summary>
+            Gets a <see cref="T:System.Span`1"/> of the memory allocation.
+            </summary>
+            <remarks>
+            This span should not be written to is <see cref="P:MonoMod.Core.Platforms.IAllocatedMemory.IsExecutable"/> is <see langword="true"/>. Instead, use
+            <see cref="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})"/> to write to the allocation.
+            </remarks>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.INativeExceptionHelper">
+            <summary>
+            A native exception helper to enable interop with native code that throws exceptions.
+            </summary>
+            <remarks>
+            <para>This helper must only be used when native->managed->native transitions are present. If the only transition
+            is managed->native, this helper cannot be used.</para>
+            <para>This helper can only propagate exceptions, not catch them permanently.</para>
+            <para>Use <see cref="M:MonoMod.Core.Platforms.INativeExceptionHelper.CreateNativeToManagedHelper(System.IntPtr,System.IDisposable@)"/> to generate a thunk which should be
+            used at the native->managed transition. This will rethrow the exception on the current thread, if there is one.
+            Similarly, use <see cref="M:MonoMod.Core.Platforms.INativeExceptionHelper.CreateManagedToNativeHelper(System.IntPtr,System.IDisposable@)"/> to generate a thunk to use at
+            the managed->native transition. This thunk will catch exceptions which are thrown in the native code, and store
+            them in a thread local associated with the exception helper.</para>
+            </remarks>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.INativeExceptionHelper.GetExceptionSlot">
+            <summary>
+            Gets a delegate which can be used to get a pointer to the current thread's native exception slot.
+            </summary>
+            <remarks>
+            Native exceptions which are caught this way <i>must</i> be preserved and restored just before returning to the 
+            native->managed helper. Because calls into the native->managed helper clear the thread local storage, this value
+            must be read and preserved immediately after any calls to the managed->native helper, to protect against other
+            uses of the exception helper. It must then be restored before returning to the native->managed helper.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.INativeExceptionHelper.CreateNativeToManagedHelper(System.IntPtr,System.IDisposable@)">
+            <summary>
+            Creates a native to managed thunk for this exception helper.
+            </summary>
+            <param name="target">The function pointer for the generated thunk to call. This is usually the result of <see cref="M:System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(System.Delegate)"/>.</param>
+            <param name="handle">A handle to any memory allocations made for the thunk. This must be kept alive as long as the returned pointer is in use.</param>
+            <returns>A pointer to the thunk to pass to native code to call instead of <paramref name="target"/>.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.INativeExceptionHelper.CreateManagedToNativeHelper(System.IntPtr,System.IDisposable@)">
+            <summary>
+            Creates a managed to native thunk for this exception helper.
+            </summary>
+            <param name="target">The function pointer for the native code to call.</param>
+            <param name="handle">A handle to any memory allocations made for the thunk. This must be kept alive as long as the returned pointer is in use.</param>
+            <returns>A pointer to the thunk for managed code to call instead of <paramref name="target"/>.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.GetExceptionSlot">
+            <summary>
+            A delegate which gets a pointer to the current thread's native exception slot.
+            </summary>
+            <returns>A pointer to the current thread's native exception slot.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.IRuntime">
+            <summary>
+            Represents a host .NET runtime.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IRuntime.Target">
+            <summary>
+            Gets the <see cref="T:MonoMod.Utils.RuntimeKind"/> that this instance represents.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IRuntime.Features">
+            <summary>
+            Gets the set of <see cref="T:MonoMod.Core.Platforms.RuntimeFeature"/>s that this instance supports. Some members may only be available with certain feature flags set.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.IRuntime.Abi">
+            <summary>
+            Gets the <see cref="P:MonoMod.Core.Platforms.IRuntime.Abi"/> descriptor for this runtime.
+            </summary>
+        </member>
+        <member name="E:MonoMod.Core.Platforms.IRuntime.OnMethodCompiled">
+            <summary>
+            An event which is invoked when a method is compiled.
+            </summary>
+            <remarks>
+            This event will only be invoked when <see cref="P:MonoMod.Core.Platforms.IRuntime.Features"/> includes <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.CompileMethodHook"/>.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IRuntime.GetIdentifiable(System.Reflection.MethodBase)">
+            <summary>
+            Gets an "identifiable" <see cref="T:System.Reflection.MethodBase"/>. The returned instance is safe to use with object identity to refer to specific methods.
+            </summary>
+            <remarks>
+            <para>This must only be called if <see cref="P:MonoMod.Core.Platforms.IRuntime.Features"/> includes <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresMethodIdentification"/>.
+            Typically, callers should use <see cref="M:MonoMod.Core.Platforms.PlatformTriple.GetIdentifiable(System.Reflection.MethodBase)"/>, which automatically
+            checks the feature flag, as well as doing additional processing which is runtime-agnostic.</para>
+            </remarks>
+            <param name="method">The method to identify.</param>
+            <returns>A <see cref="T:System.Reflection.MethodBase"/> with object identity.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IRuntime.GetMethodHandle(System.Reflection.MethodBase)">
+            <summary>
+            Portably gets the <see cref="T:System.RuntimeMethodHandle"/> for a given <see cref="T:System.Reflection.MethodBase"/>.
+            </summary>
+            <remarks>
+            <para>This method must always be implemented. For simple cases, its implementation can be just a call to
+            <see cref="P:System.Reflection.MethodBase.MethodHandle"/>, however most runtimes have edge cases which that is not well-behaved for.</para>
+            </remarks>
+            <param name="method"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IRuntime.DisableInlining(System.Reflection.MethodBase)">
+            <summary>
+            Disables inlining for a particular method. After this is called, future invocations of this method will not be inlined at the callsite by the runtime.
+            </summary>
+            <remarks>
+            <para>This must only be called if <see cref="P:MonoMod.Core.Platforms.IRuntime.Features"/> includes <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.DisableInlining"/>.
+            Typically, callers should use <see cref="M:MonoMod.Core.Platforms.PlatformTriple.TryDisableInlining(System.Reflection.MethodBase)"/>, which automatically
+            checks that feature flag, calling this method if available.</para>
+            </remarks>
+            <param name="method">The method to disable inlining for.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IRuntime.PinMethodIfNeeded(System.Reflection.MethodBase)">
+            <summary>
+            Pins a method so that it will not be garbage collected, if that is necessary for this runtime.
+            </summary>
+            <remarks>
+            <para>This must only be called if <see cref="P:MonoMod.Core.Platforms.IRuntime.Features"/> includes <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresMethodPinning"/>.
+            Typically, callers should use <see cref="M:MonoMod.Core.Platforms.PlatformTriple.PinMethodIfNeeded(System.Reflection.MethodBase)"/>, which calls this method only
+            when that flag is set.</para>
+            </remarks>
+            <param name="method">The method to pin.</param>
+            <returns>An <see cref="T:System.IDisposable"/> representing the method pin, or <see langword="null"/> if none is needed.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IRuntime.GetMethodEntryPoint(System.Reflection.MethodBase)">
+            <summary>
+            Gets the real entrypoint of the provided method.
+            </summary>
+            <remarks>
+            <para>This method must always be implemented. Its result may be treated differently by <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/> depending
+            on whether the implementation sets the flag <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresBodyThunkWalking"/>. If that flag is set, the
+            return value is presumed to be the start of a thunk chain which eventually leads to the real method body. If it is not set,
+            the return value of this method is used directly.</para>
+            </remarks>
+            <param name="method">The method to get the entrypoint of.</param>
+            <returns>A pointer to the real entrypoint of the method.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.IRuntime.Compile(System.Reflection.MethodBase)">
+            <summary>
+            Compiles the provided method so that it has a native method body.
+            </summary>
+            <remarks>
+            <para>This must only be called if <see cref="P:MonoMod.Core.Platforms.IRuntime.Features"/> includes <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresCustomMethodCompile"/>.
+            Typically, callers should use <see cref="M:MonoMod.Core.Platforms.PlatformTriple.Compile(System.Reflection.MethodBase)"/>, which automatically calls this method
+            when available.</para>
+            <para>When an implementer sets the feature flag <see cref="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresCustomMethodCompile"/>, it takes on the full
+            responsibility of ensuring that a method is compiled. No additional work is done by <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.</para>
+            </remarks>
+            <param name="method">The method to compile.</param>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.OnMethodCompiledCallback">
+            <summary>
+            A callback which is called when a method is compiled by the JIT.
+            </summary>
+            <remarks>
+            <para>On some runtimes, <paramref name="codeStart"/> != <paramref name="codeRw"/>. When this is the case, <paramref name="codeRw"/> contains the actual body, which will
+            be copied to <paramref name="codeStart"/> after the hook returns.</para>
+            </remarks>
+            <param name="methodHandle">The <see cref="T:System.RuntimeMethodHandle"/> of the method which was compiled.</param>
+            <param name="method">A <see cref="T:System.Reflection.MethodBase"/> representing the method, if one could be found.</param>
+            <param name="codeStart">A pointer to the start of the method code. This only represents the final location which the code will exist at.</param>
+            <param name="codeRw">A pointer to the start of the read/write capable code. This contains the actual code data.</param>
+            <param name="codeSize">The size of the code.</param>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.ISystem">
+            <summary>
+            Represents a host operating system.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.ISystem.Target">
+            <summary>
+            Gets the <see cref="T:MonoMod.Utils.OSKind"/> which this instance represents.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.ISystem.Features">
+            <summary>
+            Gets the set of <see cref="T:MonoMod.Core.Platforms.SystemFeature"/>s that this instance supports. Some members may only be available with certain feature flags set.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.ISystem.DefaultAbi">
+            <summary>
+            Gets the default ABI for this OS, if there is one.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.ISystem.MemoryAllocator">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.IMemoryAllocator"/> for this OS.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.ISystem.NativeExceptionHelper">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.INativeExceptionHelper"/> for this OS, if it is needed.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.ISystem.EnumerateLoadedModuleFiles">
+            <summary>
+            Enumerates all modules which are loaded in the process and yields their file names.
+            </summary>
+            <returns>An enumerable over the file names of all loaded modules.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.ISystem.GetSizeOfReadableMemory(System.IntPtr,System.IntPtr)">
+            <summary>
+            Gets an approximate amount of memory after <paramref name="start"/> which is readable.
+            </summary>
+            <param name="start">The start address to check.</param>
+            <param name="guess">The amount which is expected. This method may not return values larger than to the page following this guess.</param>
+            <returns>A number of bytes after <paramref name="start"/> which it is safe to read.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.ISystem.PatchData(MonoMod.Core.Platforms.PatchTargetKind,System.IntPtr,System.ReadOnlySpan{System.Byte},System.Span{System.Byte})">
+            <summary>
+            Patches <paramref name="patchTarget"/> to contain the data in <paramref name="data"/>, while creating a backup
+            of the data which was previously there in <paramref name="backup"/>.
+            </summary>
+            <remarks>
+            <para><paramref name="backup"/> may be an empty span. When it is, no backup is made.</para>
+            <para><paramref name="targetKind"/> is to be used as nothing more than a hint. The system should check the existing mapping
+            to ensure that it is in fact correct (so that it would not remap an RW page to an RX page, or something similar).</para>
+            </remarks>
+            <param name="targetKind">The expected kind of data at <paramref name="patchTarget"/>.</param>
+            <param name="patchTarget">A pointer to the memory location to patch.</param>
+            <param name="data">The data to write into <paramref name="patchTarget"/>.</param>
+            <param name="backup">A span to fill will the data which was already present, or an empty span.</param>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.PatchTargetKind">
+            <summary>
+            The kind of data which exists at a location to be patched.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.PatchTargetKind.Executable">
+            <summary>
+            The data at the target is expected to be executable.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.PatchTargetKind.ReadOnly">
+            <summary>
+            The data at the target is expected to be read-only.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator">
+            <summary>
+            An <see cref="T:MonoMod.Core.Platforms.IMemoryAllocator"/> based on a paged memory model.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation">
+            <summary>
+            An allocation of memory within a page.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.IsExecutable">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.#ctor(MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page,System.UInt32,System.Int32)">
+            <summary>
+            Creates a new <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation"/> in the provided page, at the specified offset, with the specified size.
+            </summary>
+            <param name="page">The <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page"/> this allocation is a part of.</param>
+            <param name="offset">The offset in the page of this allocation.</param>
+            <param name="size">The size of the allocation.</param>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.BaseAddress">
+            <inheritdoc/>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.Size">
+            <inheritdoc/>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.Memory">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.Finalize">
+            <summary>
+            Releases the allocated memory represented by this allocation.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page">
+            <summary>
+            A page of memory managed by a <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page.IsEmpty">
+            <summary>
+            Gets whether or not this page has no allocations.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page.BaseAddr">
+            <summary>
+            Gets the base address of this page.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page.Size">
+            <summary>
+            Gets the size of this page.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page.IsExecutable">
+            <summary>
+            Gets whether or not this page is executable.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page.#ctor(MonoMod.Core.Platforms.Memory.PagedMemoryAllocator,System.IntPtr,System.UInt32,System.Boolean)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page"/> object associated with the specified <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator"/>.
+            </summary>
+            <param name="owner">The <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator"/> which this page is managed by.</param>
+            <param name="baseAddr">The base address of this page.</param>
+            <param name="size">The size of this page.</param>
+            <param name="isExecutable"><see langword="true"/> if this page is executable; <see langword="false"/> otherwise.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page.TryAllocate(System.UInt32,System.UInt32,MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageAllocation@)">
+            <summary>
+            Tries to create a new allocation in this page.
+            </summary>
+            <param name="size">The size of the allocation.</param>
+            <param name="align">The alignment of the allocation.</param>
+            <param name="alloc">THe new allocation, if one was made.</param>
+            <returns><see langword="true"/> if an allocation was made; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.PageSize">
+            <summary>
+            Gets the page size.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.#ctor(System.IntPtr)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator"/> with the specified page size.
+            </summary>
+            <param name="pageSize"></param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.RoundDownToPageBoundary(System.IntPtr)">
+            <summary>
+            Rounds <paramref name="addr"/> down to the nearest page boundary below it.
+            </summary>
+            <param name="addr">The address to round.</param>
+            <returns>The dounded address.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.InsertAllocatedPage(MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page)">
+            <summary>
+            Inserts a newly allocated <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page"/> into this allocator.
+            </summary>
+            <remarks>
+            The allocation lock must be held when this is called.
+            </remarks>
+            <param name="page">The page to insert.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.RegisterForCleanup(MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page)">
+            <summary>
+            Registers the provided page for cleanup.
+            </summary>
+            <remarks>
+            Pages are not freed when their last allocation is. Instead, we wait for the next GC to free them, to allow
+            other allocation requests to reuse that page without calling into the OS.
+            </remarks>
+            <param name="page">The page to register for cleanup.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.TryFreePage(MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page,System.String@)">
+            <summary>
+            Tries to free a page.
+            </summary>
+            <param name="page">The page to free.</param>
+            <param name="errorMsg">The error message generated by the operation, if any./</param>
+            <returns><see langword="true"/> if the page was successfully freed; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.MaxSize">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.TryAllocateInRange(MonoMod.Core.Platforms.PositionedAllocationRequest,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.TryAllocate(MonoMod.Core.Platforms.AllocationRequest,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.TryAllocateNewPage(MonoMod.Core.Platforms.AllocationRequest,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <summary>
+            Tries to allocate memory from a newly allocated page, according to the provided <see cref="T:MonoMod.Core.Platforms.AllocationRequest"/>.
+            </summary>
+            <param name="request">The allocation request.</param>
+            <param name="allocated">The allocated memory, if any.</param>
+            <returns><see langword="true"/> if memory was successfully allocated; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.TryAllocateNewPage(MonoMod.Core.Platforms.PositionedAllocationRequest,System.IntPtr,System.IntPtr,System.IntPtr,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <summary>
+            Tries to allocate memory from a newly allocated page, according to the provided <see cref="T:MonoMod.Core.Platforms.PositionedAllocationRequest"/>.
+            </summary>
+            <param name="request">The allocation request.</param>
+            <param name="targetPage">The target page address.</param>
+            <param name="lowPageBound">The low page boundary.</param>
+            <param name="highPageBound">The high page boundary.</param>
+            <param name="allocated">The allocated memory, if any.</param>
+            <returns><see langword="true"/> if memory was successfully allocated; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase">
+            <summary>
+            A base type providing OS methods required for <see cref="T:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase.PageSize">
+            <summary>
+            Gets the page size.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase.TryQueryPage(System.IntPtr,System.Boolean@,System.IntPtr@,System.IntPtr@)">
+            <summary>
+            Tries to query the specified page for information.
+            </summary>
+            <param name="pageAddr">The address of the page to query.</param>
+            <param name="isFree"><see langword="true"/> if the page is free; <see langword="false"/> if it is allocated.</param>
+            <param name="allocBase">The base of the page allocation this page is a part of.</param>
+            <param name="allocSize">The size of the page allocation this page is a part of.</param>
+            <returns><see langword="true"/> if the page was successfully queried; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase.TryAllocatePage(System.IntPtr,System.Boolean,System.IntPtr@)">
+            <summary>
+            Tries to allocate a page.
+            </summary>
+            <param name="size">The size of the page allocation.</param>
+            <param name="executable"><see langword="true"/> if the page should be executable; <see langword="false"/> otherwise.</param>
+            <param name="allocated">The address of the allocated page, if successful.</param>
+            <returns><see langword="true"/> if a page was successfully allocated; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase.TryAllocatePage(System.IntPtr,System.IntPtr,System.Boolean,System.IntPtr@)">
+            <summary>
+            Tries to allocate a specific page.
+            </summary>
+            <param name="pageAddr">The address of the page to allocate.</param>
+            <param name="size">The size of the page allocation.</param>
+            <param name="executable"><see langword="true"/> if the page should be executable; <see langword="false"/> otherwise.</param>
+            <param name="allocated">The address of the allocated page, if successful.</param>
+            <returns><see langword="true"/> if a page was successfully allocated; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase.TryFreePage(System.IntPtr,System.String@)">
+            <summary>
+            Tries to free the page at the provided addresss.
+            </summary>
+            <param name="pageAddr">The address of the page to free.</param>
+            <param name="errorMsg">An error message describing the error that ocurred, if any.</param>
+            <returns><see langword="true"/> if the page was successfully freed; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator">
+            <summary>
+            A <see cref="T:MonoMod.Core.Platforms.Memory.PagedMemoryAllocator"/> built around querying pages in memory.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator.#ctor(MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator"/> using the provided <see cref="T:MonoMod.Core.Platforms.Memory.QueryingMemoryPageAllocatorBase"/>.
+            </summary>
+            <param name="alloc">The page allocator to use.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator.TryAllocateNewPage(MonoMod.Core.Platforms.AllocationRequest,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator.TryAllocateNewPage(MonoMod.Core.Platforms.PositionedAllocationRequest,System.IntPtr,System.IntPtr,System.IntPtr,MonoMod.Core.Platforms.IAllocatedMemory@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Memory.QueryingPagedMemoryAllocator.TryFreePage(MonoMod.Core.Platforms.Memory.PagedMemoryAllocator.Page,System.String@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.PlatformTriple">
+            <summary>
+            A triple of <see cref="T:MonoMod.Core.Platforms.IArchitecture"/>, <see cref="T:MonoMod.Core.Platforms.ISystem"/>, and <see cref="T:MonoMod.Core.Platforms.IRuntime"/> which provides higher-level operations
+            based on the underlying implementations.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.CreateCurrentRuntime(MonoMod.Core.Platforms.ISystem,MonoMod.Core.Platforms.IArchitecture)">
+            <summary>
+            Creates an <see cref="T:MonoMod.Core.Platforms.IRuntime"/> implementation using the provided <see cref="T:MonoMod.Core.Platforms.ISystem"/> and <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> according
+            to the runtime detected by <see cref="P:MonoMod.Utils.PlatformDetection.Runtime"/>.
+            </summary>
+            <remarks>
+            The runtime may utilize the values of <see cref="T:MonoMod.Utils.PlatformDetection"/> to make decisions about its behaviour. As such, the provided
+            implementations must be for the current process.
+            </remarks>
+            <param name="system">The <see cref="T:MonoMod.Core.Platforms.ISystem"/> implementation for the runtime to use.</param>
+            <param name="arch">The <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> implementation for the runtime to use.</param>
+            <returns>An <see cref="T:MonoMod.Core.Platforms.IRuntime"/> implementation for the currently running runtime.</returns>
+            <exception cref="T:System.PlatformNotSupportedException">Thrown if <see cref="P:MonoMod.Utils.PlatformDetection.Runtime"/> returns an unsupported
+            runtime kind.</exception>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.CreateCurrentArchitecture(MonoMod.Core.Platforms.ISystem)">
+            <summary>
+            Creates an <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> implementation using the provided <see cref="T:MonoMod.Core.Platforms.ISystem"/> according
+            to the architecture detected by <see cref="P:MonoMod.Utils.PlatformDetection.Architecture"/>.
+            </summary>
+            <remarks>
+            The architecture may utilize the values of <see cref="T:MonoMod.Utils.PlatformDetection"/> to make decisions about its behaviour. As such, the provided
+            implementations must be for the current process.
+            </remarks>
+            <param name="system">The <see cref="T:MonoMod.Core.Platforms.ISystem"/> implementation for the architecture to use.</param>
+            <returns>An <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> implementation for the current architecture.</returns>
+            <exception cref="T:System.NotImplementedException">Thrown if <see cref="P:MonoMod.Utils.PlatformDetection.Architecture"/> returns an architecture
+            which will be supported in the future, but is not currently.</exception>
+            <exception cref="T:System.PlatformNotSupportedException">Thrown if <see cref="P:MonoMod.Utils.PlatformDetection.Architecture"/> returns an unsupported
+            architecture kind.</exception>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.CreateCurrentSystem">
+            <summary>
+            Creates an <see cref="T:MonoMod.Core.Platforms.ISystem"/> implementation according to the operating system detected by <see cref="P:MonoMod.Utils.PlatformDetection.OS"/>.
+            </summary>
+            <returns>The <see cref="T:MonoMod.Core.Platforms.ISystem"/> implementation for the current operating system.</returns>
+            <exception cref="T:System.NotImplementedException">Thrown if <see cref="P:MonoMod.Utils.PlatformDetection.OS"/> returns an operating system
+            which will be supported in the future, but is not currently.</exception>
+            <exception cref="T:System.PlatformNotSupportedException">Thrown if <see cref="P:MonoMod.Utils.PlatformDetection.OS"/> returns an unsupported
+            operating system.</exception>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.Architecture">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> for this <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.System">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.ISystem"/> for this <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.Runtime">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Platforms.IRuntime"/> for this <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.Current">
+            <summary>
+            Gets the current <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+            <remarks>
+            This <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/> is automatically constructed on first access, according to the values returned by <see cref="T:MonoMod.Utils.PlatformDetection"/>.
+            </remarks>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.SetPlatformTriple(MonoMod.Core.Platforms.PlatformTriple)">
+            <summary>
+            Sets the current <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+            <remarks>
+            This must be called before the first invocation of <see cref="P:MonoMod.Core.Platforms.PlatformTriple.Current"/>.
+            </remarks>
+            <param name="triple">The <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/> to set.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if a platform triple was previously set, or <see cref="P:MonoMod.Core.Platforms.PlatformTriple.Current"/>
+            was invoked before calling this method.</exception>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.#ctor(MonoMod.Core.Platforms.IArchitecture,MonoMod.Core.Platforms.ISystem,MonoMod.Core.Platforms.IRuntime)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/> with the provided <see cref="T:MonoMod.Core.Platforms.IArchitecture"/>, <see cref="T:MonoMod.Core.Platforms.ISystem"/>, and <see cref="T:MonoMod.Core.Platforms.IRuntime"/>.
+            </summary>
+            <remarks>
+            <para>
+            Each of the provided objects will be initialized, if they support it. The following interfaces are checked, and their initialize methods called:
+            <list type="bullet">
+                <item><see cref="T:MonoMod.Core.Utils.IInitialize`1"/> of <see cref="T:MonoMod.Core.Platforms.ISystem"/></item>
+                <item><see cref="T:MonoMod.Core.Utils.IInitialize`1"/> of <see cref="T:MonoMod.Core.Platforms.IArchitecture"/></item>
+                <item><see cref="T:MonoMod.Core.Utils.IInitialize`1"/> of <see cref="T:MonoMod.Core.Platforms.IRuntime"/></item>
+                <item><see cref="T:MonoMod.Core.Utils.IInitialize`1"/> of <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/></item>
+                <item><see cref="T:MonoMod.Core.Utils.IInitialize"/></item>
+            </list>
+            After being initialized, <see cref="P:MonoMod.Core.Platforms.IRuntime.Abi"/> is read from the <see cref="T:MonoMod.Core.Platforms.IRuntime"/> instance.
+            </para>
+            </remarks>
+            <param name="architecture">The <see cref="T:MonoMod.Core.Platforms.IArchitecture"/> to use.</param>
+            <param name="system">The <see cref="T:MonoMod.Core.Platforms.ISystem"/> to use.</param>
+            <param name="runtime">The <see cref="T:MonoMod.Core.Platforms.IRuntime"/> to use.</param>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.HostTriple">
+            <summary>
+            Gets the triple of <see cref="T:MonoMod.Utils.ArchitectureKind"/>, <see cref="T:MonoMod.Utils.OSKind"/>, and <see cref="T:MonoMod.Utils.RuntimeKind"/> represented by this <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.SupportedFeatures">
+            <summary>
+            Gets the supported features of this <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.Abi">
+            <summary>
+            Gets the ABI for this <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.Compile(System.Reflection.MethodBase)">
+            <summary>
+            Prepares <paramref name="method"/> by calling <see cref="M:System.Runtime.CompilerServices.RuntimeHelpers.PrepareMethod(System.RuntimeMethodHandle)"/>.
+            </summary>
+            <remarks>
+            Unlike <see cref="M:System.Runtime.CompilerServices.RuntimeHelpers.PrepareMethod(System.RuntimeMethodHandle)"/>, this method handles generic instantiations.
+            In order to do this, however, it has to perform a fair bit of reflection on invocation. Avoid calling it multiple times
+            for the same method, if possible.
+            </remarks>
+            <param name="method">The method to prepare.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.GetIdentifiable(System.Reflection.MethodBase)">
+            <summary>
+            Gets an "identifiable" <see cref="T:System.Reflection.MethodBase"/> for a method, which has object identity.
+            </summary>
+            <param name="method">The method to identify.</param>
+            <returns>The identifiable <see cref="T:System.Reflection.MethodBase"/>.</returns>
+            <seealso cref="M:MonoMod.Core.Platforms.IRuntime.GetIdentifiable(System.Reflection.MethodBase)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.PinMethodIfNeeded(System.Reflection.MethodBase)">
+            <summary>
+            Pins a method if that is required by the runtime.
+            </summary>
+            <param name="method">The method to pin.</param>
+            <returns>An <see cref="T:System.IDisposable"/> which managed the lifetime of the pin.</returns>
+            <seealso cref="M:MonoMod.Core.Platforms.IRuntime.PinMethodIfNeeded(System.Reflection.MethodBase)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.TryDisableInlining(System.Reflection.MethodBase)">
+            <summary>
+            Tries to disable inlining of the provided method, if the underlying runtime supports it.
+            </summary>
+            <param name="method">The method to disable inlining of.</param>
+            <returns><see langword="true"/> if inlining could be disabled; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.CreateSimpleDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)">
+            <summary>
+            Creates and applies a <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> from one address to another.
+            </summary>
+            <param name="from">The address to detour.</param>
+            <param name="to">The target of the detour.</param>
+            <param name="detourMaxSize">The maximum size available for the detour.</param>
+            <param name="fromRw">The address to write the detour to, if that is different from <paramref name="from"/>. Otherwise, the default value of <see langword="default"/> should be passed.
+            Refer to <see cref="T:MonoMod.Core.Platforms.OnMethodCompiledCallback"/> for more information.</param>
+            <returns>A <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> instance managing the generated detour.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.PlatformTriple.NativeDetour">
+            <summary>
+            A wrapper struct containing a <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> and alternate entrypoint handle.
+            </summary>
+            <param name="Simple">The <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> instance backing this detour.</param>
+            <param name="AltEntry">A pointer to the generated alternate entrypoint, if one was generated.</param>
+            <param name="AltHandle">The memory handle for the alternate entry point, if one is present.</param>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.NativeDetour.#ctor(MonoMod.Core.Platforms.SimpleNativeDetour,System.IntPtr,System.IDisposable)">
+            <summary>
+            A wrapper struct containing a <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> and alternate entrypoint handle.
+            </summary>
+            <param name="Simple">The <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> instance backing this detour.</param>
+            <param name="AltEntry">A pointer to the generated alternate entrypoint, if one was generated.</param>
+            <param name="AltHandle">The memory handle for the alternate entry point, if one is present.</param>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.NativeDetour.Simple">
+            <summary>The <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> instance backing this detour.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.NativeDetour.AltEntry">
+            <summary>A pointer to the generated alternate entrypoint, if one was generated.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.NativeDetour.AltHandle">
+            <summary>The memory handle for the alternate entry point, if one is present.</summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.PlatformTriple.NativeDetour.HasAltEntry">
+            <summary>
+            Gets whether or not this instance is holding an alternate entrypoint in <see cref="P:MonoMod.Core.Platforms.PlatformTriple.NativeDetour.AltEntry"/>.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)">
+            <summary>
+            Creates a <see cref="T:MonoMod.Core.Platforms.PlatformTriple.NativeDetour"/>. This is basically identical to <see cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateSimpleDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>,
+            except that it generates an alternate entrypoint for <paramref name="from"/>.
+            </summary>
+            <param name="from">The address to detour.</param>
+            <param name="to">The target of the detour.</param>
+            <param name="detourMaxSize">The maximum size available for the detour.</param>
+            <param name="fromRw">The address to write the detour to, if that is different from <paramref name="from"/>. Otherwise, the default value of <see langword="default"/> should be passed.
+            Refer to <see cref="T:MonoMod.Core.Platforms.OnMethodCompiledCallback"/> for more information.</param>
+            <returns>A <see cref="T:MonoMod.Core.Platforms.PlatformTriple.NativeDetour"/> instance managing the generated detour.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.GetNativeMethodBody(System.Reflection.MethodBase)">
+            <summary>
+            Gets the native method body for a method.
+            </summary>
+            <param name="method">The method to get the body of.</param>
+            <returns>A pointer to the native method body of the method.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTriple.GetRealDetourTarget(System.Reflection.MethodBase,System.Reflection.MethodBase)">
+            <summary>
+            Gets the 'real detour target' when detouring <paramref name="from"/> to <paramref name="to"/>.
+            </summary>
+            <remarks>
+            This will return an ABI fixup method instead of <paramref name="to"/> when needed, automatically
+            generating them when needed. When this is needed depends on the argument order in the ABI.
+            </remarks>
+            <param name="from">The method being detoured from.</param>
+            <param name="to">The method being detoured to.</param>
+            <returns>The method to detour to instead of <paramref name="to"/>.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.PlatformTripleDetourFactory">
+            <summary>
+            An <see cref="T:MonoMod.Core.IDetourFactory"/> implementation based on <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTripleDetourFactory.#ctor(MonoMod.Core.Platforms.PlatformTriple)">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Platforms.PlatformTripleDetourFactory"/> based on the provided <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/>.
+            </summary>
+            <param name="triple">The <see cref="T:MonoMod.Core.Platforms.PlatformTriple"/> to create a detour factory using.</param>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTripleDetourFactory.CreateDetour(MonoMod.Core.CreateDetourRequest)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.PlatformTripleDetourFactory.CreateNativeDetour(MonoMod.Core.CreateNativeDetourRequest)">
+            <inheritdoc/>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.RuntimeFeature">
+            <summary>
+            A set of features which may be provided by an <see cref="T:MonoMod.Core.Platforms.IRuntime"/> implementation.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.None">
+            <summary>
+            No features are provided.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.PreciseGC">
+            <summary>
+            This runtime uses (or may use) a precise GC, so object references and byrefs must not be stored e.g. as <see cref="T:System.IntPtr"/>s.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.CompileMethodHook">
+            <summary>
+            This runtime hooks the JIT, and invokes <see cref="E:MonoMod.Core.Platforms.IRuntime.OnMethodCompiled"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.ILDetour">
+            <summary>
+            This runtime supports detouring natively.
+            </summary>
+            <remarks>
+            Currently, there are no runtimes which support this. However, it is possible that there will be a runtime in the future which does.
+            </remarks>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.GenericSharing">
+            <summary>
+            This runtime uses generic sharing.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.ListGenericInstantiations">
+            <summary>
+            This runtime supports listing the instantiations of a generic method.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.DisableInlining">
+            <summary>
+            This runtime supports disabling inlining on methods, and implements <see cref="M:MonoMod.Core.Platforms.IRuntime.DisableInlining(System.Reflection.MethodBase)"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.Uninlining">
+            <summary>
+            Thus runtime supports un-inlining previously inlined methods.
+            </summary>
+            <remarks>
+            Currently, there are no runtimes which support this. However, it is possible that there will be a runtime in the future which does.
+            </remarks>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresMethodPinning">
+            <summary>
+            This runtime requires method pinning for detours to function reliably.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresMethodIdentification">
+            <summary>
+            This runtime requires method identification, and implements <see cref="M:MonoMod.Core.Platforms.IRuntime.GetIdentifiable(System.Reflection.MethodBase)"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresBodyThunkWalking">
+            <summary>
+            This runtime requires method body thunk walking to find the actual method body.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.HasKnownABI">
+            <summary>
+            This runtime has a known ABI.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.RuntimeFeature.RequiresCustomMethodCompile">
+            <summary>
+            This method requires a custom implementation to reliably compile methods, and implements <see cref="M:MonoMod.Core.Platforms.IRuntime.Compile(System.Reflection.MethodBase)"/>.,
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.Runtimes.Core21Runtime.JitHookHelpersHolder.GetOrCreateGetTypeFromHandleUnsafe(MonoMod.Core.Platforms.Runtimes.Core21Runtime)">
+            <summary>
+            This method gets or creates the internal call for Type.GetTypeFromHandleUnsafe.
+            The internal call always exists, but the managed method doesn't in some cases.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.SimpleNativeDetour">
+            <summary>
+            A simple native detour from one address to another.
+            </summary>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateSimpleDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.SimpleNativeDetour.DetourBackup">
+            <summary>
+            Gets the backup data for this detour. This contains the bytes which were originally at the detour location.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.SimpleNativeDetour.Source">
+            <summary>
+            Gets the detour source location.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Platforms.SimpleNativeDetour.Destination">
+            <summary>
+            Gets the detour target location.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.SimpleNativeDetour.ChangeTarget(System.IntPtr)">
+            <summary>
+            Changes the target of this detour to <paramref name="newTarget"/>.,
+            </summary>
+            <remarks>
+            If this <see cref="T:MonoMod.Core.Platforms.SimpleNativeDetour"/> was created as a result of <see cref="M:MonoMod.Core.Platforms.PlatformTriple.CreateNativeDetour(System.IntPtr,System.IntPtr,System.Int32,System.IntPtr)"/>,
+            then it is not safe to use this method. Because this method may enlarge the detour, it would need to fix up the generated alt entrypoint too, which is
+            not currently supported. Refer to <see cref="M:MonoMod.Core.Platforms.IAltEntryFactory.CreateAlternateEntrypoint(System.IntPtr,System.Int32,System.IDisposable@)"/> for more information.
+            </remarks>
+            <param name="newTarget">The new target of the detour.</param>
+            <seealso cref="M:MonoMod.Core.Platforms.IArchitecture.ComputeRetargetInfo(MonoMod.Core.Platforms.NativeDetourInfo,System.IntPtr,System.Int32)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.IArchitecture.GetRetargetBytes(MonoMod.Core.Platforms.NativeDetourInfo,MonoMod.Core.Platforms.NativeDetourInfo,System.Span{System.Byte},System.IDisposable@,System.Boolean@,System.Boolean@)"/>
+            <seealso cref="M:MonoMod.Core.Platforms.IAltEntryFactory.CreateAlternateEntrypoint(System.IntPtr,System.Int32,System.IDisposable@)"/>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.SimpleNativeDetour.Undo">
+            <summary>
+            Undoes this detour. After this is called, the object is disposed, and may not be used.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.SimpleNativeDetour.Finalize">
+            <summary>
+            Undoes and cleans up this detour.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Platforms.SimpleNativeDetour.Dispose">
+            <summary>
+            Undoes and cleans up this detour.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Platforms.SystemFeature">
+            <summary>
+            A set of features which may be provided by an <see cref="T:MonoMod.Core.Platforms.ISystem"/> implementation.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SystemFeature.None">
+            <summary>
+            No features are provided.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SystemFeature.RWXPages">
+            <summary>
+            This system allows for pages which are protected Read/Write/Execute.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Platforms.SystemFeature.RXPages">
+            <summary>
+            This system allows for pages which are protected Read/Execute.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Utils.AddressKind">
+            <summary>
+            The kind of an address in a <see cref="T:MonoMod.Core.Utils.BytePattern"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.Rel32">
+            <summary>
+            A 32-bit relative address.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.Rel64">
+            <summary>
+            A 64-bit relative address.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.Abs32">
+            <summary>
+            A 32-bit absolute address.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.Abs64">
+            <summary>
+            A 64-bit absolute address.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.PrecodeFixupThunkRel32">
+            <summary>
+            A <see cref="F:MonoMod.Core.Utils.AddressKind.Rel32"/> address, pointing to <c>PrecodeFixupThunk</c> or some equivalent.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.PrecodeFixupThunkRel64">
+            <summary>
+            A <see cref="F:MonoMod.Core.Utils.AddressKind.Rel64"/> address, pointing to <c>PrecodeFixupThunk</c> or some equivalent.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.PrecodeFixupThunkAbs32">
+            <summary>
+            A <see cref="F:MonoMod.Core.Utils.AddressKind.Abs32"/> address, pointing to <c>PrecodeFixupThunk</c> or some equivalent.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.PrecodeFixupThunkAbs64">
+            <summary>
+            A <see cref="F:MonoMod.Core.Utils.AddressKind.Abs64"/> address, pointing to <c>PrecodeFixupThunk</c> or some equivalent.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.Indirect">
+            <summary>
+            An indirect address. This must be combined with one of the other address kinds. The address points
+            to a word-sized indirection cell which contains the actual target.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKind.Constant">
+            <summary>
+            A constant address. This must be combined with one of the other address kinds. The address value is always
+            a constant.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Utils.AddressKindExtensions">
+            <summary>
+            Extensions to <see cref="T:MonoMod.Core.Utils.AddressKind"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKindExtensions.IsAbsoluteField">
+            <summary>
+            The <see cref="T:MonoMod.Core.Utils.AddressKind"/> flag indicating that the kind is absolute.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKindExtensions.Is64BitField">
+            <summary>
+            The <see cref="T:MonoMod.Core.Utils.AddressKind"/> flag indicating that the kind is 64-bit.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKindExtensions.IsPrecodeFixupField">
+            <summary>
+            The <see cref="T:MonoMod.Core.Utils.AddressKind"/> flag indicating that the kind is a <c>PrecodeFixupThunk</c> address.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKindExtensions.IsIndirectField">
+            <summary>
+            The <see cref="T:MonoMod.Core.Utils.AddressKind"/> flag indicating that the kind is indirect.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.AddressKindExtensions.IsConstantField">
+            <summary>
+            The <see cref="T:MonoMod.Core.Utils.AddressKind"/> flag indicating that the kind is constant.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.IsRelative(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is relative.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is relative; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.IsAbsolute(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is absolute.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is absolute; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.Is32Bit(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is 32-bit.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is 32-bit; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.Is64Bit(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is 64-bit.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is 64-bit; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.IsPrecodeFixup(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is a <c>PrecodeFixupThunk</c> address.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is a <c>PrecodeFixupThunk</c> address; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.IsIndirect(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is indirect.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is indirect; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.IsConstant(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Gets whether or not this <see cref="T:MonoMod.Core.Utils.AddressKind"/> is constant.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to check.</param>
+            <returns><see langword="true"/> if <paramref name="value"/> is constant; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.Validate(MonoMod.Core.Utils.AddressKind,System.String)">
+            <summary>
+            Validates <paramref name="value"/>, ensuring that it is a valid <see cref="T:MonoMod.Core.Utils.AddressKind"/>.
+            </summary>
+            <param name="value">The value to validate.</param>
+            <param name="argName">The name of the argument.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if <paramref name="value"/> is invalid.</exception>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressKindExtensions.FastToString(MonoMod.Core.Utils.AddressKind)">
+            <summary>
+            Converts this <see cref="T:MonoMod.Core.Utils.AddressKind"/> to a string.
+            </summary>
+            <param name="value">The <see cref="T:MonoMod.Core.Utils.AddressKind"/> to convert.</param>
+            <returns>The string representation of this <see cref="T:MonoMod.Core.Utils.AddressKind"/>.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Utils.AddressMeaning">
+            <summary>
+            An address meaning for use with a <see cref="T:MonoMod.Core.Utils.BytePattern"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.AddressMeaning.Kind">
+            <summary>
+            Gets the <see cref="T:MonoMod.Core.Utils.AddressKind"/> associated with this meaning.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.AddressMeaning.RelativeToOffset">
+            <summary>
+            Gets the offset from the match start that an address is relative to, if it is relative.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.AddressMeaning.ConstantValue">
+            <summary>
+            Gets the constant value of this address, if it is constant.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.#ctor(MonoMod.Core.Utils.AddressKind,System.UInt64)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> for the specified <see cref="T:MonoMod.Core.Utils.AddressKind"/>.
+            </summary>
+            <param name="kind">The <see cref="T:MonoMod.Core.Utils.AddressKind"/>.</param>
+            <param name="constantValue">The constant value of the address, if it is constant.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if <paramref name="kind"/> is invalid -OR- <paramref name="kind"/> is relative.</exception>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.#ctor(MonoMod.Core.Utils.AddressKind,System.Int32,System.UInt64)">
+            <summary>
+            Constructs an <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> for the specified <see cref="T:MonoMod.Core.Utils.AddressKind"/> and relative offset.
+            </summary>
+            <param name="kind">The <see cref="T:MonoMod.Core.Utils.AddressKind"/>.</param>
+            <param name="relativeOffset">The offset relative to the match start.</param>
+            <param name="constantValue">The constant value of the address, if it is constant.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if <paramref name="kind"/> is invalid
+            -OR- <paramref name="kind"/> is absolute
+            -OR- <paramref name="relativeOffset"/> is less than zero.</exception>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.ProcessAddress(System.IntPtr,System.Int32,System.UInt64)">
+            <summary>
+            Processes an address according to this <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> into an absolute address.
+            </summary>
+            <param name="basePtr">The base pointer of the match.</param>
+            <param name="offset">The offset from the base pointer that the match occurred at.</param>
+            <param name="address">The address which was extracted from the match.</param>
+            <returns>The resolved target address.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.Equals(MonoMod.Core.Utils.AddressMeaning)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.op_Equality(MonoMod.Core.Utils.AddressMeaning,MonoMod.Core.Utils.AddressMeaning)">
+            <summary>
+            Compares two <see cref="T:MonoMod.Core.Utils.AddressMeaning"/>s for equality.
+            </summary>
+            <param name="left">The first <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> to compare.</param>
+            <param name="right">The second <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> to compare.</param>
+            <returns><see langword="true"/> if the two <see cref="T:MonoMod.Core.Utils.AddressMeaning"/>s are equal; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.AddressMeaning.op_Inequality(MonoMod.Core.Utils.AddressMeaning,MonoMod.Core.Utils.AddressMeaning)">
+            <summary>
+            Compares two <see cref="T:MonoMod.Core.Utils.AddressMeaning"/>s for inequality.
+            </summary>
+            <param name="left">The first <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> to compare.</param>
+            <param name="right">The second <see cref="T:MonoMod.Core.Utils.AddressMeaning"/> to compare.</param>
+            <returns><see langword="true"/> if the two <see cref="T:MonoMod.Core.Utils.AddressMeaning"/>s are not equal; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:MonoMod.Core.Utils.BytePattern">
+            <summary>
+            A byte pattern which can be quickly matched, and extract an address.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.BytePattern.BAnyValue">
+            <summary>
+            A placeholder which represents one byte with any value. For use in <see cref="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.ReadOnlyMemory{System.Byte},System.ReadOnlyMemory{System.Byte})"/>,
+            in the pattern argument, corresponding to an empty mask byte.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.BytePattern.SAnyValue">
+            <summary>
+            A placeholder which represents one byte with any value. For use in <see cref="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.Boolean,System.ReadOnlyMemory{System.UInt16})"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.BytePattern.BAnyRepeatingValue">
+            <summary>
+            A placeholder which represents any number of bytes with any value. For use in <see cref="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.ReadOnlyMemory{System.Byte},System.ReadOnlyMemory{System.Byte})"/>,
+            in the pattern argument, corresponding to an empty mask byte.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.BytePattern.SAnyRepeatingValue">
+            <summary>
+            A placeholder which represents any number of bytes with any value. For use in <see cref="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.Boolean,System.ReadOnlyMemory{System.UInt16})"/>.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.BytePattern.BAddressValue">
+            <summary>
+            A placeholder which represents an address byte. For use in <see cref="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.ReadOnlyMemory{System.Byte},System.ReadOnlyMemory{System.Byte})"/>,
+            in the pattern argument, corresponding to an empty mask byte.
+            </summary>
+        </member>
+        <member name="F:MonoMod.Core.Utils.BytePattern.SAddressValue">
+            <summary>
+            A placeholder which represents an address byte. For use in <see cref="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.Boolean,System.ReadOnlyMemory{System.UInt16})"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePattern.AddressBytes">
+            <summary>
+            Gets the number of address bytes.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePattern.MinLength">
+            <summary>
+            Gets the minimum length of this pattern.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePattern.AddressMeaning">
+            <summary>
+            Gets the <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> associated with this <see cref="T:MonoMod.Core.Utils.BytePattern"/>.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePattern.MustMatchAtStart">
+            <summary>
+            Gets whether or not this pattern must match exactly at the start of the data being scanned.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.UInt16[])">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePattern"/> with the specified <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> and pattern.
+            </summary>
+            <remarks>
+            The pattern is a sequence of <see cref="T:System.UInt16"/>s. Each element corresponds to one byte. If the high byte of the element is zero, then the low
+            byte is the exact byte value to match. If the high byte is 0xFF, then the low byte is some value with special meaning associated with it.
+            If the high byte is any other value, then that high byte acts as a mask for the bits of the low byte which must match.
+            </remarks>
+            <param name="meaning">The <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/>.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.Boolean,System.UInt16[])">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePattern"/> with the specified <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> and pattern.
+            </summary>
+            <remarks>
+            The pattern is a sequence of <see cref="T:System.UInt16"/>s. Each element corresponds to one byte. If the high byte of the element is zero, then the low
+            byte is the exact byte value to match. If the high byte is 0xFF, then the low byte is some value with special meaning associated with it.
+            If the high byte is any other value, then that high byte acts as a mask for the bits of the low byte which must match.
+            </remarks>
+            <param name="meaning">The <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/>.</param>
+            <param name="mustMatchAtStart"><see langword="true"/> if this pattern must match at the start of scanned data.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.ReadOnlyMemory{System.UInt16})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePattern"/> with the specified <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> and pattern.
+            </summary>
+            <remarks>
+            The pattern is a sequence of <see cref="T:System.UInt16"/>s. Each element corresponds to one byte. If the high byte of the element is zero, then the low
+            byte is the exact byte value to match. If the high byte is 0xFF, then the low byte is some value with special meaning associated with it.
+            If the high byte is any other value, then that high byte acts as a mask for the bits of the low byte which must match.
+            </remarks>
+            <param name="meaning">The <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/>.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.Boolean,System.ReadOnlyMemory{System.UInt16})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePattern"/> with the specified <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> and pattern.
+            </summary>
+            <remarks>
+            The pattern is a sequence of <see cref="T:System.UInt16"/>s. Each element corresponds to one byte. If the high byte of the element is zero, then the low
+            byte is the exact byte value to match. If the high byte is 0xFF, then the low byte is some value with special meaning associated with it.
+            If the high byte is any other value, then that high byte acts as a mask for the bits of the low byte which must match.
+            </remarks>
+            <param name="meaning">The <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/>.</param>
+            <param name="mustMatchAtStart"><see langword="true"/> if this pattern must match at the start of scanned data.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.ReadOnlyMemory{System.Byte},System.ReadOnlyMemory{System.Byte})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePattern"/> with the specified <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> and pattern.
+            </summary>
+            <remarks>
+            <para><paramref name="mask"/> and <paramref name="pattern"/> must be the same length.</para>
+            <para>If an element of <paramref name="mask"/> is zero, then the corresponding byte in <paramref name="pattern"/> has a special meaning.</para>
+            </remarks>
+            <param name="meaning">The <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/>.</param>
+            <param name="mask">The bitmask to use to match against <paramref name="pattern"/>.</param>
+            <param name="pattern">The pattern bytes.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.#ctor(MonoMod.Core.Utils.AddressMeaning,System.Boolean,System.ReadOnlyMemory{System.Byte},System.ReadOnlyMemory{System.Byte})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePattern"/> with the specified <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/> and pattern.
+            </summary>
+            <remarks>
+            <para><paramref name="mask"/> and <paramref name="pattern"/> must be the same length.</para>
+            <para>If an element of <paramref name="mask"/> is zero, then the corresponding byte in <paramref name="pattern"/> has a special meaning.</para>
+            </remarks>
+            <param name="meaning">The <see cref="P:MonoMod.Core.Utils.BytePattern.AddressMeaning"/>.</param>
+            <param name="mustMatchAtStart"><see langword="true"/> if this pattern must match at the start of scanned data.</param>
+            <param name="mask">The bitmask to use to match against <paramref name="pattern"/>.</param>
+            <param name="pattern">The pattern bytes.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.TryMatchAt(System.ReadOnlySpan{System.Byte},System.UInt64@,System.Int32@)">
+            <summary>
+            Tries to match this pattern over the provided span.
+            </summary>
+            <remarks>
+            <paramref name="address"/> is constructed starting at the byte with the lowest address. This means that
+            big-endian machines may need the address to be shifted if the address is smaller than 64 bits.
+            </remarks>
+            <param name="data">The data to try to match at the start of.</param>
+            <param name="address">The address which is parsed out of the data.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if <paramref name="data"/> matched at the start; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.TryMatchAt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.Int32@)">
+            <summary>
+            Tries to match this pattern over the provided span.
+            </summary>
+            <param name="data">The data to try to match at the start of.</param>
+            <param name="addrBuf">A buffer to write address bytes to.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if <paramref name="data"/> matched at the start; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.TryFindMatch(System.ReadOnlySpan{System.Byte},System.UInt64@,System.Int32@,System.Int32@)">
+            <summary>
+            Tries to find a match of this pattern within the provided span.
+            </summary>
+            <remarks>
+            <paramref name="address"/> is constructed starting at the byte with the lowest address. This means that
+            big-endian machines may need the address to be shifted if the address is smaller than 64 bits.
+            </remarks>
+            <param name="data">The data to find a match in.</param>
+            <param name="address">The address which is parsed out of the data.</param>
+            <param name="offset">The offset within the span that the pattern matched at.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if a match was found; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePattern.TryFindMatch(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.Int32@,System.Int32@)">
+            <summary>
+            Tries to find a match of this pattern within the provided span.
+            </summary>
+            <param name="data">The data to find a match in.</param>
+            <param name="addrBuf">A buffer to write address bytes to.</param>
+            <param name="offset">The offset within the span that the pattern matched at.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if a match was found; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePattern.FirstLiteralSegment">
+            <summary>
+            Gets the first literal segment of this pattern.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Utils.BytePatternCollection">
+            <summary>
+            A collection of <see cref="T:MonoMod.Core.Utils.BytePattern"/>s which can quickly try to match any contained pattern.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePatternCollection.MinLength">
+            <summary>
+            The minimum length that this collection can match.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePatternCollection.MaxMinLength">
+            <summary>
+            The maximum value of <see cref="P:MonoMod.Core.Utils.BytePattern.MinLength"/> within this collection.
+            </summary>
+        </member>
+        <member name="P:MonoMod.Core.Utils.BytePatternCollection.MaxAddressLength">
+            <summary>
+            The maximum address length.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.#ctor(System.ReadOnlyMemory{MonoMod.Core.Utils.BytePattern})">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePatternCollection"/> using the provided <see cref="T:MonoMod.Core.Utils.BytePattern"/>s.
+            </summary>
+            <param name="patterns">The <see cref="T:MonoMod.Core.Utils.BytePattern"/>s to construct this collection with.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.#ctor(MonoMod.Core.Utils.BytePattern[])">
+            <summary>
+            Constructs a <see cref="T:MonoMod.Core.Utils.BytePatternCollection"/> using the provided <see cref="T:MonoMod.Core.Utils.BytePattern"/>s.
+            </summary>
+            <param name="patterns">The <see cref="T:MonoMod.Core.Utils.BytePattern"/>s to construct this collection with.</param>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.GetEnumerator">
+            <summary>
+            Gets an enumerator over all of the patterns in this collection.
+            </summary>
+            <returns>An enumerator over all patterns in this collection.</returns>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.TryMatchAt(System.ReadOnlySpan{System.Byte},System.UInt64@,MonoMod.Core.Utils.BytePattern@,System.Int32@)">
+            <summary>
+            Tries to match this pattern over the provided span.
+            </summary>
+            <remarks>
+            <paramref name="address"/> is constructed starting at the byte with the lowest address. This means that
+            big-endian machines may need the address to be shifted if the address is smaller than 64 bits.
+            </remarks>
+            <param name="data">The data to try to match at the start of.</param>
+            <param name="address">The address which is parsed out of the data.</param>
+            <param name="matchingPattern">The <see cref="T:MonoMod.Core.Utils.BytePattern"/> which matched the buffer.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if <paramref name="data"/> matched at the start; <see langword="false"/> otherwise.</returns>
+            <seealso cref="M:MonoMod.Core.Utils.BytePattern.TryMatchAt(System.ReadOnlySpan{System.Byte},System.UInt64@,System.Int32@)"/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.TryMatchAt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},MonoMod.Core.Utils.BytePattern@,System.Int32@)">
+            <summary>
+            Tries to match this pattern over the provided span.
+            </summary>
+            <param name="data">The data to try to match at the start of.</param>
+            <param name="addrBuf">A buffer to write address bytes to.</param>
+            <param name="matchingPattern">The <see cref="T:MonoMod.Core.Utils.BytePattern"/> which matched the buffer.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if <paramref name="data"/> matched at the start; <see langword="false"/> otherwise.</returns>
+            <seealso cref="M:MonoMod.Core.Utils.BytePattern.TryMatchAt(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.Int32@)"/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.TryFindMatch(System.ReadOnlySpan{System.Byte},System.UInt64@,MonoMod.Core.Utils.BytePattern@,System.Int32@,System.Int32@)">
+            <summary>
+            Tries to find a match of this pattern within the provided span.
+            </summary>
+            <remarks>
+            <paramref name="address"/> is constructed starting at the byte with the lowest address. This means that
+            big-endian machines may need the address to be shifted if the address is smaller than 64 bits.
+            </remarks>
+            <param name="data">The data to find a match in.</param>
+            <param name="address">The address which is parsed out of the data.</param>
+            <param name="matchingPattern">The <see cref="T:MonoMod.Core.Utils.BytePattern"/> which matched the buffer.</param>
+            <param name="offset">The offset within the span that the pattern matched at.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if a match was found; <see langword="false"/> otherwise.</returns>
+            <seealso cref="M:MonoMod.Core.Utils.BytePattern.TryFindMatch(System.ReadOnlySpan{System.Byte},System.UInt64@,System.Int32@,System.Int32@)"/>
+        </member>
+        <member name="M:MonoMod.Core.Utils.BytePatternCollection.TryFindMatch(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},MonoMod.Core.Utils.BytePattern@,System.Int32@,System.Int32@)">
+            <summary>
+            Tries to find a match of this pattern within the provided span.
+            </summary>
+            <param name="data">The data to find a match in.</param>
+            <param name="addrBuf">A buffer to write address bytes to.</param>
+            <param name="matchingPattern">The <see cref="T:MonoMod.Core.Utils.BytePattern"/> which matched the buffer.</param>
+            <param name="offset">The offset within the span that the pattern matched at.</param>
+            <param name="length">The length of the matched pattern.</param>
+            <returns><see langword="true"/> if a match was found; <see langword="false"/> otherwise.</returns>
+            <seealso cref="M:MonoMod.Core.Utils.BytePattern.TryFindMatch(System.ReadOnlySpan{System.Byte},System.Span{System.Byte},System.Int32@,System.Int32@)"/>
+        </member>
+        <member name="T:MonoMod.Core.Utils.IInitialize">
+            <summary>
+            An object which must be initialized after construction.
+            </summary>
+        </member>
+        <member name="M:MonoMod.Core.Utils.IInitialize.Initialize">
+            <summary>
+            Initializes this instance.
+            </summary>
+        </member>
+        <member name="T:MonoMod.Core.Utils.IInitialize`1">
+            <summary>
+            An object which must be initialized with some value after construction.
+            </summary>
+            <typeparam name="T">The type of value this must be initialized with.</typeparam>
+        </member>
+        <member name="M:MonoMod.Core.Utils.IInitialize`1.Initialize(`0)">
+            <summary>
+            Initializes this instance.
+            </summary>
+            <param name="value">The requested value.</param>
+        </member>
+    </members>
+</doc>

@@ -51,10 +51,10 @@ public class LauncherActivity : Activity
         Platform.Init(this, savedInstanceState);
 
         // MonoMod Config
-        System.Environment.SetEnvironmentVariable("MONOMOD_DMDType", "cecil");
+        //System.Environment.SetEnvironmentVariable("MONOMOD_DMDType", "cecil");
         //var DMDDumpTo = Path.Combine(FileTool.ExternalFilesDir, "DMD Dump");
         //System.Environment.SetEnvironmentVariable("MONOMOD_DMDDumpTo", DMDDumpTo);
-        HarmonyLib.Harmony.SetCustomReolsveAssemblyForMonoMod_CecilBackEnd(StardewAssembliesResolver.Instance);
+        //HarmonyLib.Harmony.SetCustomReolsveAssemblyForMonoMod_CecilBackEnd(StardewAssembliesResolver.Instance);
 
 
         //setup my sdk
