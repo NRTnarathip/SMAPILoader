@@ -9,7 +9,7 @@
 		<Version></Version>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0.8</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>1.0.9</ApplicationDisplayVersion>
 		<ApplicationVersion>$([System.DateTimeOffset]::Now.ToUnixTimeSeconds())</ApplicationVersion>
 
 	</PropertyGroup>
@@ -50,29 +50,29 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="0Harmony">
-		  <HintPath>..\SharedLibs\0Harmony.dll</HintPath>
+			<HintPath>..\SharedLibs\0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoGame.Framework">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
 			<Private>True</Private>
 		</Reference>
 		<Reference Include="MonoMod.Backports">
-		  <HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Core">
-		  <HintPath>..\SharedLibs\MonoMod.Core.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Iced">
-		  <HintPath>..\SharedLibs\MonoMod.Iced.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Iced.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.ILHelpers">
-		  <HintPath>..\SharedLibs\MonoMod.ILHelpers.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.ILHelpers.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.RuntimeDetour">
-		  <HintPath>..\SharedLibs\MonoMod.RuntimeDetour.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.RuntimeDetour.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Utils">
-		  <HintPath>..\SharedLibs\MonoMod.Utils.dll</HintPath>
+			<HintPath>..\SharedLibs\MonoMod.Utils.dll</HintPath>
 		</Reference>
 		<Reference Include="StardewValley">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.dll</HintPath>
