@@ -56,12 +56,14 @@ internal static class GameCloner
     {
         try
         {
+            //throw exception here if file never crate
             var jsonString = File.ReadAllText(ClonerStateFilePath);
             var clonerState = JsonConvert.DeserializeObject<ClonerState>(jsonString);
             return clonerState ?? new ClonerState();
         }
         catch (Exception ex)
         {
+            //Recreate Game Cloner State always
             return new ClonerState();
         }
     }
