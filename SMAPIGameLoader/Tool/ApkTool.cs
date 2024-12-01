@@ -6,11 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace SMAPIGameLoader;
 
 internal static class ApkTool
 {
+    public static int AppBuildCode => int.Parse(AppInfo.BuildString);
+    public static Version AppVersion => AppInfo.Version;
+
     public static PackageInfo GetPackageInfo(string PackageName)
     {
         try

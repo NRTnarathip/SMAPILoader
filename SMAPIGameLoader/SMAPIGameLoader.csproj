@@ -15,13 +15,15 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
-		<RunAOTCompilation>False</RunAOTCompilation>
 		<PublishTrimmed>False</PublishTrimmed>
 		<AndroidEnableSGenConcurrent>True</AndroidEnableSGenConcurrent>
 		<AndroidKeyStore>True</AndroidKeyStore>
 		<AndroidSigningStorePass>android</AndroidSigningStorePass>
 		<AndroidSigningKeyAlias>androiddebugkey</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>android</AndroidSigningKeyPass>
+		<IsAotCompatible>False</IsAotCompatible>
+		<AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+		<RunAOTCompilation>False</RunAOTCompilation>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AndroidEnableSGenConcurrent>True</AndroidEnableSGenConcurrent>
@@ -29,8 +31,14 @@
 		<AndroidSigningStorePass>android</AndroidSigningStorePass>
 		<AndroidSigningKeyAlias>androiddebugkey</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>android</AndroidSigningKeyPass>
+		<IsAotCompatible>False</IsAotCompatible>
+		<AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+		<RunAOTCompilation>False</RunAOTCompilation>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Mono.Cecil" Version="0.11.5">
+			<Aliases>MonoCecilAlias</Aliases>
+		</PackageReference>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Octokit" Version="13.0.1" />
 		<PackageReference Include="SkiaSharp" Version="2.88.9" />
@@ -42,29 +50,11 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="0Harmony">
-			<HintPath>..\SharedLibs\0Harmony.dll</HintPath>
+			<HintPath>..\..\..\Harmony-2.3.3.0\Harmony\bin\ReleaseFat\net8.0\0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoGame.Framework">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
 			<Private>True</Private>
-		</Reference>
-		<Reference Include="MonoMod.Backports">
-			<HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
-		</Reference>
-		<Reference Include="MonoMod.Core">
-			<HintPath>..\SharedLibs\MonoMod.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="MonoMod.Iced">
-			<HintPath>..\SharedLibs\MonoMod.Iced.dll</HintPath>
-		</Reference>
-		<Reference Include="MonoMod.ILHelpers">
-			<HintPath>..\SharedLibs\MonoMod.ILHelpers.dll</HintPath>
-		</Reference>
-		<Reference Include="MonoMod.RuntimeDetour">
-			<HintPath>..\SharedLibs\MonoMod.RuntimeDetour.dll</HintPath>
-		</Reference>
-		<Reference Include="MonoMod.Utils">
-			<HintPath>..\SharedLibs\MonoMod.Utils.dll</HintPath>
 		</Reference>
 		<Reference Include="StardewValley">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.dll</HintPath>

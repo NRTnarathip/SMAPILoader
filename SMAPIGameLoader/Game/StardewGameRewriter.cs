@@ -13,7 +13,7 @@ internal static class StardewGameRewriter
     }
     public static ReaderParameters MonoCecilReaderConfig = new()
     {
-        AssemblyResolver = new StardewAssembliesResolver(),
+        AssemblyResolver = StardewAssembliesResolver.Instance,
     };
     public static ModuleDefinition ReadModule(string filePath)
     {
@@ -22,6 +22,21 @@ internal static class StardewGameRewriter
     public static ModuleDefinition ReadModule(Stream stream)
     {
         return ModuleDefinition.ReadModule(stream, MonoCecilReaderConfig);
+    }
+    public static void AddInternalVisableTo(ModuleDefinition module, string visableTo)
+    {
+        var assembly = module.Assembly;
+        var attributeConstructor = assembly.MainModule.ImportReference(
+                typeof(System.Runtime.CompilerServices.InternalsVisibleToAttribute).GetConstructor(new[] { typeof(string) })
+            );
+        var customAttribute = new CustomAttribute(attributeConstructor);
+        customAttribute.ConstructorArguments.Add(
+            new CustomAttributeArgument(assembly.MainModule.TypeSystem.String, visableTo)
+        );
+
+        assembly.CustomAttributes.Add(customAttribute);
+        Console.WriteLine("Done added InternalsVisibleTo with: " + visableTo);
+
     }
     public static void Rewrite(string stardewDllFilePath)
     {
@@ -41,6 +56,7 @@ internal static class StardewGameRewriter
                 stardewModule.Write();
                 Console.WriteLine("Successfully Rewrite StardewValley.dll");
             }
+
             ToastNotifyTool.Notify("Done Game Rewriter");
         }
         catch (Exception ex)

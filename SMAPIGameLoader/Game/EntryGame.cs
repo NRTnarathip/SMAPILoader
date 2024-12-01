@@ -10,6 +10,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SMAPIGameLoader;
 internal static class EntryGame
@@ -41,30 +42,12 @@ internal static class EntryGame
                 return;
             }
 
-            //clone game assets
-            TaskTool.AddNewLine("Try clone game assets");
-            GameAssetManager.VerifyAssets();
-            TaskTool.AddNewLine("Done verify asset");
-            GameAssemblyManager.VerifyAssemblies();
-            TaskTool.AddNewLine("Done verify assemblies");
+            GameCloner.Setup();
 
-            //Load MonoGame.Framework.dll into reference
-            GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameFrameworkDllFileName);
-
-            //patch rewrite StardewValley.dll & Load
-            TaskTool.AddNewLine("Try rewrite StardewValley.dll");
-            var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
-            StardewGameRewriter.Rewrite(stardewDllFilePath);
-            TaskTool.AddNewLine("Done rewriter");
-
-            //Don't load StardewValley assembly here
-            //you should load at SMAPIActivity
-            //Assembly.LoadFrom(stardewDllFilePath);
 #if DEBUG
             ToastNotifyTool.Notify("Error can't start game on Debug Mode");
             return;
 #endif
-
             var intent = new Intent(launcherActivity, typeof(SMAPIActivity));
             launcherActivity.StartActivity(intent);
             launcherActivity.Finish();

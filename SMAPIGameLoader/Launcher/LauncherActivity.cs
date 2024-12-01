@@ -3,14 +3,15 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Widget;
+using Mono.Cecil;
 using SMAPIGameLoader.Tool;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
+using System.Security.Permissions;
 using Xamarin.Essentials;
-
 
 namespace SMAPIGameLoader.Launcher;
 
@@ -49,7 +50,14 @@ public class LauncherActivity : Activity
         SetContentView(Resource.Layout.LauncherLayout);
         Platform.Init(this, savedInstanceState);
 
-        //setu my sdk
+        // MonoMod Config
+        System.Environment.SetEnvironmentVariable("MONOMOD_DMDType", "cecil");
+        //var DMDDumpTo = Path.Combine(FileTool.ExternalFilesDir, "DMD Dump");
+        //System.Environment.SetEnvironmentVariable("MONOMOD_DMDDumpTo", DMDDumpTo);
+        HarmonyLib.Harmony.SetCustomReolsveAssemblyForMonoMod_CecilBackEnd(StardewAssembliesResolver.Instance);
+
+
+        //setup my sdk
         Instance = this;
         ActivityTool.Init(this);
 
