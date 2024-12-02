@@ -32,11 +32,12 @@ internal class ModManagerActivity : Activity
     }
 
     ModAdapter modAdapter;
+    List<ModItemView> mods = new();
     void SetupPage()
     {
         //setup bind
         var modsListView = FindViewById<ListView>(Resource.Id.modsListViews);
-        modsListView.Adapter = modAdapter = new ModAdapter(this, new());
+        modsListView.Adapter = modAdapter = new ModAdapter(this, mods);
         modsListView.ItemClick += (sender, e) =>
         {
             OnClickModItemView(e);
@@ -53,29 +54,32 @@ internal class ModManagerActivity : Activity
         //ready
         RefreshMods();
     }
+
+    // mod folder path with manifest.json inside
     void RefreshMods()
     {
-        //simulate test only
-        List<ModItemView> mods = new();
+        //clear first
+        mods.Clear();
 
-        var folders = Directory.GetDirectories(ModInstaller.ModDir);
-        foreach (var folderPath in folders)
+        try
         {
-
-            var directoryInfo = new DirectoryInfo(folderPath);
-            //find manfiest single
-            var files = Directory.GetFiles(folderPath);
-            var manifestFiles = files.Where(file => file.Contains("manifest.json")).ToArray();
-            if (manifestFiles.Length == 1)
+            var manifestFiles = new List<string>();
+            Console.WriteLine("Start Refresh Mods..");
+            ModTool.FindManifestFile(ModInstaller.ModDir, manifestFiles);
+            foreach (var manifestFilePath in manifestFiles)
             {
-                var manifestText = File.ReadAllText(manifestFiles[0]);
-                var manifest = JObject.Parse(manifestText);
-                var mod = new ModItemView(manifest, folderPath);
+                var mod = new ModItemView(manifestFilePath);
                 mods.Add(mod);
             }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorDialogTool.Show(ex);
         }
 
-        modAdapter.RefreshMods(mods);
+        //refresh
+        modAdapter.RefreshMods();
         var foundModsText = FindViewById<TextView>(Resource.Id.foundModsText);
         foundModsText.Text = "Found Mods: " + mods.Count;
     }

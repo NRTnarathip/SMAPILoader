@@ -33,10 +33,8 @@ public class ModAdapter : BaseAdapter<ModItemView>
         return view;
     }
 
-    public void RefreshMods(List<ModItemView> newMods)
+    public void RefreshMods()
     {
-        this.items.Clear();
-        this.items.AddRange(newMods);
         NotifyDataSetChanged();
     }
     public ModItemView GetModOnClick(AdapterView.ItemClickEventArgs click)

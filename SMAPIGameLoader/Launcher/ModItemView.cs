@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.IO;
 using System.Text.Json.Nodes;
 
 namespace SMAPIGameLoader.Launcher;
@@ -13,16 +14,18 @@ public class ModItemView
     public readonly string modVersion;
     public readonly string modFolderPath;
 
-    public ModItemView(JObject manifest, string modFolderPath)
+    public ModItemView(string manifestFilePath)
     {
-        //setup readonly
-        this.modFolderPath = modFolderPath;
-        modName = manifest["Name"].ToString();
-        modVersion = manifest["Version"].ToString();
+        var manifestText = File.ReadAllText(manifestFilePath);
+        var manifest = JObject.Parse(manifestText);
 
+        this.modName = manifest["Name"].ToString();
+        this.modVersion = manifest["Version"].ToString();
 
-        //setup text for ItemView
-        var modPath = modFolderPath.Substring(modFolderPath.IndexOf("/Mods"));
-        FolderPathText = $"Mod Path: {modPath}";
+        var manifestDir = Path.GetDirectoryName(manifestFilePath);
+        this.modFolderPath = manifestDir;
+
+        var relativeModDir = modFolderPath.Substring(modFolderPath.IndexOf("/Mods"));
+        FolderPathText = $"Folder: {relativeModDir}";
     }
 }

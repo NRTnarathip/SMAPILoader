@@ -62,9 +62,6 @@ public class LauncherActivity : Activity
         ActivityTool.Init(this);
 
         //ready
-        ToastNotifyTool.Notify("on Create Launcher Activity");
-
-
         if (AssetGameVerify() == false)
         {
             Finish();

@@ -64,6 +64,29 @@ internal static class ModInstaller
         bool isContentPack = manifest.ContainsKey("ContentPackFor");
         return true;
     }
+
+    //Install Mod Zip Single, Pack Mods
+    public static void InstallModPackZip(ZipArchive zip)
+    {
+        //extract mod
+        zip.ExtractToDirectory(ModTool.ModsDir, true);
+        //done
+
+        //print log
+        var entries = zip.Entries;
+        var manifestEntires = entries.Where(entry => entry.Name == ModTool.ManifiestFileName).ToArray();
+        var logBuilder = new StringBuilder();
+        logBuilder.AppendLine("List Mods: " + manifestEntires.Length);
+        for(int i = 0;i< manifestEntires.Length;i++)
+        {
+            var manifestEntry = manifestEntires[i];
+            var modDir = manifestEntry.FullName.Replace($"/{ModTool.ManifiestFileName}", "");
+            var dirInfo = new DirectoryInfo(modDir);
+            logBuilder.AppendLine($"[{i + 1}]: {dirInfo.Name}");
+        }
+
+        DialogTool.Show("Installed Mod Pack", logBuilder.ToString());
+    }
     public static async void OnClickInstallMod(Action OnInstalledCallback = null)
     {
         try
@@ -74,23 +97,25 @@ internal static class ModInstaller
 
             using var zip = ZipFile.OpenRead(pickFile.FullPath);
             var entries = zip.Entries;
-            var manifestEntry = entries.FirstOrDefault(file => file.Name == "manifest.json");
-            if (manifestEntry == null)
+            var manifestEntires = entries.Where(entry => entry.Name == ModTool.ManifiestFileName).ToArray();
+            if (manifestEntires.Length == 0)
             {
                 ToastNotifyTool.Notify("Not found manifest.json");
+                OnInstalledCallback?.Invoke();
+                return;
+            }
+
+            bool isModPack = manifestEntires.Length != 1;
+            if (isModPack)
+            {
+                InstallModPackZip(zip);
                 return;
             }
 
             //try unpack into mods dir
-            var manifestText = ReadManifest(manifestEntry);
+            var manifestText = ReadManifest(manifestEntires[0]);
             var manifestJson = JObject.Parse(manifestText);
             string modName = manifestJson["Name"].ToString();
-            //check mod support
-            if (AssertModISupport(manifestJson) is false)
-            {
-                return;
-            }
-
 
             var extractDestDir = Path.Combine(ModDir);
             zip.ExtractToDirectory(extractDestDir, true);
@@ -111,7 +136,8 @@ internal static class ModInstaller
             if (minSMAPIVersion != null)
                 modLogBuilder.AppendLine($"Minimum SMAPI Version: " + minSMAPIVersion);
 
-            DialogTool.Show("Successfully Install Mod", modLogBuilder.ToString());
+
+            DialogTool.Show("Installed Mod", modLogBuilder.ToString());
             OnInstalledCallback?.Invoke();
         }
         catch (Exception ex)
