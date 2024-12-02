@@ -66,9 +66,10 @@ internal class ModManagerActivity : Activity
             var manifestFiles = new List<string>();
             Console.WriteLine("Start Refresh Mods..");
             ModTool.FindManifestFile(ModInstaller.ModDir, manifestFiles);
-            foreach (var manifestFilePath in manifestFiles)
+            for (int i = 0; i < manifestFiles.Count; i++)
             {
-                var mod = new ModItemView(manifestFilePath);
+                var manifestFilePath = manifestFiles[i];
+                var mod = new ModItemView(manifestFilePath, i);
                 mods.Add(mod);
             }
 

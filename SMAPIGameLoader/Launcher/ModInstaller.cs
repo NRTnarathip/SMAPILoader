@@ -66,7 +66,7 @@ internal static class ModInstaller
     }
 
     //Install Mod Zip Single, Pack Mods
-    public static void InstallModPackZip(ZipArchive zip)
+    public static void InstallModPackZip(string zipFilePath, ZipArchive zip)
     {
         //extract mod
         zip.ExtractToDirectory(ModTool.ModsDir, true);
@@ -76,8 +76,11 @@ internal static class ModInstaller
         var entries = zip.Entries;
         var manifestEntires = entries.Where(entry => entry.Name == ModTool.ManifiestFileName).ToArray();
         var logBuilder = new StringBuilder();
-        logBuilder.AppendLine("List Mods: " + manifestEntires.Length);
-        for(int i = 0;i< manifestEntires.Length;i++)
+        var fileInfo = new FileInfo(zipFilePath);
+        logBuilder.AppendLine("Mod zip: " + fileInfo.Name);
+        logBuilder.AppendLine("");
+        logBuilder.AppendLine("List mods: " + manifestEntires.Length);
+        for (int i = 0; i < manifestEntires.Length; i++)
         {
             var manifestEntry = manifestEntires[i];
             var modDir = manifestEntry.FullName.Replace($"/{ModTool.ManifiestFileName}", "");
@@ -108,7 +111,7 @@ internal static class ModInstaller
             bool isModPack = manifestEntires.Length != 1;
             if (isModPack)
             {
-                InstallModPackZip(zip);
+                InstallModPackZip(pickFile.FullPath, zip);
                 return;
             }
 
