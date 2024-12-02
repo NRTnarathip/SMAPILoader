@@ -104,7 +104,6 @@ internal static class ModInstaller
             if (manifestEntires.Length == 0)
             {
                 ToastNotifyTool.Notify("Not found manifest.json");
-                OnInstalledCallback?.Invoke();
                 return;
             }
 
@@ -112,6 +111,7 @@ internal static class ModInstaller
             if (isModPack)
             {
                 InstallModPackZip(pickFile.FullPath, zip);
+                OnInstalledCallback.Invoke();
                 return;
             }
 
