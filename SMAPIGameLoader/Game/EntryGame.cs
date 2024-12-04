@@ -38,7 +38,7 @@ internal static class EntryGame
 
             if (SMAPIInstaller.IsInstalled is false)
             {
-                ToastNotifyTool.Notify("Please install SMAPI zip!!");
+                ToastNotifyTool.Notify("Please install SMAPI!!");
                 return;
             }
 
