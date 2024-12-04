@@ -59,10 +59,18 @@
             android:gravity="center_horizontal"
             >
             <Button
-                android:id="@+id/InstallSMAPI"
+                android:id="@+id/InstallSMAPIOnline"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Install SMAPI Zip" 
+                android:text="Install SMAPI Online" 
+                android:layout_marginVertical="10dp"
+				android:textAllCaps="false"
+                />
+            <Button
+                android:id="@+id/InstallSMAPIZip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Install SMAPI From Zip" 
                 android:layout_marginVertical="10dp"
 				android:textAllCaps="false"
                 />

@@ -37,7 +37,7 @@ internal static class SMAPIInstaller
         }
     }
 
-    public static async void OnClickInstall()
+    public static async void OnClickInstallSMAPIOnline()
     {
         try
         {
@@ -106,7 +106,7 @@ internal static class SMAPIInstaller
             Console.WriteLine("error try to install SMAPI Zip: " + ex);
         }
     }
-    public static async void OnClickInstallOld()
+    public static async void OnClickInstallSMAPIZip()
     {
         try
         {
@@ -121,9 +121,10 @@ internal static class SMAPIInstaller
                 return;
             }
 
-            ToastNotifyTool.Notify("Starting Install SMAPI");
             InstallSMAPIFromZipFile(pick.FullPath);
-            ToastNotifyTool.Notify("Successfully Install SMAPI!");
+
+            DialogTool.Show("Successfully Install SMAPI",
+                "done installed SMAPI from zip file: " + pick.FileName);
         }
         catch (Exception ex)
         {

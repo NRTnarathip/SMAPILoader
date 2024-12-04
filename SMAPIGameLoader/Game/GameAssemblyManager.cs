@@ -46,7 +46,6 @@ internal class GameAssemblyManager
         }
 
         SetupLibs();
-        ToastNotifyTool.Notify("Done Setup Assemblies");
     }
     const string liblwjgl_lz4Name = "liblwjgl_lz4.so";
     static void SetupLibs()

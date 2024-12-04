@@ -50,13 +50,6 @@ public class LauncherActivity : Activity
         SetContentView(Resource.Layout.LauncherLayout);
         Platform.Init(this, savedInstanceState);
 
-        // MonoMod Config
-        //System.Environment.SetEnvironmentVariable("MONOMOD_DMDType", "cecil");
-        //var DMDDumpTo = Path.Combine(FileTool.ExternalFilesDir, "DMD Dump");
-        //System.Environment.SetEnvironmentVariable("MONOMOD_DMDDumpTo", DMDDumpTo);
-        //HarmonyLib.Harmony.SetCustomReolsveAssemblyForMonoMod_CecilBackEnd(StardewAssembliesResolver.Instance);
-
-
         //setup my sdk
         Instance = this;
         ActivityTool.Init(this);
@@ -77,11 +70,15 @@ public class LauncherActivity : Activity
         }
 
         // Create your application here
-        var installSMAPIBtn = FindViewById<Button>(Resource.Id.InstallSMAPI);
-        installSMAPIBtn.Click += (sender, e) =>
+        FindViewById<Button>(Resource.Id.InstallSMAPIZip).Click += (sender, e) =>
         {
-            SMAPIInstaller.OnClickInstall();
+            SMAPIInstaller.OnClickInstallSMAPIZip();
         };
+        FindViewById<Button>(Resource.Id.InstallSMAPIOnline).Click += (sender, e) =>
+        {
+            SMAPIInstaller.OnClickInstallSMAPIOnline();
+        };
+
         var startGameBtn = FindViewById<Button>(Resource.Id.StartGame);
         startGameBtn.Click += (sender, e) =>
         {

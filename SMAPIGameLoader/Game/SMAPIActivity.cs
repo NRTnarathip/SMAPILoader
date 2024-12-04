@@ -48,8 +48,6 @@ public class SMAPIActivity : AndroidGameActivity
         ActivityTool.Init(this);
 
         //ready
-        ToastNotifyTool.Notify("On SMAPIActivity.OnCreate(bundle)");
-
         LaunchGame();
     }
     void LaunchGame()
@@ -115,7 +113,6 @@ public class SMAPIActivity : AndroidGameActivity
             ToastNotifyTool.Notify("error try run SMAPI: " + err.ToString());
             ErrorDialogTool.Show(err);
         }
-        ToastNotifyTool.Notify("Done OnCreatePartTwo()");
     }
 
     Game1 _game1 => Game1.game1;
