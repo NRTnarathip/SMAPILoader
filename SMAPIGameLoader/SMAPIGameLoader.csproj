@@ -9,7 +9,7 @@
 		<Version></Version>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0.11</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>1.0.12</ApplicationDisplayVersion>
 		<ApplicationVersion>$([System.DateTimeOffset]::Now.ToUnixTimeSeconds())</ApplicationVersion>
 
 	</PropertyGroup>
