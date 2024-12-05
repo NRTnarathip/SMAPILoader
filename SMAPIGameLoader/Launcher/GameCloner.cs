@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -84,6 +85,8 @@ internal static class GameCloner
             TaskTool.AddNewLine("Done verify asset");
             GameAssemblyManager.VerifyAssemblies();
             TaskTool.AddNewLine("Done verify assemblies");
+            GameAssemblyManager.VerifyLibs();
+            TaskTool.AddNewLine("Done verify libs");
         }
 
         //Load MonoGame.Framework.dll into reference

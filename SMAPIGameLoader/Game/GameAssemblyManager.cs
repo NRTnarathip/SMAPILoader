@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using MonoGame.Framework.Utilities;
 using SMAPIGameLoader.Launcher;
 using System;
 using System.IO;
@@ -44,36 +45,20 @@ internal class GameAssemblyManager
             }
             Console.WriteLine("done clone SMAPI Game Loader Assemblies");
         }
-
-        SetupLibs();
-    }
-    const string liblwjgl_lz4Name = "liblwjgl_lz4.so";
-    static void SetupLibs()
-    {
-        Console.WriteLine("try setup libs");
-        //clone libs
-        //liblwjgl_lz4.so
-        using var configApkZip = ZipFile.OpenRead(StardewApkTool.ConfigApkPath);
-        var liblwjgl_lz4SO = configApkZip.Entries.FirstOrDefault(lib => lib.Name == liblwjgl_lz4Name);
-        if (liblwjgl_lz4SO == null)
-        {
-            throw new System.Exception("not found lib: " + liblwjgl_lz4Name);
-        }
-        Console.WriteLine("lib lwjgl: " + liblwjgl_lz4SO);
-        string personalPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-        Console.WriteLine("personalPath: " + personalPath);
-        string destLib_LWJGL_FilePath = Path.Combine(Path.GetDirectoryName(personalPath), "lib", liblwjgl_lz4Name);
-        //create dir path for copy file
-        Directory.CreateDirectory(Path.GetDirectoryName(destLib_LWJGL_FilePath));
-        Console.WriteLine("try extract to: " + destLib_LWJGL_FilePath);
-        ZipFileTool.Extract(liblwjgl_lz4SO, destLib_LWJGL_FilePath);
-        Console.WriteLine("done added lib: " + liblwjgl_lz4SO);
-
-
-        Console.WriteLine("done setup libs");
     }
     public static Assembly LoadAssembly(string dllFileName)
     {
         return Assembly.LoadFrom(Path.Combine(AssembliesDirPath, dllFileName));
+    }
+
+    static string LibDirPath => Path.Combine(FileTool.ExternalFilesDir, "lib");
+    internal static void VerifyLibs()
+    {
+        Console.WriteLine("try setup libs");
+        //clean lib first
+        Console.WriteLine("clean up lib dir");
+        if (Directory.Exists(LibDirPath))
+            Directory.Delete(LibDirPath, true);
+        Console.WriteLine("done setup libs");
     }
 }

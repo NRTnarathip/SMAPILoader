@@ -7,7 +7,10 @@ using Android.Util;
 using Android.Views;
 using HarmonyLib;
 using Java.Util;
+using LWJGL;
 using Microsoft.Xna.Framework;
+using MonoGame.Framework.Utilities;
+using SMAPIGameLoader.Game;
 using SMAPIGameLoader.Tool;
 using StardewValley;
 using StardewValley.Mobile;
@@ -17,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 namespace SMAPIGameLoader;
@@ -69,6 +73,9 @@ public class SMAPIActivity : AndroidGameActivity
 
             //ready
             Console.WriteLine("Stardew Activity Ready");
+            //fix load lib
+            NativeLibManager.Loads();
+
             Stardew_OnCreate();
         }
         catch (Exception ex)

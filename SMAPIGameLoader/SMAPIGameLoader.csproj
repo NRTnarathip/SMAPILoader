@@ -84,9 +84,6 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="libs\" />
-	</ItemGroup>
-	<ItemGroup>
 		<None Update="Resources\Drawable\icon.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
