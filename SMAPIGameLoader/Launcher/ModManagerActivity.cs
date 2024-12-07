@@ -65,11 +65,10 @@ internal class ModManagerActivity : Activity
         {
             var manifestFiles = new List<string>();
             Console.WriteLine("Start Refresh Mods..");
-            ModTool.FindManifestFile(ModInstaller.ModDir, manifestFiles);
+            ModTool.FindManifestFile(ModTool.ModsDir, manifestFiles);
             for (int i = 0; i < manifestFiles.Count; i++)
             {
-                var manifestFilePath = manifestFiles[i];
-                var mod = new ModItemView(manifestFilePath, i);
+                var mod = new ModItemView(manifestFiles[i], i);
                 mods.Add(mod);
             }
 

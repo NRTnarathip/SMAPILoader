@@ -10,7 +10,7 @@ internal static class ErrorDialogTool
     // you will got error when you alert.Show() & Finish() it
     //example case
     // android.view.WindowLeaked: Activity crc644389b739a03c2b33.SMAPIActivity has leaked window DecorView@fd80140[Error Dialog] that was originally added here
-    public static void Show(Exception exception)
+    public static void Show(Exception exception, string title = "Exception Dialog")
     {
 
         if (exception is null)
@@ -22,14 +22,14 @@ internal static class ErrorDialogTool
         {
             TaskTool.RunMainThread(() =>
             {
-                Show(exception);
+                Show(exception, title);
             });
             return;
         }
 
         var dialog = new AlertDialog.Builder(ActivityTool.CurrentActivity);
         var alert = dialog.Create();
-        alert.SetTitle("Error Dialog");
+        alert.SetTitle(title);
         alert.SetMessage(exception.ToString());
         alert.SetButton("OK", (c, ev) =>
         {

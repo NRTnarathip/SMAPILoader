@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Text.Json.Nodes;
 
@@ -24,10 +25,16 @@ public class ModItemView
 
         this.NameText = $"[{modListIndex + 1}]: {modName}";
         this.VersionText = $"Version: {modVersion}";
-        var manifestDir = Path.GetDirectoryName(manifestFilePath);
-        this.modFolderPath = manifestDir;
-
-        var relativeModDir = modFolderPath.Substring(modFolderPath.IndexOf("/Mods") + 5);
-        FolderPathText = $"Folder: {relativeModDir}";
+        try
+        {
+            this.modFolderPath = Path.GetDirectoryName(manifestFilePath);
+            var relativeModDir = modFolderPath.Substring(modFolderPath.IndexOf("/Mods") + 5);
+            FolderPathText = $"Folder: {relativeModDir}";
+        }
+        catch (Exception ex)
+        {
+            FolderPathText = modFolderPath;
+            ErrorDialogTool.Show(ex, "Error can't decorate for mod path: " + this.modFolderPath);
+        }
     }
 }
