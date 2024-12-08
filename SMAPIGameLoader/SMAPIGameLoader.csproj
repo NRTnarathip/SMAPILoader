@@ -11,6 +11,7 @@
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0.12</ApplicationDisplayVersion>
 		<ApplicationVersion>$([System.DateTimeOffset]::Now.ToUnixTimeSeconds())</ApplicationVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
