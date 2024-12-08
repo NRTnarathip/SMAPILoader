@@ -27,7 +27,6 @@ internal static class ApkTool
         }
         catch (Exception e)
         {
-            ToastNotifyTool.Notify("Err:GetPackageInfo(); " + e.ToString());
             return null;
         }
     }

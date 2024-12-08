@@ -24,13 +24,47 @@ namespace SMAPIGameLoader.Launcher;
 )]
 public class LauncherActivity : Activity
 {
+    public static LauncherActivity Instance { get; private set; }
+    protected override void OnCreate(Bundle? savedInstanceState)
+    {
+        Instance = this;
+        base.OnCreate(savedInstanceState);
+        SetContentView(Resource.Layout.LauncherLayout);
+        Platform.Init(this, savedInstanceState);
+        ActivityTool.Init(this);
+
+        //assert
+        AssertRequirement();
+
+        //ready
+        OnReadyToSetupLayoutPage();
+    }
+
+    static bool IsDeviceSupport => IntPtr.Size == 8;
     bool AssetGameVerify()
     {
         try
         {
             if (StardewApkTool.IsInstalled == false)
             {
-                ToastNotifyTool.Notify("Please Download Game From Play Store");
+                var currentPackage = StardewApkTool.CurrentPackageInfo;
+                if (currentPackage != null)
+                {
+                    switch (currentPackage.PackageName)
+                    {
+                        case StardewApkTool.GamePlayStorePackageName:
+                            ToastNotifyTool.Notify("Please Download Game From Play Store");
+                            break;
+                        case StardewApkTool.GameSamsungPackageName:
+                            ToastNotifyTool.Notify("Please Download Game From Galaxy Store");
+                            break;
+                    }
+                }
+                else
+                {
+                    ToastNotifyTool.Notify("Please Download Game From Play Store Or Galaxy Store");
+                }
+
                 return false;
             }
         }
@@ -42,25 +76,8 @@ public class LauncherActivity : Activity
 
         return true;
     }
-    public static LauncherActivity Instance { get; private set; }
-    static bool IsDeviceSupport => IntPtr.Size == 8;
-    protected override void OnCreate(Bundle? savedInstanceState)
+    void AssertRequirement()
     {
-        base.OnCreate(savedInstanceState);
-        SetContentView(Resource.Layout.LauncherLayout);
-        Platform.Init(this, savedInstanceState);
-
-        //setup my sdk
-        Instance = this;
-        ActivityTool.Init(this);
-
-        //ready
-        if (AssetGameVerify() == false)
-        {
-            Finish();
-            return;
-        }
-
         //check if 32bit not support
         if (IsDeviceSupport is false)
         {
@@ -69,6 +86,18 @@ public class LauncherActivity : Activity
             return;
         }
 
+        //Assert Game Requirement
+        if (AssetGameVerify() == false)
+        {
+            Finish();
+            return;
+        }
+
+        BypassAccessException.Apply();
+    }
+
+    void OnReadyToSetupLayoutPage()
+    {
         // Create your application here
         FindViewById<Button>(Resource.Id.InstallSMAPIZip).Click += (sender, e) =>
         {

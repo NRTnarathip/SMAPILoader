@@ -49,6 +49,8 @@ internal static class EntryGame
             return;
 #endif
             var intent = new Intent(launcherActivity, typeof(SMAPIActivity));
+            intent.AddFlags(ActivityFlags.ClearTask);
+            intent.AddFlags(ActivityFlags.NewTask);
             launcherActivity.StartActivity(intent);
             launcherActivity.Finish();
         }
