@@ -14,8 +14,16 @@ namespace SMAPIGameLoader.Launcher;
 
 internal static class BypassAccessException
 {
-    [DllImport("libdl.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr dlsym(IntPtr handle, string symbol);
+    private const int RTLD_LAZY = 1;
+
+    [DllImport("libdl.so")]
+    static extern IntPtr dlopen(string filename, int flags);
+
+    [DllImport("libdl.so")]
+    public static extern nint dlsym(nint handle, string symbol);
+
+    [DllImport("libdl.so")]
+    public static extern nint dlerror();
 
     public static void Apply()
     {
@@ -40,8 +48,7 @@ internal static class BypassAccessException
 
     static void ApplyInternal()
     {
-        //var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
-        var libHandle = FuncLoader.LoadLibrary("libmonosgen-2.0.so");
+        var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
 
         IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
 
@@ -51,7 +58,19 @@ internal static class BypassAccessException
             //x64
             IntPtr targetAddress = mono_method_can_access_field + 0x132;
             byte[] patchBytes = [
-                //0xB8, 0x01, 0x00, 0x00, 0x00, // MOV EAX, 1
+                //bypass return true
+                0xB8, 0x01, 0x00, 0x00, 0x00, // MOV EAX, 1
+                0x48, 0x83, 0xC4, 0x58,       // ADD RSP, 0x58
+                0x5B,                         // POP RBX
+                0x41, 0x5C,                   // POP R12
+                0x41, 0x5D,                   // POP R13
+                0x41, 0x5E,                   // POP R14
+                0x41, 0x5F,                   // POP R15
+                0x5D,                         // POP RBP
+                0xC3                          // RET
+
+                //original
+                //0x44, 0x89 ,0xf0,             // MOV EAX, R14D
                 //0x48, 0x83, 0xC4, 0x58,       // ADD RSP, 0x58
                 //0x5B,                         // POP RBX
                 //0x41, 0x5C,                   // POP R12
@@ -60,22 +79,13 @@ internal static class BypassAccessException
                 //0x41, 0x5F,                   // POP R15
                 //0x5D,                         // POP RBP
                 //0xC3                          // RET
-
-                //original
-                0x44, 0x89 ,0xf0,             // MOV EAX, R14D
-                0x48, 0x83, 0xC4, 0x58,       // ADD RSP, 0x58
-                0x5B,                         // POP RBX
-                0x41, 0x5C,                   // POP R12
-                0x41, 0x5D,                   // POP R13
-                0x41, 0x5E,                   // POP R14
-                0x41, 0x5F,                   // POP R15
-                0x5D,                         // POP RBP
-                0xCC                          // RET
             ];            //add offset into ret
-            patchBytes = Enumerable.Repeat((byte)0xCC, patchBytes.Length).ToArray();
 
-            //Patch(targetAddress, patchBytes);
-            Patch(mono_method_can_access_field, Enumerable.Repeat((byte)0xCC, 0x132).ToArray());
+            //patch bypass return true
+            Patch(targetAddress, patchBytes);
+
+            //test crash
+            //Patch(mono_method_can_access_field, Enumerable.Repeat((byte)0xCC, 0x132).ToArray());
         }
         Console.WriteLine("After patch");
         DumpMemory(mono_method_can_access_field);
@@ -84,12 +94,15 @@ internal static class BypassAccessException
     {
         var pageAddress = AlignToPageSize(targetAddress);
         var pageSize = Environment.SystemPageSize;
-        int protect = mprotect(pageAddress, (uint)pageSize, PROT_EXEC | PROT_READ | PROT_WRITE);
-        if (protect != 0)
+        Console.WriteLine("trying set memory page protection");
+        int protectResultError = mprotect(pageAddress, (uint)pageSize, PROT_EXEC | PROT_READ | PROT_WRITE);
+        Console.WriteLine("done set memory page protect: " + protectResultError);
+        if (protectResultError != 0)
         {
             Console.WriteLine("error can't set protect memory at address: " + pageAddress.ToString("X"));
             return;
         }
+        Console.WriteLine("trying patch bytes at: " + targetAddress.ToString("X"));
         Marshal.Copy(patchBytes, 0, targetAddress, patchBytes.Length);
         Console.WriteLine("done patch bytes at address: " + targetAddress.ToString("X"));
     }

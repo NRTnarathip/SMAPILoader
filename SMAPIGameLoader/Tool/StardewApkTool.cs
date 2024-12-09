@@ -19,7 +19,7 @@ internal static class StardewApkTool
     {
         get
         {
-            if (_isCacheCurrentPackageInfo == false)
+            if (_isCacheCurrentPackageInfo is false)
             {
                 _isCacheCurrentPackageInfo = true;
 
