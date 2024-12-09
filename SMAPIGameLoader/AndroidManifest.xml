@@ -11,5 +11,6 @@
 	<application android:label="SMAPI Launcher"></application>
 	<queries>
 		<package android:name="com.chucklefish.stardewvalley" />
+		<package android:name="com.chucklefish.stardewvalleysamsung" />
 	</queries>
 </manifest>

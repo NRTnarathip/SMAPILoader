@@ -55,7 +55,7 @@ public class LauncherActivity : Activity
                         case StardewApkTool.GamePlayStorePackageName:
                             ToastNotifyTool.Notify("Please Download Game From Play Store");
                             break;
-                        case StardewApkTool.GameSamsungPackageName:
+                        case StardewApkTool.GameGalaxyStorePackageName:
                             ToastNotifyTool.Notify("Please Download Game From Galaxy Store");
                             break;
                     }
@@ -93,6 +93,7 @@ public class LauncherActivity : Activity
             return;
         }
 
+        //ready to apply patch bytes
         BypassAccessException.Apply();
     }
 

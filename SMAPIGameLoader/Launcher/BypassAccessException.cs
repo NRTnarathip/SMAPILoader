@@ -1,5 +1,6 @@
 ﻿using MonoGame.Framework.Utilities;
 using Octokit;
+using SMAPIGameLoader.Tool;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,17 +28,29 @@ internal static class BypassAccessException
 
     public static void Apply()
     {
-        Console.WriteLine("Try Apply BypassAccessException");
         try
         {
-            ApplyInternal();
+            Console.WriteLine("Try Apply BypassAccessException");
+
+            if (ArchitectureTool.IsIntel())
+                ApplyInternal_Intel_x64();
+            else
+                ApplyInternal_Arm64();
+
+            Console.WriteLine("Successfully BypassAccessException");
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-        Console.WriteLine("Successfully BypassAccessException");
     }
+
+    static void ApplyInternal_Arm64()
+    {
+        Console.WriteLine("Start patch on arm64");
+        throw new NotImplementedException();
+    }
+
     private const int PROT_READ = 0x1;
     private const int PROT_WRITE = 0x2;
     private const int PROT_EXEC = 0x4;
@@ -46,8 +59,9 @@ internal static class BypassAccessException
     private static extern int mprotect(IntPtr addr, UIntPtr len, int prot);
 
 
-    static void ApplyInternal()
+    static void ApplyInternal_Intel_x64()
     {
+        Console.WriteLine("Start patch on x64");
         var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
 
         IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");

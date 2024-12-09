@@ -12,58 +12,99 @@ namespace SMAPIGameLoader;
 internal static class StardewApkTool
 {
     public const string GamePlayStorePackageName = "com.chucklefish.stardewvalley";
-    public const string GameSamsungPackageName = "com.chucklefish.stardewvalleysamsung";
+    public const string GameGalaxyStorePackageName = "com.chucklefish.stardewvalleysamsung";
+    static bool IsGameFromPlayStore = false;
+    static bool IsGameFromGalaxyStore = false;
     static PackageInfo _currentPackageInfo;
-    static bool _isCacheCurrentPackageInfo = false;
-    public static PackageInfo CurrentPackageInfo
+
+    //init at first SDK
+    static StardewApkTool()
     {
-        get
+        Console.WriteLine("Initialize Stardew Apk Tool");
+        var playStore = ApkTool.GetPackageInfo(GamePlayStorePackageName);
+        var samsung = ApkTool.GetPackageInfo(GameGalaxyStorePackageName);
+
+        //select samsung first, better for debug, test app
+        if (samsung != null)
         {
-            if (_isCacheCurrentPackageInfo is false)
-            {
-                _isCacheCurrentPackageInfo = true;
-
-                var playStore = ApkTool.GetPackageInfo(GamePlayStorePackageName);
-                if (playStore != null)
-                    _currentPackageInfo = playStore;
-
-                //check other package from galaxy store
-                var samsung = ApkTool.GetPackageInfo(GameSamsungPackageName);
-                if (samsung != null)
-                    _currentPackageInfo = samsung;
-            }
-
-            Console.WriteLine("current package: " + _currentPackageInfo?.PackageName);
-            return _currentPackageInfo;
+            _currentPackageInfo = samsung;
+            IsGameFromGalaxyStore = true;
+            Console.WriteLine("Game Install From Galaxy Store");
+        }
+        else if (playStore != null)
+        {
+            _currentPackageInfo = playStore;
+            IsGameFromPlayStore = true;
+            Console.WriteLine("Game Install From Play Store");
         }
     }
+
+    public static PackageInfo CurrentPackageInfo => _currentPackageInfo;
 
     public static bool IsInstalled
     {
         get
         {
+            if (CurrentPackageInfo == null)
+                return false;
+
+            //play store
+            if (IsGameFromPlayStore)
+            {
+                var version = CurrentPackageInfo.VersionName;
+                var splitApks = CurrentPackageInfo.ApplicationInfo?.SplitSourceDirs;
+                return splitApks?.Count == 2;
+            }
+
+            //samsung
+            return true;
+        }
+    }
+
+    public static Android.Content.Context GetContext => Application.Context;
+    public static string? BaseApkPath => CurrentPackageInfo?.ApplicationInfo?.PublicSourceDir;
+    public static string? ContentApkPath
+    {
+        get
+        {
             try
             {
-                //check if found package
-                var version = CurrentPackageInfo.VersionName;
-                //check if we have 3 apks: [base, split_content & split_config]
-                bool haveApksValid = SplitApks?.Count == 2;
-                return haveApksValid;
+                if (CurrentPackageInfo == null)
+                    return null;
+
+                //play store
+                if (IsGameFromPlayStore)
+                    return CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.First(path => path.Contains("split_content"));
+
+                //samsung
+                return BaseApkPath;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return false;
+                ErrorDialogTool.Show(ex, "Error try to get ContentApkPath");
+                return null;
             }
         }
     }
-    public static Android.Content.Context GetContext => Application.Context;
-    public static string? BaseApkPath => CurrentPackageInfo?.ApplicationInfo?.PublicSourceDir;
-    public static IList<string>? SplitApks => CurrentPackageInfo?.ApplicationInfo?.SplitSourceDirs;
 
-    public static string? ContentApkPath => SplitApks.First(path => path.Contains("split_content"));
-    public static string? ConfigApkPath => SplitApks.First(path => path.Contains("split_config"));
+    public static Version GameVersionSupport
+    {
+        get
+        {
+            if (CurrentPackageInfo == null)
+                return null;
 
-    public readonly static Version GameVersionSupport = Constants.GameVersionSupport;
+            switch (CurrentPackageInfo.PackageName)
+            {
+                case GamePlayStorePackageName:
+                    return new(1, 6, 14, 10);
+                case GameGalaxyStorePackageName:
+                    return new(1, 6, 14, 8);
+                default:
+                    return null;
+            }
+        }
+    }
     public static Version CurrentGameVersion => new Version(CurrentPackageInfo?.VersionName);
     public static bool IsGameVersionSupport => CurrentGameVersion >= GameVersionSupport;
 }

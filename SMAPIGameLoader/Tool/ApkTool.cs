@@ -12,7 +12,7 @@ namespace SMAPIGameLoader;
 
 internal static class ApkTool
 {
-    public static int AppBuildCode => int.Parse(AppInfo.BuildString);
+    public static int LauncherBuildCode => int.Parse(AppInfo.BuildString);
     public static Version AppVersion => AppInfo.Version;
 
     public static PackageInfo GetPackageInfo(string PackageName)
