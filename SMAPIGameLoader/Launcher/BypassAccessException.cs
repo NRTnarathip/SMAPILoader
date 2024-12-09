@@ -43,23 +43,6 @@ internal static class BypassAccessException
         }
     }
 
-    static void ApplyInternal_Arm64()
-    {
-        Console.WriteLine("Start patch on arm64");
-        var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
-        IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
-        Console.WriteLine("Start Patch mono_method_can_access_field");
-        unsafe
-        {
-            //arm64
-            IntPtr targetAddress = mono_method_can_access_field + 0x120;
-            byte[] patchBytes =
-            [
-                0x20, 0x00, 0x80, 0x52// move w0, 1
-            ];
-            PatchBytes(targetAddress, patchBytes);
-        }
-    }
 
     private const int PROT_READ = 0x1;
     private const int PROT_WRITE = 0x2;
@@ -68,6 +51,39 @@ internal static class BypassAccessException
     [DllImport("libc.so", SetLastError = true)]
     private static extern int mprotect(IntPtr addr, UIntPtr len, int prot);
 
+    static void ApplyInternal_Arm64()
+    {
+        Console.WriteLine("Start patch on arm64");
+        var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
+        unsafe
+        {
+            IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
+            Console.WriteLine("Start Patch mono_method_can_access_field: " + mono_method_can_access_field);
+            IntPtr targetAddress = mono_method_can_access_field + 0x120;
+            byte[] patchBytes =
+            [
+                0x20, 0x00, 0x80, 0x52// move w0, 1
+            ];
+            PatchBytes(targetAddress, patchBytes);
+        }
+        unsafe
+        {
+            IntPtr mono_method_can_access_method_full = dlsym(libHandle, "mono_method_can_access_method") + 0x24;
+            Console.WriteLine("start patch mono_method_can_access_method_full: " + mono_method_can_access_method_full);
+
+            var targetAddress = mono_method_can_access_method_full + 0x1C;
+            byte[] patchBytes = [
+                //0x1F, 0x11, 0x1E, 0x2E
+                0x1F, 0x20, 0x03, 0xD5,
+                0x1F, 0x20, 0x03, 0xD5,
+                0x1F, 0x20, 0x03, 0xD5,
+                0x1F, 0x20, 0x03, 0xD5,
+                0x1F, 0x20, 0x03, 0xD5,
+            ];
+
+            PatchBytes(targetAddress, patchBytes);
+        }
+    }
 
     static void ApplyInternal_Intel_x64()
     {
