@@ -74,11 +74,10 @@ internal static class BypassAccessException
         Console.WriteLine("Start patch on x64");
         var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
 
-        IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
-
-        Console.WriteLine("Start Patch mono_method_can_access_field");
         unsafe
         {
+            IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
+            Console.WriteLine("Start Patch mono_method_can_access_field: " + mono_method_can_access_field);
             //x64
             IntPtr targetAddress = mono_method_can_access_field + 0x132;
             byte[] patchBytes = [
@@ -92,27 +91,23 @@ internal static class BypassAccessException
                 0x41, 0x5F,                   // POP R15
                 0x5D,                         // POP RBP
                 0xC3                          // RET
+            ];
 
-                //original
-                //0x44, 0x89 ,0xf0,             // MOV EAX, R14D
-                //0x48, 0x83, 0xC4, 0x58,       // ADD RSP, 0x58
-                //0x5B,                         // POP RBX
-                //0x41, 0x5C,                   // POP R12
-                //0x41, 0x5D,                   // POP R13
-                //0x41, 0x5E,                   // POP R14
-                //0x41, 0x5F,                   // POP R15
-                //0x5D,                         // POP RBP
-                //0xC3                          // RET
-            ];            //add offset into ret
-
-            //patch bypass return true
             PatchBytes(targetAddress, patchBytes);
-
-            //test crash
-            //Patch(mono_method_can_access_field, Enumerable.Repeat((byte)0xCC, 0x132).ToArray());
         }
-        Console.WriteLine("After patch");
-        DumpMemory(mono_method_can_access_field);
+
+        unsafe
+        {
+            IntPtr mono_method_can_access_method = dlsym(libHandle, "mono_method_can_access_method");
+            IntPtr mono_method_can_access_method_full = mono_method_can_access_method + 0x30;
+            Console.WriteLine("start patch mono_method_can_access_method_full: " + mono_method_can_access_method_full);
+
+            var targetAddress = mono_method_can_access_method_full + 0x15;
+            byte[] patchBytes = [
+                0xEB, 0x09, //jump to return;
+            ];
+            PatchBytes(targetAddress, patchBytes);
+        }
     }
     static void PatchBytes(IntPtr targetAddress, byte[] patchBytes)
     {
