@@ -15,8 +15,6 @@ namespace SMAPIGameLoader.Launcher;
 
 internal static class BypassAccessException
 {
-    private const int RTLD_LAZY = 1;
-
     [DllImport("libdl.so")]
     static extern IntPtr dlopen(string filename, int flags);
 
@@ -48,7 +46,19 @@ internal static class BypassAccessException
     static void ApplyInternal_Arm64()
     {
         Console.WriteLine("Start patch on arm64");
-        throw new NotImplementedException();
+        var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
+        IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
+        Console.WriteLine("Start Patch mono_method_can_access_field");
+        unsafe
+        {
+            //arm64
+            IntPtr targetAddress = mono_method_can_access_field + 0x120;
+            byte[] patchBytes =
+            [
+                0x20, 0x00, 0x80, 0x52// move w0, 1
+            ];
+            PatchBytes(targetAddress, patchBytes);
+        }
     }
 
     private const int PROT_READ = 0x1;
@@ -96,7 +106,7 @@ internal static class BypassAccessException
             ];            //add offset into ret
 
             //patch bypass return true
-            Patch(targetAddress, patchBytes);
+            PatchBytes(targetAddress, patchBytes);
 
             //test crash
             //Patch(mono_method_can_access_field, Enumerable.Repeat((byte)0xCC, 0x132).ToArray());
@@ -104,7 +114,7 @@ internal static class BypassAccessException
         Console.WriteLine("After patch");
         DumpMemory(mono_method_can_access_field);
     }
-    static void Patch(IntPtr targetAddress, byte[] patchBytes)
+    static void PatchBytes(IntPtr targetAddress, byte[] patchBytes)
     {
         var pageAddress = AlignToPageSize(targetAddress);
         var pageSize = Environment.SystemPageSize;
