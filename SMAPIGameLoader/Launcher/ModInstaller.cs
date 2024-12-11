@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Java.Lang.Ref;
 using Newtonsoft.Json.Linq;
 using SMAPIGameLoader.Tool;
 using System;
@@ -69,8 +70,7 @@ internal static class ModInstaller
     public static void InstallModPackZip(string zipFilePath, ZipArchive zip)
     {
         //extract mod
-        zip.ExtractToDirectory(ModTool.ModsDir, true);
-        //done
+        ExtractModZipFile(zipFilePath, zip, ModTool.ModsDir);
 
         //print log
         var entries = zip.Entries;
@@ -120,8 +120,7 @@ internal static class ModInstaller
             var manifestJson = JObject.Parse(manifestText);
             string modName = manifestJson["Name"].ToString();
 
-            var extractDestDir = Path.Combine(ModDir);
-            zip.ExtractToDirectory(extractDestDir, true);
+            ExtractModZipFile(pickFile.FileName, zip, Path.Combine(ModDir));
             zip.Dispose();
 
             var modVersion = manifestJson["Version"].ToString();
@@ -148,6 +147,18 @@ internal static class ModInstaller
             ErrorDialogTool.Show(ex);
         }
     }
+    public static void ExtractModZipFile(string zipFilePath, ZipArchive zip, string outputDir)
+    {
+        //fix bug
+        //if you have file with name == zip.fileNameWithoutExtension
+        //example exist file "SpaceCore" 
+        var fileNameNoExtens = new FileInfo(zipFilePath).Name.Replace(".zip", "");
+        var checkFileExist = Path.Combine(outputDir, fileNameNoExtens);
+        if (File.Exists(checkFileExist))
+            File.Delete(checkFileExist);
+
+        zip.ExtractToDirectory(outputDir, true);
+    }
     public static string ReadManifest(ZipArchiveEntry entry)
     {
         string result;
@@ -157,7 +168,7 @@ internal static class ModInstaller
         }
         return result;
     }
-    internal static bool TryDeleteMod(string folderPath)
+    internal static bool TryDeleteMod(string folderPath, bool cleaupParentFolder)
     {
         try
         {
@@ -165,6 +176,21 @@ internal static class ModInstaller
                 return false;
 
             Directory.Delete(folderPath, true);
+
+            //clean up folder parent if need
+            if (cleaupParentFolder)
+            {
+                var parentDir = Directory.GetParent(folderPath).FullName;
+                if (parentDir != ModDir)
+                {
+                    var dirs = Directory.GetDirectories(folderPath);
+                    if (dirs.Length == 0)
+                    {
+                        Directory.Delete(parentDir);
+                    }
+                }
+            }
+
             return true;
         }
         catch (Exception ex)

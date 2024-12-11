@@ -98,19 +98,18 @@ internal class ModManagerActivity : Activity
             buttonOKName: "Yes Delete It!",
             onClickYes: () =>
             {
-                DeleteMod(mod);
+                OnClickDeleteMod(mod);
             }
         );
     }
-    void DeleteMod(ModItemView mod)
+    void OnClickDeleteMod(ModItemView mod)
     {
         Console.WriteLine("try delete mod: " + mod.modName);
-        if (ModInstaller.TryDeleteMod(mod.modFolderPath))
+        if (ModInstaller.TryDeleteMod(mod.modFolderPath, true))
         {
             ToastNotifyTool.Notify("Done delete mod: " + mod.modName);
             RefreshMods();
         }
     }
-
 }
 
