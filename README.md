@@ -7,10 +7,11 @@
 - Need to download game from Play Store only, not support game apks modify or pirate game
 - Install & Update SMAPI by 1 click
 - Support device 64bit only
+- Mod Manager
 
 # 🍕 Upcoming Feature
-- Mod Manager
 - Save Import & Export
+- Log Export, copy to clipboard
 
 # How To Install Wiki
 https://github.com/NRTnarathip/SMAPILoader/wiki/How-To-Install-SMAPI
