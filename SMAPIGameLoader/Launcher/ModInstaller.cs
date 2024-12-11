@@ -183,11 +183,9 @@ internal static class ModInstaller
                 var parentDir = Directory.GetParent(folderPath).FullName;
                 if (parentDir != ModDir)
                 {
-                    var dirs = Directory.GetDirectories(folderPath);
+                    var dirs = Directory.GetDirectories(parentDir);
                     if (dirs.Length == 0)
-                    {
-                        Directory.Delete(parentDir);
-                    }
+                        Directory.Delete(parentDir, true);
                 }
             }
 
@@ -195,7 +193,9 @@ internal static class ModInstaller
         }
         catch (Exception ex)
         {
-            return false;
+            Console.WriteLine(ex);
+            ErrorDialogTool.Show(ex);
+            return true;
         }
     }
 }
