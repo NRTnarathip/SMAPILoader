@@ -322,7 +322,6 @@ public class SMAPIActivity : AndroidGameActivity
     static string GetSMAPIFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, "StardewModdingAPI.dll");
     public Exception StartGameWithSMAPI()
     {
-        Console.WriteLine("try start game with SMAPI");
         Exception exOut = null;
         try
         {
@@ -330,7 +329,6 @@ public class SMAPIActivity : AndroidGameActivity
             Log.Setup();
 
             var smapiFilePath = GetSMAPIFilePath;
-            Console.WriteLine("smapi path to load: " + smapiFilePath);
             if (File.Exists(smapiFilePath) == false)
             {
                 Console.WriteLine("error StardewModdingAPI.dll file not found");
@@ -338,13 +336,10 @@ public class SMAPIActivity : AndroidGameActivity
             }
 
             var smapi = Assembly.LoadFrom(smapiFilePath);
-            Console.WriteLine(smapi);
             var programType = smapi.GetType("StardewModdingAPI.Program");
             var mainMethod = programType.GetMethod("Main", BindingFlags.Static | BindingFlags.Public);
             var args = new object[] { new string[] { } };
-            Console.WriteLine("try invoke SMAPI Program.Main()");
             mainMethod.Invoke(null, args);
-            Console.WriteLine("done run SMAPI Program.Main()");
         }
         catch (Exception err)
         {
