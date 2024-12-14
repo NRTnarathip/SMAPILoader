@@ -15,13 +15,13 @@ internal static class StardewGameRewriter
     {
         AssemblyResolver = StardewAssembliesResolver.Instance,
     };
-    public static ModuleDefinition ReadModule(string filePath)
-    {
-        return ModuleDefinition.ReadModule(filePath, MonoCecilReaderConfig);
-    }
     public static ModuleDefinition ReadModule(Stream stream)
     {
         return ModuleDefinition.ReadModule(stream, MonoCecilReaderConfig);
+    }
+    public static AssemblyDefinition ReadAssembly(Stream stream)
+    {
+        return AssemblyDefinition.ReadAssembly(stream, MonoCecilReaderConfig);
     }
     public static void AddInternalVisableTo(ModuleDefinition module, string visableTo)
     {

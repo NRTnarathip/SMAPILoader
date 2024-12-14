@@ -24,6 +24,16 @@ namespace SMAPIGameLoader.Launcher;
 )]
 public class LauncherActivity : Activity
 {
+    static LauncherActivity()
+    {
+        AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
+    }
+
+    private static void CurrentDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+    {
+        Console.WriteLine("loaded asm: " + args.LoadedAssembly);
+    }
+
     public static LauncherActivity Instance { get; private set; }
     protected override void OnCreate(Bundle? savedInstanceState)
     {
@@ -146,6 +156,7 @@ public class LauncherActivity : Activity
 
     void OnClickStartGame()
     {
+        Console.WriteLine("On click start game");
         EntryGame.LaunchGameActivity(this);
         Console.WriteLine("done continue UI runner");
     }

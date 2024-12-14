@@ -90,7 +90,7 @@ internal static class GameCloner
         }
 
         //Load MonoGame.Framework.dll into reference
-        GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameFrameworkDllFileName);
+        GameAssemblyManager.LoadAssembly(GameAssemblyManager.MonoGameDLLFileName);
 
         //Rewrite StardewValley.dll
         if (isNeedCloenGame)

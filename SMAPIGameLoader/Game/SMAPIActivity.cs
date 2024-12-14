@@ -7,21 +7,14 @@ using Android.Util;
 using Android.Views;
 using HarmonyLib;
 using Java.Util;
-using LWJGL;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.Utilities;
 using SMAPIGameLoader.Game;
 using SMAPIGameLoader.Tool;
 using StardewValley;
-using StardewValley.Mobile;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
 
 namespace SMAPIGameLoader;
 
