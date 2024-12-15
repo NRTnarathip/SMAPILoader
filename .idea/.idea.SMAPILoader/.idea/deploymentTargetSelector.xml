@@ -5,6 +5,9 @@
       <SelectionState runConfigName="AndroidAppTestMonoMod">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="SMAPIGameLoader">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

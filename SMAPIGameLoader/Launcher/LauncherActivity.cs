@@ -1,16 +1,10 @@
+using System;
+using _Microsoft.Android.Resource.Designer;
 using Android.App;
-using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Widget;
-using Mono.Cecil;
 using SMAPIGameLoader.Tool;
-using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Reflection;
-using System.Security.Permissions;
 using Xamarin.Essentials;
 
 namespace SMAPIGameLoader.Launcher;
@@ -25,11 +19,14 @@ namespace SMAPIGameLoader.Launcher;
 public class LauncherActivity : Activity
 {
     public static LauncherActivity Instance { get; private set; }
+
+    private static bool IsDeviceSupport => IntPtr.Size == 8;
+
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         Instance = this;
         base.OnCreate(savedInstanceState);
-        SetContentView(Resource.Layout.LauncherLayout);
+        SetContentView(ResourceConstant.Layout.LauncherLayout);
         Platform.Init(this, savedInstanceState);
         ActivityTool.Init(this);
 
@@ -38,10 +35,24 @@ public class LauncherActivity : Activity
 
         //ready
         OnReadyToSetupLayoutPage();
+
+        //run utils scripts
+        ProcessAdbExtras();
     }
 
-    static bool IsDeviceSupport => IntPtr.Size == 8;
-    bool AssetGameVerify()
+    /// <summary>
+    ///     Receive argument launch activity
+    /// </summary>
+    private void ProcessAdbExtras()
+    {
+        if (AdbExtraTool.IsClickStartGame(this))
+        {
+            Console.WriteLine("On click start game");
+            OnClickStartGame();
+        }
+    }
+
+    private static bool AssetGameVerify()
     {
         try
         {
@@ -49,7 +60,6 @@ public class LauncherActivity : Activity
             {
                 var currentPackage = StardewApkTool.CurrentPackageInfo;
                 if (currentPackage != null)
-                {
                     switch (currentPackage.PackageName)
                     {
                         case StardewApkTool.GamePlayStorePackageName:
@@ -59,11 +69,8 @@ public class LauncherActivity : Activity
                             ToastNotifyTool.Notify("Please Download Game From Galaxy Store");
                             break;
                     }
-                }
                 else
-                {
                     ToastNotifyTool.Notify("Please Download Game From Play Store Or Galaxy Store");
-                }
 
                 return false;
             }
@@ -76,7 +83,8 @@ public class LauncherActivity : Activity
 
         return true;
     }
-    void AssertRequirement()
+
+    private void AssertRequirement()
     {
         //check if 32bit not support
         if (IsDeviceSupport is false)
@@ -97,44 +105,38 @@ public class LauncherActivity : Activity
         BypassAccessException.Apply();
     }
 
-    void OnReadyToSetupLayoutPage()
+    private void OnReadyToSetupLayoutPage()
     {
         // Create your application here
-        FindViewById<Button>(Resource.Id.InstallSMAPIZip).Click += (sender, e) =>
+        FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += (sender, e) =>
         {
             SMAPIInstaller.OnClickInstallSMAPIZip();
         };
-        FindViewById<Button>(Resource.Id.InstallSMAPIOnline).Click += (sender, e) =>
+        FindViewById<Button>(ResourceConstant.Id.InstallSMAPIOnline).Click += (sender, e) =>
         {
             SMAPIInstaller.OnClickInstallSMAPIOnline();
         };
 
-        var startGameBtn = FindViewById<Button>(Resource.Id.StartGame);
-        startGameBtn.Click += (sender, e) =>
-        {
-            OnClickStartGame();
-        };
-        var modManagerBtn = FindViewById<Button>(Resource.Id.ModManagerBtn);
-        modManagerBtn.Click += (sender, e) =>
-        {
-            ActivityTool.SwapActivity<ModManagerActivity>(this, false);
-        };
+        var startGameBtn = FindViewById<Button>(ResourceConstant.Id.StartGame);
+        startGameBtn.Click += (sender, e) => { OnClickStartGame(); };
+        var modManagerBtn = FindViewById<Button>(ResourceConstant.Id.ModManagerBtn);
+        modManagerBtn.Click += (sender, e) => { ActivityTool.SwapActivity<ModManagerActivity>(this, false); };
 
         try
         {
-
             //set app version
-            var appVersionTextView = FindViewById<TextView>(Resource.Id.appVersionTextView);
+            var appVersionTextView = FindViewById<TextView>(ResourceConstant.Id.appVersionTextView);
             appVersionTextView.Text = "Launcher Version: " + AppInfo.VersionString;
-            DateTimeOffset buildDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(int.Parse(AppInfo.BuildString));
+            var buildDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(int.Parse(AppInfo.BuildString));
             var localDateTimeOffset = buildDateTimeOffset.ToLocalTime();
             var localDateTimeString = localDateTimeOffset.ToString("HH:mm:ss dd/MM/yyyy");
-            FindViewById<TextView>(Resource.Id.appBuildDate).Text = $"Build: {localDateTimeString} (Day/Month/Year)";
+            FindViewById<TextView>(ResourceConstant.Id.appBuildDate).Text =
+                $"Build: {localDateTimeString} (Day/Month/Year)";
 
             //set support game version
-            var supportGameVersionTextView = FindViewById<TextView>(Resource.Id.supportGameVersionTextView);
+            var supportGameVersionTextView = FindViewById<TextView>(ResourceConstant.Id.supportGameVersionTextView);
             supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport} Or Above";
-            var yourGameVersion = FindViewById<TextView>(Resource.Id.yourGameVersion);
+            var yourGameVersion = FindViewById<TextView>(ResourceConstant.Id.yourGameVersion);
             yourGameVersion.Text = "Your Game Version: " + StardewApkTool.CurrentGameVersion;
         }
         catch (Exception ex)
@@ -144,7 +146,7 @@ public class LauncherActivity : Activity
         }
     }
 
-    void OnClickStartGame()
+    private void OnClickStartGame()
     {
         Console.WriteLine("On click start game");
         EntryGame.LaunchGameActivity(this);
