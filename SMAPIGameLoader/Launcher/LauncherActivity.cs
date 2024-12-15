@@ -47,7 +47,6 @@ public class LauncherActivity : Activity
     {
         if (AdbExtraTool.IsClickStartGame(this))
         {
-            Console.WriteLine("On click start game");
             OnClickStartGame();
         }
     }
