@@ -53,12 +53,10 @@ internal static class BypassAccessException
 
     static void ApplyInternal_Arm64()
     {
-        Console.WriteLine("Start patch on arm64");
         var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
         unsafe
         {
             IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
-            Console.WriteLine("Start Patch mono_method_can_access_field: " + mono_method_can_access_field);
             IntPtr targetAddress = mono_method_can_access_field + 0x120;
             byte[] patchBytes =
             [
@@ -87,13 +85,11 @@ internal static class BypassAccessException
 
     static void ApplyInternal_Intel_x64()
     {
-        Console.WriteLine("Start patch on x64");
         var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
 
         unsafe
         {
             IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
-            Console.WriteLine("Start Patch mono_method_can_access_field: " + mono_method_can_access_field);
             //x64
             IntPtr targetAddress = mono_method_can_access_field + 0x132;
             byte[] patchBytes = [
@@ -129,15 +125,12 @@ internal static class BypassAccessException
     {
         var pageAddress = AlignToPageSize(targetAddress);
         var pageSize = Environment.SystemPageSize;
-        Console.WriteLine("trying set memory page protection");
         int protectResultError = mprotect(pageAddress, (uint)pageSize, PROT_EXEC | PROT_READ | PROT_WRITE);
-        Console.WriteLine("done set memory page protect: " + protectResultError);
         if (protectResultError != 0)
         {
             Console.WriteLine("error can't set protect memory at address: " + pageAddress.ToString("X"));
             return;
         }
-        Console.WriteLine("trying patch bytes at: " + targetAddress.ToString("X"));
         Marshal.Copy(patchBytes, 0, targetAddress, patchBytes.Length);
         Console.WriteLine("done patch bytes at address: " + targetAddress.ToString("X"));
     }
