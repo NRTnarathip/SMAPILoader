@@ -46,10 +46,6 @@ internal class GameAssemblyManager
             }
             Console.WriteLine("done clone SMAPI Game Loader Assemblies");
         }
-
-        //rewrite MonoGame.Framework
-        MonoGameRewriter.Rewrite(Path.Combine(assembliesOutputDirPath, MonoGameDLLFileName));
-
     }
     public static Assembly LoadAssembly(string dllFileName)
     {

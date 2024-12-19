@@ -28,48 +28,71 @@ internal static class BypassAccessException
     {
         try
         {
-            Console.WriteLine("Try Apply BypassAccessException");
+            Log("Try Apply BypassAccessException");
 
             if (ArchitectureTool.IsIntel())
                 ApplyInternal_Intel_x64();
             else
                 ApplyInternal_Arm64();
 
-            Console.WriteLine("Successfully BypassAccessException");
+            Log("Successfully BypassAccessException");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log(e);
         }
+
+#if false
+        //debug only
+        DialogTool.Show("Bypass Field & Method AccessException", logLines.ToString());
+#endif
     }
 
 
     private const int PROT_READ = 0x1;
     private const int PROT_WRITE = 0x2;
     private const int PROT_EXEC = 0x4;
+    static StringBuilder logLines = new();
+    static void Log(string msg)
+    {
+        logLines.AppendLine(msg);
+    }
+    static void Log(System.Exception ex) => Log(ex.ToString());
 
     [DllImport("libc.so", SetLastError = true)]
     private static extern int mprotect(IntPtr addr, UIntPtr len, int prot);
 
+    [DllImport("libBypassAccessExceptionLib.so")]
+    private static extern void ApplyBypass();
+
     static void ApplyInternal_Arm64()
     {
+        Log("Start ApplyInternal_Arm64()");
+        ApplyBypass();
+
+        Log("Done ApplyInternal_Arm64()");
+        return;
+
         var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
         unsafe
         {
             IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");
             IntPtr targetAddress = mono_method_can_access_field + 0x120;
+            Log("try patch mono_method_can_access_field at: " + targetAddress);
             byte[] patchBytes =
             [
                 0x20, 0x00, 0x80, 0x52// move w0, 1
             ];
             PatchBytes(targetAddress, patchBytes);
+            Console.WriteLine("done patch mono_method_can_access_field");
         }
         unsafe
         {
             IntPtr mono_method_can_access_method_full = dlsym(libHandle, "mono_method_can_access_method") + 0x24;
-            Console.WriteLine("start patch mono_method_can_access_method_full: " + mono_method_can_access_method_full);
+            Log("start patch mono_method_can_access_method_full: " + mono_method_can_access_method_full);
 
             var targetAddress = mono_method_can_access_method_full + 0x1C;
+            Console.WriteLine("targetAddress: " + targetAddress);
             byte[] patchBytes = [
                 //0x1F, 0x11, 0x1E, 0x2E
                 0x1F, 0x20, 0x03, 0xD5,
@@ -80,6 +103,7 @@ internal static class BypassAccessException
             ];
 
             PatchBytes(targetAddress, patchBytes);
+            Console.WriteLine("done patch mono_method_can_access_method_full");
         }
     }
 
@@ -112,7 +136,7 @@ internal static class BypassAccessException
         {
             IntPtr mono_method_can_access_method = dlsym(libHandle, "mono_method_can_access_method");
             IntPtr mono_method_can_access_method_full = mono_method_can_access_method + 0x30;
-            Console.WriteLine("start patch mono_method_can_access_method_full: " + mono_method_can_access_method_full);
+            Log("start patch mono_method_can_access_method_full: " + mono_method_can_access_method_full);
 
             var targetAddress = mono_method_can_access_method_full + 0x15;
             byte[] patchBytes = [
@@ -128,12 +152,16 @@ internal static class BypassAccessException
         int protectResultError = mprotect(pageAddress, (uint)pageSize, PROT_EXEC | PROT_READ | PROT_WRITE);
         if (protectResultError != 0)
         {
-            Console.WriteLine("error can't set protect memory at address: " + pageAddress.ToString("X"));
+            Log("error can't set protect memory at address: " + pageAddress.ToString("X"));
             return;
         }
+
+        Log("try copy bytes hex to address");
         Marshal.Copy(patchBytes, 0, targetAddress, patchBytes.Length);
-        Console.WriteLine("done patch bytes at address: " + targetAddress.ToString("X"));
+
+        Log("done patch bytes at address: " + targetAddress.ToString("X"));
     }
+
     static IntPtr AlignToPageSize(IntPtr address)
     {
         long pageSize = Environment.SystemPageSize;

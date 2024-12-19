@@ -3,7 +3,7 @@ using System.Linq;
 using Mono.Cecil;
 using System.IO;
 
-namespace SMAPIGameLoader;
+namespace SMAPIGameLoader.Game.Rewriter;
 
 internal static class StardewGameRewriter
 {
@@ -38,26 +38,18 @@ internal static class StardewGameRewriter
         Console.WriteLine("Done added InternalsVisibleTo with: " + visableTo);
 
     }
-    public static void Rewrite(string stardewDllFilePath)
+    public static void Rewrite(AssemblyDefinition assemblyDefinition)
     {
-        ToastNotifyTool.Notify("Starting Game Rewriter...");
 
         try
         {
-            using var stardewDllStream = File.Open(stardewDllFilePath, FileMode.Open, FileAccess.ReadWrite);
-            var stardewModule = ReadModule(stardewDllStream);
+            StardewRewriterTool.Init(assemblyDefinition);
+            var stardewModule = assemblyDefinition.MainModule;
             var mainActivityTypeDef = stardewModule.Types.First(t => t.Name == "MainActivity");
             var instance_FieldDef = mainActivityTypeDef.Fields.First(f => f.Name == "instance");
             //change FieldType MainActivity to SMAPIActivity;
-            if (instance_FieldDef.FieldType.Name != typeof(SMAPIActivity).Name)
-            {
-                instance_FieldDef.FieldType = stardewModule.ImportReference(typeof(SMAPIActivity));
-                Console.WriteLine("done change field type MainActivity to SMAPIActivity");
-                stardewModule.Write();
-                Console.WriteLine("Successfully Rewrite StardewValley.dll");
-            }
-
-            ToastNotifyTool.Notify("Done Game Rewriter");
+            instance_FieldDef.FieldType = stardewModule.ImportReference(typeof(SMAPIActivity));
+            TaskTool.NewLine("done change field type MainActivity to SMAPIActivity");
         }
         catch (Exception ex)
         {

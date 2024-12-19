@@ -88,7 +88,7 @@ internal static class TaskTool
             busyDialog.SetMessage(msg);
         }
     }
-    public static void AddNewLine(string msg)
+    public static void NewLine(string msg)
     {
         RunMainThread(() =>
         {

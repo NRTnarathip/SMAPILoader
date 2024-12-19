@@ -3,6 +3,7 @@ using Android.OS;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Org.Json;
+using SMAPIGameLoader.Game.Rewriter;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -71,7 +72,7 @@ internal static class GameCloner
     public static void Setup()
     {
         ClonerState clonerState = GetClonerState();
-        TaskTool.AddNewLine("Try to assert game clone");
+        TaskTool.NewLine("Try to assert game clone");
 
         bool isNeedCloenGame = clonerState.IsNeedToCloneGame();
 
@@ -79,14 +80,14 @@ internal static class GameCloner
 
         if (isNeedCloenGame)
         {
-            TaskTool.AddNewLine("Starting cloner game assets");
+            TaskTool.NewLine("Starting cloner game assets");
             //clone game assets
             GameAssetManager.VerifyAssets();
-            TaskTool.AddNewLine("Done verify asset");
+            TaskTool.NewLine("Done verify asset");
             GameAssemblyManager.VerifyAssemblies();
-            TaskTool.AddNewLine("Done verify assemblies");
+            TaskTool.NewLine("Done verify assemblies");
             GameAssemblyManager.VerifyLibs();
-            TaskTool.AddNewLine("Done verify libs");
+            TaskTool.NewLine("Done verify libs");
         }
 
         //Load MonoGame.Framework.dll into reference
@@ -95,10 +96,21 @@ internal static class GameCloner
         //Rewrite StardewValley.dll
         if (isNeedCloenGame)
         {
-            TaskTool.AddNewLine("Try rewrite StardewValley.dll");
-            var stardewDllFilePath = GameAssemblyManager.StardewValleyFilePath;
-            StardewGameRewriter.Rewrite(stardewDllFilePath);
-            TaskTool.AddNewLine("Done rewriter");
+            TaskTool.NewLine("Try rewriter StardewValley.dll");
+            using (var stardewAssemblyStream = File.Open(GameAssemblyManager.StardewValleyFilePath,
+                FileMode.Open, FileAccess.ReadWrite))
+            {
+
+                TaskTool.NewLine("Starting StardewValley Rewriter...");
+                var stardewAssemblyDef = StardewGameRewriter.ReadAssembly(stardewAssemblyStream);
+                StardewGameRewriter.Rewrite(stardewAssemblyDef);
+                StardewAudioRewriter.Rewrite(stardewAssemblyDef);
+
+                TaskTool.NewLine("Try save StardewValley rewriter to file..");
+                stardewAssemblyDef.Write();
+                TaskTool.NewLine("Successfully Rewrite StardewValley.dll");
+            }
+
             //Don't load StardewValley assembly here
             //you should load at SMAPIActivity
             //Assembly.LoadFrom(stardewDllFilePath);
@@ -110,9 +122,9 @@ internal static class GameCloner
             //mark
             clonerState.MarkCloenGameDone();
             clonerState.SaveToFile();
-            TaskTool.AddNewLine("Done save cloner state to file");
+            TaskTool.NewLine("Done save cloner state to file");
         }
 
-        TaskTool.AddNewLine("Done assert game clone");
+        TaskTool.NewLine("Done assert game clone");
     }
 }

@@ -48,6 +48,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\AssemblyStore\AssemblyStore.csproj" />
+		<ProjectReference Include="..\BypassAccessExceptionLib\BypassAccessExceptionLib.vcxproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="0Harmony">
@@ -55,7 +56,6 @@
 		</Reference>
 		<Reference Include="MonoGame.Framework">
 			<HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
-			<Private>True</Private>
 		</Reference>
 		<Reference Include="MonoMod.Backports">
 			<HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
