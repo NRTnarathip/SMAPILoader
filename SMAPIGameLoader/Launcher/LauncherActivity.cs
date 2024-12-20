@@ -176,8 +176,10 @@ public class LauncherActivity : AppCompatActivity
             return;
         }
 
-        var currentVersion = SMAPIInstaller.GetCurrentVersion();
-        smapiInstallInfo.Text = $"SMAPI Installed Version: {currentVersion}";
+        var lines = new StringBuilder();
+        lines.AppendLine($"SMAPI Installed Version: {SMAPIInstaller.GetCurrentVersion()}");
+        lines.AppendLine($"SMAPI Installed Build: {SMAPIInstaller.GetBuildCode()}");
+        smapiInstallInfo.Text = lines.ToString();
     }
 
     private void OnClickStartGame()

@@ -19,7 +19,7 @@ internal static class EntryGame
     static void LaunchGameActivityInternal(Activity launcherActivity)
     {
         Console.WriteLine("try start game..");
-        ToastNotifyTool.Notify("Starting Game..");
+        //ToastNotifyTool.Notify("Starting Game..");
         //check game it's can launch with version
 
         try
