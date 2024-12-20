@@ -106,6 +106,7 @@ internal static class SMAPIInstaller
             Console.WriteLine("error try to install SMAPI Zip: " + ex);
         }
     }
+    public static Action OnInstalledSMAPI;
     public static async void OnClickInstallSMAPIZip()
     {
         try
@@ -125,6 +126,8 @@ internal static class SMAPIInstaller
 
             DialogTool.Show("Successfully Install SMAPI",
                 "done installed SMAPI from zip file: " + pick.FileName);
+            OnInstalledSMAPI?.Invoke();
+
         }
         catch (Exception ex)
         {

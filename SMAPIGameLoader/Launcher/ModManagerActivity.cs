@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.OS;
 using Android.Widget;
+using AndroidX.AppCompat.App;
 using Newtonsoft.Json.Linq;
 using SMAPIGameLoader.Tool;
 using System;
@@ -13,9 +14,10 @@ using Xamarin.Essentials;
 
 namespace SMAPIGameLoader.Launcher;
 [Activity(
-    Label = "Mod Manager"
+    Label = "Mod Manager",
+    Theme = "@style/AppTheme"
 )]
-internal class ModManagerActivity : Activity
+internal class ModManagerActivity : AppCompatActivity
 {
     protected override void OnCreate(Bundle savedInstanceState)
     {

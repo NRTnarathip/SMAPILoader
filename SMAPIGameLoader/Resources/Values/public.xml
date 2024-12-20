@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <public type="color" name="splash_background" id="0x7f010000" />
     <public type="drawable" name="screen" id="0x7f020000" />
     <public type="drawable" name="splash_logos" id="0x7f020001" />
     <public type="drawable" name="splash_logos_crop" id="0x7f020002" />

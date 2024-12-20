@@ -6,17 +6,21 @@ using Android.OS;
 using Android.Widget;
 using SMAPIGameLoader.Tool;
 using Xamarin.Essentials;
+using AndroidX.AppCompat.App;
+using System.Text;
+
 
 namespace SMAPIGameLoader.Launcher;
 
 [Activity(
     Label = "SMAPI Launcher",
     MainLauncher = true,
+    Theme = "@style/AppTheme",
     AlwaysRetainTaskState = true,
     LaunchMode = LaunchMode.SingleInstance,
     ScreenOrientation = ScreenOrientation.SensorPortrait
 )]
-public class LauncherActivity : Activity
+public class LauncherActivity : AppCompatActivity
 {
     public static LauncherActivity Instance { get; private set; }
 
@@ -26,7 +30,9 @@ public class LauncherActivity : Activity
     {
         Instance = this;
         base.OnCreate(savedInstanceState);
+
         SetContentView(ResourceConstant.Layout.LauncherLayout);
+
         Platform.Init(this, savedInstanceState);
         ActivityTool.Init(this);
 
@@ -35,9 +41,15 @@ public class LauncherActivity : Activity
 
         //ready
         OnReadyToSetupLayoutPage();
+        SetDarkMode();
 
         //run utils scripts
         ProcessAdbExtras();
+    }
+
+    private void SetDarkMode()
+    {
+        AppCompatDelegate.DefaultNightMode = AppCompatDelegate.ModeNightYes;
     }
 
     /// <summary>
@@ -104,9 +116,10 @@ public class LauncherActivity : Activity
         BypassAccessException.Apply();
     }
 
+
     private void OnReadyToSetupLayoutPage()
     {
-        // Create your application here
+        //setup bind events
         FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += (sender, e) =>
         {
             SMAPIInstaller.OnClickInstallSMAPIZip();
@@ -121,28 +134,50 @@ public class LauncherActivity : Activity
         var modManagerBtn = FindViewById<Button>(ResourceConstant.Id.ModManagerBtn);
         modManagerBtn.Click += (sender, e) => { ActivityTool.SwapActivity<ModManagerActivity>(this, false); };
 
+        SMAPIInstaller.OnInstalledSMAPI += NotifyInstalledSMAPIInfo;
+
+        //set launcher text info
         try
         {
+            var launcherInfoLines = new StringBuilder();
             //set app version
-            var appVersionTextView = FindViewById<TextView>(ResourceConstant.Id.appVersionTextView);
-            appVersionTextView.Text = "Launcher Version: " + AppInfo.VersionString;
+            launcherInfoLines.AppendLine("Launcher Version: " + AppInfo.VersionString);
+
             var buildDateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(int.Parse(AppInfo.BuildString));
             var localDateTimeOffset = buildDateTimeOffset.ToLocalTime();
             var localDateTimeString = localDateTimeOffset.ToString("HH:mm:ss dd/MM/yyyy");
-            FindViewById<TextView>(ResourceConstant.Id.appBuildDate).Text =
-                $"Build: {localDateTimeString} (Day/Month/Year)";
+            launcherInfoLines.AppendLine($"Build: {localDateTimeString} (d/m/y)");
 
             //set support game version
-            var supportGameVersionTextView = FindViewById<TextView>(ResourceConstant.Id.supportGameVersionTextView);
-            supportGameVersionTextView.Text = $"Support Game Version: {StardewApkTool.GameVersionSupport} Or Above";
-            var yourGameVersion = FindViewById<TextView>(ResourceConstant.Id.yourGameVersion);
-            yourGameVersion.Text = "Your Game Version: " + StardewApkTool.CurrentGameVersion;
+            launcherInfoLines.AppendLine($"Support Game Version: {StardewApkTool.GameVersionSupport} Or Later");
+            launcherInfoLines.AppendLine("Your Game Version: " + StardewApkTool.CurrentGameVersion);
+
+            FindViewById<TextView>(ResourceConstant.Id.launcherInfoTextView).Text = launcherInfoLines.ToString();
+
         }
         catch (Exception ex)
         {
             ToastNotifyTool.Notify("Error:Try setup app text info: " + ex);
             ErrorDialogTool.Show(ex);
         }
+
+        //init ui info
+        NotifyInstalledSMAPIInfo();
+
+
+    }
+
+    private void NotifyInstalledSMAPIInfo()
+    {
+        var smapiInstallInfo = FindViewById<TextView>(ResourceConstant.Id.SMAPIInstallInfoTextView);
+        if (SMAPIInstaller.IsInstalled is false)
+        {
+            smapiInstallInfo.Text = "Please install SMAPI!!";
+            return;
+        }
+
+        var currentVersion = SMAPIInstaller.GetCurrentVersion();
+        smapiInstallInfo.Text = $"SMAPI Installed Version: {currentVersion}";
     }
 
     private void OnClickStartGame()
