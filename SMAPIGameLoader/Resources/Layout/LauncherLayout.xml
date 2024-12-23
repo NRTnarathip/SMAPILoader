@@ -45,14 +45,14 @@
             android:layout_marginHorizontal="50dp"
             android:gravity="center_horizontal"
             >
-            <Button
+            <!--<Button
                 android:id="@+id/InstallSMAPIOnline"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Install SMAPI Online" 
                 android:layout_marginVertical="10dp"
 				android:textAllCaps="false"
-                />
+                />-->
             <Button
                 android:id="@+id/InstallSMAPIZip"
                 android:layout_width="match_parent"
@@ -75,7 +75,7 @@
                 android:id="@+id/UploadLog"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Share Log Error" 
+                android:text="Share Log" 
 				android:textAllCaps="false"
                 android:layout_marginVertical="10dp"
                 />

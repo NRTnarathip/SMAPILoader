@@ -127,10 +127,10 @@ public class LauncherActivity : AppCompatActivity
             {
                 SMAPIInstaller.OnClickInstallSMAPIZip();
             };
-            FindViewById<Button>(ResourceConstant.Id.InstallSMAPIOnline).Click += (sender, e) =>
-            {
-                SMAPIInstaller.OnClickInstallSMAPIOnline();
-            };
+            //FindViewById<Button>(ResourceConstant.Id.InstallSMAPIOnline).Click += (sender, e) =>
+            //{
+            //    SMAPIInstaller.OnClickInstallSMAPIOnline();
+            //};
 
             FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += (sender, e) =>
             {
@@ -194,8 +194,8 @@ public class LauncherActivity : AppCompatActivity
         }
 
         var lines = new StringBuilder();
-        lines.AppendLine($"SMAPI Installed Version: {SMAPIInstaller.GetCurrentVersion()}");
-        lines.AppendLine($"SMAPI Installed Build: {SMAPIInstaller.GetBuildCode()}");
+        lines.AppendLine($"SMAPI Version: {SMAPIInstaller.GetCurrentVersion()}");
+        lines.AppendLine($"SMAPI Build: {SMAPIInstaller.GetBuildCode()}");
         smapiInstallInfo.Text = lines.ToString();
     }
 
