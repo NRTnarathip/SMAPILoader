@@ -1,0 +1,490 @@
+[21:17:40 INFO  SMAPI] SMAPI 4.1.7.7 with Stardew Valley 1.6.14.11 build 24341 on Android Unix 33.0.0.0
+[21:17:40 INFO  SMAPI] SMAPI Build: 1734703505
+[21:17:40 INFO  SMAPI] Mods go here: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods
+[21:17:40 TRACE SMAPI] (Using custom --mods-path argument. Game folder: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assemblies.)
+[21:17:40 TRACE SMAPI] Log started at 2024-12-20T14:17:40 UTC
+[21:17:40 TRACE game] On ApplyHarmonyPatchAll()..
+[21:17:40 TRACE game] Try harmony.PatchAll()
+[21:17:40 TRACE game] Done harmony.PatchAll()
+[21:17:40 INFO  SMAPI] You enabled developer mode, so the console will be much more verbose. You can disable it by installing the non-developer version of SMAPI.
+[21:17:40 DEBUG SMAPI] Waiting for game to launch...
+[21:17:41 TRACE game] Instance_Initialize() finished, elapsed = '00:00:00.3527444'
+[21:17:41 TRACE game] Instance_LoadContent() finished, elapsed = '00:00:00.4826368'
+[21:17:41 DEBUG SMAPI] Loading mod metadata...
+[21:17:41 DEBUG SMAPI] Loading mods...
+[21:17:42 TRACE SMAPI]    Virtual Keyboard (from Mods/VirtualKeyboard/VirtualKeyboard.dll, ID: NRTnarathip.VirtualKeyboard, assembly version: 1.0.0)...
+[21:17:42 TRACE SMAPI]       Rewrote VirtualKeyboard.dll for OS...
+[21:17:42 TRACE SMAPI]       Detected game patcher in assembly VirtualKeyboard.dll.
+[21:17:42 TRACE SMAPI]       Detected direct console access (System.Console type) in assembly VirtualKeyboard.dll.
+[21:17:42 TRACE SMAPI]    CJB Cheats Menu (from Mods/CJBCheatsMenu/CJBCheatsMenu.dll, ID: CJBok.CheatsMenu, assembly version: 1.37.1)...
+[21:17:42 TRACE SMAPI]       Rewrote CJBCheatsMenu.dll to fix Game1.get_locations method...
+[21:17:42 TRACE SMAPI]       Rewrote CJBCheatsMenu.dll to fix Game1.warpFarmer (added missing optional parameters), IClickableMenu.drawHoverText (added missing optional parameters), IClickableMenu.drawTextureBox (added missing optional parameters)...
+[21:17:42 TRACE SMAPI]       Rewrote CJBCheatsMenu.dll to fix Replace Method: System.Void StardewValley.Menus.OptionsElement::draw(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Int32,System.Int32,StardewValley.Menus.IClickableMenu)...
+[21:17:43 TRACE SMAPI]    CJB Item Spawner (from Mods/CJBItemSpawner/CJBItemSpawner.dll, ID: CJBok.ItemSpawner, assembly version: 2.5.1)...
+[21:17:43 TRACE SMAPI]       Rewrote CJBItemSpawner.dll to fix Game1.get_locations method, ItemGrabMenu..ctor constructor, MenuWithInventory.get_heldItem method, MenuWithInventory.set_heldItem method...
+[21:17:43 TRACE SMAPI]       Rewrote CJBItemSpawner.dll to fix IClickableMenu.drawTextureBox (added missing optional parameters), TextBox..ctor (added missing optional parameters), Utility.getTrashReclamationPrice (added missing optional parameters)...
+[21:17:43 TRACE SMAPI]    Tractor Mod (from Mods/TractorMod/TractorMod.dll, ID: Pathoschild.TractorMod, assembly version: 4.20.2)...
+[21:17:43 TRACE SMAPI]       Rewrote TractorMod.dll to fix Game1.get_locations method...
+[21:17:43 TRACE SMAPI]       Rewrote TractorMod.dll to fix IClickableMenu.drawTextureBox (added missing optional parameters)...
+[21:17:43 TRACE SMAPI]       Rewrote TractorMod.dll to fix Replace Method: System.Void StardewValley.ICue::set_Volume(System.Single)...
+[21:17:43 TRACE SMAPI]    Content Patcher (from Mods/ContentPatcher/ContentPatcher.dll, ID: Pathoschild.ContentPatcher, assembly version: 2.4.4)...
+[21:17:44 TRACE SMAPI]       Rewrote ContentPatcher.dll to fix Force.DeepCloner.DeepClonerExtensions type, Game1.get_locations method...
+[21:17:44 TRACE SMAPI]       Rewrote ContentPatcher.dll to fix IClickableMenu.drawTextureBox (added missing optional parameters)...
+[21:17:44 TRACE SMAPI]       Rewrote ContentPatcher.dll to fix Replace Method: System.Void Microsoft.Xna.Framework.Graphics.Texture2D::GetData<Microsoft.Xna.Framework.Color>(!!0[])...
+[21:17:44 TRACE SMAPI]    Farm Type Manager (from Mods/FarmTypeManager/FarmTypeManager.dll, ID: Esca.FarmTypeManager, assembly version: 1.24.0)...
+[21:17:44 TRACE SMAPI]       Rewrote FarmTypeManager.dll to fix Game1.get_locations method...
+[21:17:44 TRACE SMAPI]       Rewrote FarmTypeManager.dll to fix Farmer.couldInventoryAcceptThisItem (added missing optional parameters)...
+[21:17:44 TRACE SMAPI]       Detected game patcher in assembly FarmTypeManager.dll.
+[21:17:44 TRACE game] start FarmTypeManagerFix
+[21:17:44 TRACE game] Start patching fix
+[21:17:44 TRACE game] Applying Harmony patch "FarmTypeManagerFix": prefixing SDV method "Monster.findPlayer".
+[21:17:44 TRACE game] Applying Harmony patch "FarmTypeManagerFix": postfixing SDV method "Monster.findPlayer".
+[21:17:44 TRACE game] done FarmTypeManagerFix
+[21:17:44 TRACE SMAPI]    SpaceCore (from Mods/SpaceCore/SpaceCore.dll, ID: spacechase0.SpaceCore, assembly version: 1.27.0)...
+[21:17:45 TRACE SMAPI]       Loading assembly 'SpaceCore.Content.Parser.dll'...
+[21:17:45 TRACE SMAPI]       Loading assembly 'SpaceCore.Content.Engine.dll'...
+[21:17:45 TRACE SMAPI]       Rewrote SpaceCore.dll to fix Force.DeepCloner.DeepClonerExtensions type, Game1.get_locations method, IClickableMenu.drawToolTip method, MenuWithInventory..ctor constructor, MenuWithInventory.get_heldItem method, MenuWithInventory.set_heldItem method, SaveGame.descriptionElementSerializer field, SaveGame.farmerSerializer field, SaveGame.legacyDescriptionElementSerializer field, SaveGame.locationSerializer field, SaveGame.serializer field, ShopMenu.tabButtons field, ShopMenu.UseCatalogueTabs method, ShopMenu.UseFurnitureCatalogueTabs method, ShopMenu.UseNoTabs method, StardewValley.Menus.ShopMenu/ShopTabClickableTextureComponent type...
+[21:17:45 TRACE SMAPI]       Rewrote SpaceCore.dll to fix GameMenu.skillsTab (field => const)...
+[21:17:45 TRACE SMAPI]       Rewrote SpaceCore.dll to fix Game1.parseText (added missing optional parameters), Game1.warpFarmer (added missing optional parameters), IClickableMenu.drawHoverText (added missing optional parameters), IClickableMenu.drawTextureBox (added missing optional parameters)...
+[21:17:45 TRACE SMAPI]       Rewrote SpaceCore.dll to fix Replace Method: System.Void Microsoft.Xna.Framework.Graphics.Texture2D::GetData<Microsoft.Xna.Framework.Color>(!!0[])...
+[21:17:45 TRACE SMAPI]       Detected game patcher in assembly SpaceCore.dll.
+[21:17:45 TRACE SMAPI]       Loading assembly 'SpaceCore.dll' (rewritten)...
+[21:17:45 TRACE game] Start SpaceCoreFix
+[21:17:45 TRACE game] Start SpaceCoreFix.ApplyFix()
+[21:17:46 TRACE game] Done SpaceCoreFix
+[21:17:46 TRACE SMAPI]    Custom Companions (from Mods/CustomCompanions/CustomCompanions.dll, ID: PeacefulEnd.CustomCompanions, assembly version: 5.0.0)...
+[21:17:46 TRACE SMAPI]       Rewrote CustomCompanions.dll to fix Game1.get_locations method...
+[21:17:46 TRACE SMAPI]       Detected game patcher in assembly CustomCompanions.dll.
+[21:17:46 TRACE SMAPI]    (CP) Chocobo Valley Mounts (from Mods/[CP] Chocobo Valley Mounts, ID: Kitsutsune.Chocobovalleymounts) [content pack]...
+[21:17:46 INFO  SMAPI] Loaded 8 mods:
+[21:17:46 INFO  SMAPI]    CJB Cheats Menu 1.37.1 by CJBok and Pathoschild | Simple in-game cheats menu!
+[21:17:46 INFO  SMAPI]    CJB Item Spawner 2.5.1 by CJBok and Pathoschild | Simple in-game item spawner!
+[21:17:46 INFO  SMAPI]    Content Patcher 2.4.4 by Pathoschild | Loads content packs which edit game data, images, and maps without changing the game files.
+[21:17:46 INFO  SMAPI]    Custom Companions 5.0.0 by PeacefulEnd | Framework for creating custom entities that can be spawned on maps or follow you around in Stardew Valley.
+[21:17:46 INFO  SMAPI]    Farm Type Manager 1.24.0 by Esca | Allows custom spawning of content from each farm type: forage, large objects, ore, and monsters
+[21:17:46 INFO  SMAPI]    SpaceCore 1.27.0 by spacechase0 | The space-iest of cores. (Framework mod)
+[21:17:46 INFO  SMAPI]    Tractor Mod 4.20.2 by Pathoschild | Lets you buy a tractor to more efficiently work with crops, clear twigs and rocks, etc.
+[21:17:46 INFO  SMAPI]    Virtual Keyboard 2.0.3 by NRTnarathip | Virtual Keyboard for android
+
+[21:17:46 INFO  SMAPI] Loaded 1 content packs:
+[21:17:46 INFO  SMAPI]    (CP) Chocobo Valley Mounts 1.0.1 by Kitsutsune | for Content Patcher | Want to be a chocobo rider?
+
+[21:17:46 INFO  SMAPI]    Patched game code
+[21:17:46 INFO  SMAPI]    --------------------------------------------------
+[21:17:46 INFO  SMAPI]       These mods directly change the game code. They're more likely to cause errors or bugs in-game; if
+[21:17:46 INFO  SMAPI]       your game has issues, try removing these first. Otherwise you can ignore this warning.
+
+[21:17:46 INFO  SMAPI]       - Custom Companions
+[21:17:46 INFO  SMAPI]       - Farm Type Manager
+[21:17:46 INFO  SMAPI]       - SpaceCore
+[21:17:46 INFO  SMAPI]       - Virtual Keyboard
+
+[21:17:46 TRACE SMAPI]    Direct console access
+[21:17:46 TRACE SMAPI]    --------------------------------------------------
+[21:17:46 TRACE SMAPI]       These mods access the SMAPI console window directly. This is more fragile, and their output may not
+[21:17:46 TRACE SMAPI]       be logged by SMAPI.
+
+[21:17:46 TRACE SMAPI]       - Virtual Keyboard
+
+[21:17:46 DEBUG SMAPI]    No update keys
+[21:17:46 DEBUG SMAPI]    --------------------------------------------------
+[21:17:46 DEBUG SMAPI]       These mods have no update keys in their manifest. SMAPI may not notify you about updates for these
+[21:17:46 DEBUG SMAPI]       mods. Consider notifying the mod authors about this problem.
+
+[21:17:46 DEBUG SMAPI]       - Virtual Keyboard
+
+[21:17:46 DEBUG SMAPI] Launching mods...
+[21:17:46 TRACE CJB Cheats Menu] Started with menu key P.
+[21:17:46 TRACE CJB Item Spawner] Started with menu key I.
+[21:17:46 TRACE Tractor Mod] Requested cache invalidation for 'Data/Buildings'.
+[21:17:46 TRACE SMAPI] Invalidated 0 cache entries.
+[21:17:46 TRACE Tractor Mod] Requested cache invalidation for 'Data/AudioChanges'.
+[21:17:46 TRACE SMAPI] Invalidated 0 cache entries.
+[21:17:46 TRACE SMAPI]    Found mod-provided API (ContentPatcher.Framework.ContentPatcherAPI).
+[21:17:46 TRACE Farm Type Manager] Applying Harmony patch "HarmonyPatch_DisableFurniturePickup": postfixing 3 implementations of SDV method "Furniture.canBeRemoved(Farmer)".
+[21:17:46 TRACE Farm Type Manager] Applying Harmony patch "HarmonyPatch_InstantKillImmunity": prefixing SDV method "HungryFrogCompanion.tongueReachedMonster".
+[21:17:46 TRACE Farm Type Manager] Applying Harmony patch "HarmonyPatch_StunImmunity": prefixing SDV method "DebuffingProjectile.behaviorOnCollisionWithMonster".
+[21:17:46 TRACE Farm Type Manager] Applying Harmony patch "HarmonyPatch_ToggleExtraLoot": postfixing 12 implementations of SDV method "Monster.getExtraDropitems()".
+[21:17:46 TRACE Farm Type Manager] Applying Harmony patch "HarmonyPatch_UpdateCursorOverPlacedItem": postfixing SDV method "Utility.canGrabSomethingFromHere(int, int, Farmer)".
+[21:17:47 TRACE game] call GatherLocals() for android
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_PlaySound'.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_ShowHudMessage'.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_PlayEvent'.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_DamageCurrentFarmer'.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_ApplyBuff'.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_OpenGuidebook'.
+[21:17:47 TRACE game] Registered event command: damageFarmer
+[21:17:47 TRACE game] Registered event command: giveHat
+[21:17:47 TRACE game] Registered event command: setDating
+[21:17:47 TRACE game] Registered event command: setEngaged
+[21:17:47 TRACE game] Registered event command: totemWarpEffect
+[21:17:47 TRACE game] Registered event command: setActorScale
+[21:17:47 TRACE game] Registered event command: cycleActorColors
+[21:17:47 TRACE game] Registered event command: flash
+[21:17:47 TRACE game] Registered event command: setRaining
+[21:17:47 TRACE game] Registered event command: screenShake
+[21:17:47 TRACE game] Registered event command: setZoom
+[21:17:47 TRACE game] Registered event command: smoothZoom
+[21:17:47 TRACE game] Registered event command: switchEventFull
+[21:17:47 TRACE game] Registered event command: reSetUpCharacters
+[21:17:47 TRACE game] Registered trigger type for Data/Triggers: spacechase0.SpaceCore_OnItemUsed.
+[21:17:47 TRACE game] Registered trigger type for Data/Triggers: spacechase0.SpaceCore_OnItemEaten.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_TriggerSpawnGroup'.
+[21:17:47 TRACE game] Registered trigger action handler 'spacechase0.SpaceCore_ClearSetPiecesFromSpawnable'.
+[21:17:47 TRACE SpaceCore] NPC.draw: inserting mul at 36
+[21:17:47 TRACE SpaceCore] NPC.draw: inserting mul at 42
+[21:17:47 TRACE SpaceCore] NPC.draw: inserting mul at 47
+[21:17:47 TRACE SpaceCore] NPC.draw: replacing Color.White at 139
+[21:17:47 TRACE SpaceCore] NPC.draw: replacing Color.White at 277
+[21:17:47 TRACE SpaceCore] NPC.draw: inserting vec2 mul at 303
+[21:17:47 TRACE SpaceCore] NPC.draw: replacing SpriteBatch.Draw at 324
+[21:17:47 TRACE SpaceCore] NPC.DrawBreathing: replacing Color.White at 283
+[21:17:47 TRACE SpaceCore] NPC.DrawBreathing: inserting vec2 mul/add at 308
+[21:17:47 TRACE SpaceCore] NPC.DrawBreathing: replacing Draw at 329
+[21:17:48 TRACE SpaceCore] Found crafting recipe constructor in Void setupRecipes(System.Collections.Generic.List`1[System.String])!
+[21:17:48 TRACE SpaceCore] Found first newobj for ClickableTextureComponent in Void setupRecipes(System.Collections.Generic.List`1[System.String]); storing potential override w/ recipeLocal=StardewValley.CraftingRecipe (5)
+[21:17:49 WARN  SpaceCore] GetLoadEnumeratorMethods: Found 5 transpiler targets, expected 4
+[21:17:49 TRACE SpaceCore] 	<getLoadEnumerator>b__4 Void <getLoadEnumerator>b__4()
+[21:17:49 TRACE SpaceCore] 	<getLoadEnumerator>b__1 Void <getLoadEnumerator>b__1()
+[21:17:49 TRACE SpaceCore] 	MoveNext Boolean MoveNext()
+[21:17:49 TRACE SpaceCore] 	<FindSaveGames>g__TryReadSaveInfo|64_2 StardewValley.Farmer <FindSaveGames>g__TryReadSaveInfo|64_2(System.String, System.Exception ByRef, <>c__DisplayClass64_1 ByRef)
+[21:17:49 TRACE SpaceCore] 	<FindSaveGames>g__TryReadSaveData|64_3 StardewValley.Farmer <FindSaveGames>g__TryReadSaveData|64_3(System.String, System.Exception ByRef, <>c__DisplayClass64_1 ByRef)
+[21:17:49 TRACE SMAPI]    Found mod-provided API (SpaceCore.Api).
+[21:17:49 TRACE SMAPI]    Found mod-provided API (CustomCompanions.Framework.Interfaces.API.Api).
+[21:17:49 DEBUG SMAPI] Mods loaded and ready!
+[21:17:49 TRACE SMAPI] Tractor Mod edited Data/Buildings.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/Dungeons'.
+[21:17:51 TRACE game] Starting load cueModificationData...
+[21:17:51 TRACE SMAPI] Tractor Mod edited Data/AudioChanges.
+[21:17:51 TRACE game] setGameMode( 'titleScreenGameMode (0)' )
+[21:17:51 TRACE game] Start taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Start, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/start.ogg'
+[21:17:51 TRACE game] Done taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Start, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/start.ogg' in 47.2656ms
+[21:17:51 TRACE game] current total time in this frame: 47.266ms
+[21:17:51 TRACE game] Start taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Rev, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/rev.ogg'
+[21:17:51 TRACE game] Done taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Rev, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/rev.ogg' in 7.6412ms
+[21:17:51 TRACE game] current total time in this frame: 54.907ms
+[21:17:51 TRACE game] Start taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Idle, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/idle.ogg'
+[21:17:51 TRACE game] Done taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Idle, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/idle.ogg' in 7.7108ms
+[21:17:51 TRACE game] current total time in this frame: 62.618ms
+[21:17:51 TRACE game] Start taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Stop, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/stop.ogg'
+[21:17:51 TRACE game] Done taskOnMainThread: 'Apply CueModify key: Pathoschild.TractorMod/Stop, filePath[0]: /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/TractorMod/assets/audio/stop.ogg' in 7.6001ms
+[21:17:51 TRACE game] current total time in this frame: 70.218ms
+[21:17:51 INFO  SMAPI] Type 'help' for help, or 'help <cmd>' for a command's usage
+[21:17:51 TRACE Farm Type Manager] Optional API not found: Generic Mod Config Menu (GMCM).
+[21:17:51 TRACE Farm Type Manager] API not found: Expanded Preconditions Utility (EPU).
+[21:17:51 TRACE Farm Type Manager] API not found: Dynamic Game Assets (DGA).
+[21:17:51 TRACE Farm Type Manager] Accessed mod-provided API (ContentPatcher.Framework.ContentPatcherAPI) for Content Patcher.
+[21:17:51 TRACE Farm Type Manager] API found: Content Patcher (CP).
+[21:17:51 TRACE Farm Type Manager] Mod not found: Monsters The Framework (MTF).
+[21:17:51 TRACE Farm Type Manager] Optional API not found: Item Extensions.
+[21:17:51 TRACE SpaceCore] Accessed mod-provided API (SpaceCore.Api) for SpaceCore.
+[21:17:51 TRACE SpaceCore] Accessed mod-provided API (ContentPatcher.Framework.ContentPatcherAPI) for Content Patcher.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/TextureOverrides'.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/CraftingRecipeOverrides'.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/CookingRecipeOverrides'.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/VirtualCurrencyData'.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/WearableData'.
+[21:17:51 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/TriggerActionExtensionData'.
+[21:17:51 TRACE Custom Companions] Accessed mod-provided API (ContentPatcher.Framework.ContentPatcherAPI) for Content Patcher.
+[21:17:51 DEBUG Custom Companions] Successfully hooked into Pathoschild.ContentPatcher.
+[21:17:52 TRACE Content Patcher] Farm Type Manager added a custom token with prefix 'Esca.FarmTypeManager/': NumberOfMonsters.
+[21:17:52 TRACE Content Patcher] Custom Companions added a custom token with prefix 'PeacefulEnd.CustomCompanions/': Companions.
+[21:17:52 TRACE Content Patcher] SpaceCore added 4 custom tokens with prefix 'spacechase0.SpaceCore/': BooksellerInTown, CurrentEventId, CurrentlyInEvent, QuestionsAsked.
+[21:17:52 TRACE game] Registered trigger action handler 'Pathoschild.ContentPatcher_MigrateIds'.
+[21:17:52 TRACE Content Patcher] Requested cache invalidation for all assets matching a predicate.
+[21:17:52 TRACE game] Loading manifest...
+[21:17:52 TRACE SMAPI] Content Patcher edited LooseSprites/Cursors (for the '(CP) Chocobo Valley Mounts' content pack).
+[21:17:52 TRACE SMAPI] Content Patcher edited Maps/springobjects (for the '(CP) Chocobo Valley Mounts' content pack).
+[21:17:52 TRACE SMAPI] Content Patcher edited TileSheets/Objects_2 (for the '(CP) Chocobo Valley Mounts' content pack).
+[21:17:53 TRACE SMAPI] Content Patcher edited Data/Objects (for the '(CP) Chocobo Valley Mounts' content pack).
+[21:17:53 TRACE SMAPI] Invalidated 4 asset names (Data/Objects, LooseSprites/Cursors, Maps/springobjects, TileSheets/Objects_2).
+Propagated 4 core assets (Data/Objects, LooseSprites/Cursors, Maps/springobjects, TileSheets/Objects_2).
+[21:18:59 TRACE SpaceCore] Reinitializing serializers for 1 mod types...
+[21:19:32 TRACE game] gameMode was 'titleScreenGameMode (0)', set to 'loadingMode (6)'.
+[21:19:32 TRACE game] Game loader with AndroidSaveLoader currentLoader.MoveNext()
+[21:19:32 TRACE game] Try StartTask name: 'Load_ReadSave' on Android SModHook
+[21:19:32 TRACE game] Starting Task On Background id: 'Load_ReadSave'
+[21:19:33 TRACE SMAPI] Content Patcher loaded asset 'Animals/horse' (for the '(CP) Chocobo Valley Mounts' content pack).
+[21:19:33 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/NpcExtensionData'.
+[21:19:35 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/FurnitureExtensionData'.
+[21:19:37 TRACE game] Completed Task On Background id: Load_ReadSave in 5321.7925ms
+[21:19:37 TRACE game] Try StartTask name: 'Load_LoadForNewGame' on Android SModHook
+[21:19:37 TRACE game] Starting Task On Background id: 'Load_LoadForNewGame'
+[21:19:38 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/ObjectExtensionData'.
+[21:19:39 TRACE SMAPI] SpaceCore loaded asset 'spacechase0.SpaceCore/FarmExtensionData'.
+[21:19:39 TRACE SpaceCore] Event: OnBlankSave
+[21:19:39 TRACE game] Completed Task On Background id: Load_LoadForNewGame in 2116.0645ms
+[21:19:39 TRACE game] Try StartTask name: 'Load_Farmer' on Android SModHook
+[21:19:39 TRACE game] Starting Task On Background id: 'Load_Farmer'
+[21:19:39 TRACE game] Completed Task On Background id: Load_Farmer in 0.4365ms
+[21:19:39 TRACE game] Try StartTask name: 'Load_Locations' on Android SModHook
+[21:19:39 TRACE game] Starting Task On Background id: 'Load_Locations'
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AuroraVineyardRefurbished' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AuroraVineyardCellarRefurbished' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrandpasShedRuins' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrandpasShed' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_TownEast' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_FakeEnchantedGrove' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_FakeEnchantedGrove2' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_WillyRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_MarnieShed' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AndyHouse' in save data, including NPC 'Andy'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AndyCellar' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SusanHouse' in save data, including NPC 'Susan'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_JenkinsHouse' in save data, including NPCs 'Olivia', 'Victor'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_OliviaCellar' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SophiaHouse' in save data, including NPC 'Sophia'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SophiaCellar' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_CrimsonBadlandsMap' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_MovieTheaterScreen_ClaireEvent' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_CastleVillage_DayEnd_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AuroraVineyardPictureMap' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_StardustFarmPictureMap' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GaldoranVoid' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Claire_WarpRoom' in save data, including NPC 'Claire'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Martin_WarpRoom' in save data, including NPC 'Martin'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Camilla_WarpRoom' in save data, including NPC 'Camilla'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Alesia_WarpRoom' in save data, including NPC 'Alesia'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Isaac_WarpRoom' in save data, including NPC 'Isaac'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Lance_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Jadu_WarpRoom' in save data, including NPC 'Jadu'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Apples_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Peaches_WarpRoom' in save data, including NPC 'Peaches'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Charlie_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Morgan_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Scarlett_WarpRoom' in save data, including NPC 'ScarlettFake'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Sandy_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ApplesRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GunthersRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Countryside_BusStop_Bus' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Countryside_BusStop_NoBus' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Countryside_ClaireHouse' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ClaireHouse' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_JojaEmporium' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GuntherExpedition1' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GuntherExpedition2' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrampletonFields_Small' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_BusStop_NoBus' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SakuraVineyardCottageInterior' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Highway' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Sawyer_WarpRoom' in save data, including NPC 'Sawyer'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Jolyne_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Edmund_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Gale_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Gertrude_WarpRoom' in save data, including NPC 'Gertrude'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Brock_WarpRoom' in save data, including NPC 'Brock'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Cordelia_WarpRoom' in save data, including NPC 'Cordelia'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Freya_WarpRoom' in save data, including NPC 'Freya'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Cassandra_WarpRoom' in save data, including NPC 'Cassandra'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Emin_WarpRoom' in save data, including NPC 'Emin'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Brianna_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Drake_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HighlandsDwarf_WarpRoom' in save data, including NPC 'HighlandsDwarf'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_MorrisHouse' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ForestWestOld' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_LanceSecretWarp' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Krobus_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_VoidDen' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ScarlettHouse' in save data, including NPCs 'HankSVE', 'Treyvon'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HanksGarage' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_WoodsCompat' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_VictorSummit' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AuroraVineyard' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_DayEnd_WarpRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Atlantis' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_DesertRailway' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_EnchantedGrove' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_FirstSlashGuestRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrampletonCoast' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrampletonTrainStation' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrenvilleFalls' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HighlandsCavernPrison' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HighlandsCavernPrisonEvent' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_IridiumQuarry' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_JojaPetStore' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SakuraVineyard' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SakuraVineyardCellar' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SakuraVineyardCottage' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SakuraVineyardDiningRoom' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SpriteSpringCave' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_TreasureCave' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Void' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZCCC_Entrance' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZCCC_FoodCourt' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZCCC_MainHall' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZCCC_Stage' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZCCC_VendorFloor' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZuzuCityStreet' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HighlandsOutpost' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_CastleVillageOutpost' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_FirstSlashGuild' in save data, including NPCs 'Drake', 'Edmund', 'Gale', 'Jolyne'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_FirstSlashHallway' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_WizardBasement' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ZCCC_Courtyard' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SVESummit' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_AdventurerSummit' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_BlueMoonVineyard' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ForbiddenMaze' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HenchmanBackyard' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HenchmanHouse' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_DinoIsland_South' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_DinoIsland_North' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_CrimsonBadlands' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_FableReef' in save data, including NPC 'Brianna'.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrandpasShedGreenhouse' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ForestWest' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Garden' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrampletonSuburbs' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrampletonSuburbsTrainStation' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrampletonSuburbsOutskirts' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GoGoatRanch' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GoGoatRanch_Interior' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_GrandpasShedOutside' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_Highlands' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_HighlandsCavern' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_DiamondCavern' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_JunimoWoods' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_MorrisProperty' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_ShearwaterBridge' in save data.
+[21:19:40 WARN  game] Ignored unknown location 'Custom_SpriteSpring2' in save data.
+[21:19:40 WARN  game] NPC MorrisTod can't load portraits from 'Portraits/MorrisTod': Microsoft.Xna.Framework.Content.ContentLoadException: The content file was not found.
+ ---> System.IO.FileNotFoundException: Could not find file '/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assets/Content/Portraits/MorrisTod.xnb'.
+File name: '/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assets/Content/Portraits/MorrisTod.xnb'
+   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Interop.CheckIo(Error error, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String path, OpenFlags flags, Int32 mode, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode, Func`4 createOpenException)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.UnixFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategy(FileStream fileStream, String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.IO.File.OpenRead(String path)
+   at SMAPIGameLoader.GameAssetManager.FixOpenStream(String assetName)
+   at SMAPIGameLoader.GameAssetManager.PrefixOpenStream(Stream& __result, String name)
+   at DMD<>?329537516.Microsoft.Xna.Framework.TitleContainer.OpenStream_Patch1(String name)
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   --- End of inner exception stack trace ---
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[Texture2D](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[Texture2D](String assetName)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.RawLoad[Texture2D](IAssetName assetName, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.GameContentManager.<>c__DisplayClass6_0`1[[Microsoft.Xna.Framework.Graphics.Texture2D, MonoGame.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]].<LoadExact>b__0()
+   at StardewModdingAPI.Framework.Utilities.ContextHash`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].Track[Texture2D](String key, Func`1 action)
+   at StardewModdingAPI.Framework.ContentManagers.GameContentManager.LoadExact[Texture2D](IAssetName assetName, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.LoadLocalized[Texture2D](IAssetName assetName, LanguageCode language, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.Load[Texture2D](String assetName, LanguageCode language)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.Load[Texture2D](String assetName)
+   at StardewValley.NPC.TryLoadPortraits(String assetName, String& error, LocalizedContentManager content).
+[21:19:42 WARN  game] NPC GuntherSilvian can't load portraits from 'Portraits/GuntherSilvian': Microsoft.Xna.Framework.Content.ContentLoadException: The content file was not found.
+ ---> System.IO.FileNotFoundException: Could not find file '/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assets/Content/Portraits/GuntherSilvian.xnb'.
+File name: '/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assets/Content/Portraits/GuntherSilvian.xnb'
+   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Interop.CheckIo(Error error, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String path, OpenFlags flags, Int32 mode, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode, Func`4 createOpenException)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.UnixFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategy(FileStream fileStream, String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.IO.File.OpenRead(String path)
+   at SMAPIGameLoader.GameAssetManager.FixOpenStream(String assetName)
+   at SMAPIGameLoader.GameAssetManager.PrefixOpenStream(Stream& __result, String name)
+   at DMD<>?329537516.Microsoft.Xna.Framework.TitleContainer.OpenStream_Patch1(String name)
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   --- End of inner exception stack trace ---
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[Texture2D](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[Texture2D](String assetName)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.RawLoad[Texture2D](IAssetName assetName, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.GameContentManager.<>c__DisplayClass6_0`1[[Microsoft.Xna.Framework.Graphics.Texture2D, MonoGame.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]].<LoadExact>b__0()
+   at StardewModdingAPI.Framework.Utilities.ContextHash`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].Track[Texture2D](String key, Func`1 action)
+   at StardewModdingAPI.Framework.ContentManagers.GameContentManager.LoadExact[Texture2D](IAssetName assetName, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.LoadLocalized[Texture2D](IAssetName assetName, LanguageCode language, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.Load[Texture2D](String assetName, LanguageCode language)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.Load[Texture2D](String assetName)
+   at StardewValley.NPC.TryLoadPortraits(String assetName, String& error, LocalizedContentManager content).
+[21:19:42 WARN  game] NPC MarlonFay can't load portraits from 'Portraits/MarlonFay': Microsoft.Xna.Framework.Content.ContentLoadException: The content file was not found.
+ ---> System.IO.FileNotFoundException: Could not find file '/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assets/Content/Portraits/MarlonFay.xnb'.
+File name: '/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Stardew Assets/Content/Portraits/MarlonFay.xnb'
+   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Interop.CheckIo(Error error, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String path, OpenFlags flags, Int32 mode, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode, Func`4 createOpenException)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.UnixFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategyCore(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.Strategies.FileStreamHelpers.ChooseStrategy(FileStream fileStream, String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.IO.File.OpenRead(String path)
+   at SMAPIGameLoader.GameAssetManager.FixOpenStream(String assetName)
+   at SMAPIGameLoader.GameAssetManager.PrefixOpenStream(Stream& __result, String name)
+   at DMD<>?329537516.Microsoft.Xna.Framework.TitleContainer.OpenStream_Patch1(String name)
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   --- End of inner exception stack trace ---
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[Texture2D](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[Texture2D](String assetName)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.RawLoad[Texture2D](IAssetName assetName, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.GameContentManager.<>c__DisplayClass6_0`1[[Microsoft.Xna.Framework.Graphics.Texture2D, MonoGame.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]].<LoadExact>b__0()
+   at StardewModdingAPI.Framework.Utilities.ContextHash`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]].Track[Texture2D](String key, Func`1 action)
+   at StardewModdingAPI.Framework.ContentManagers.GameContentManager.LoadExact[Texture2D](IAssetName assetName, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.LoadLocalized[Texture2D](IAssetName assetName, LanguageCode language, Boolean useCache)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.Load[Texture2D](String assetName, LanguageCode language)
+   at StardewModdingAPI.Framework.ContentManagers.BaseContentManager.Load[Texture2D](String assetName)
+   at StardewValley.NPC.TryLoadPortraits(String assetName, String& error, LocalizedContentManager content).
+[21:19:42 TRACE game] Completed Task On Background id: Load_Locations in 3014.5433ms
+[21:19:43 TRACE game] gameMode was 'loadingMode (6)', set to 'playingGameMode (3)'.
+[21:19:43 WARN  game] Removed broken NPC 'MorrisTod' in Town: villager with no data or sprites.
+[21:19:43 WARN  game] Removed broken NPC 'GuntherSilvian' in ArchaeologyHouse: villager with no data or sprites.
+[21:19:43 WARN  game] Removed broken NPC 'MarlonFay' in AdventureGuild: villager with no data or sprites.
+[21:19:43 TRACE game] setGameMode( 'playingGameMode (3)' )
+[21:19:43 TRACE game] Game loader done.
+[21:19:43 TRACE SMAPI] Context: loaded save 'jfjf_393972298', starting spring 9 Y1, locale set to . Single-player.
+[21:19:43 TRACE SMAPI] Try OnLoadStageChanged to Ready
+[21:19:43 TRACE SMAPI] Try raise SaveLoaded
+[21:19:43 TRACE SMAPI] Try raise DayStarted
+[21:19:43 TRACE SMAPI] Tractor Mod loaded asset 'Mods/Pathoschild.TractorMod/tractor'.
+[21:19:43 TRACE SMAPI] Tractor Mod loaded asset 'Mods/Pathoschild.TractorMod/garage'.
+[21:19:43 TRACE SMAPI] Tractor Mod loaded asset 'Mods/Pathoschild.TractorMod/buffIcon'.
+[21:19:44 TRACE Farm Type Manager] Day is starting. Loading config data.
+[21:19:44 TRACE Farm Type Manager] Beginning file loading process...
+[21:19:44 TRACE Farm Type Manager] All available content packs checked.
+[21:19:44 TRACE Farm Type Manager] Loading files from FarmTypeManager/data
+[21:19:44 TRACE Farm Type Manager] Validating data from FarmTypeManager/data
+[21:19:44 TRACE Farm Type Manager] Checking for duplicate UniqueAreaIDs...
+[21:19:44 TRACE Farm Type Manager] Assigning new UniqueAreaIDs to any blanks or duplicates...
+[21:19:44 TRACE Farm Type Manager] Validation complete for data from FarmTypeManager/data
+[21:19:44 TRACE Farm Type Manager] Checking file conditions...
+[21:19:44 TRACE Farm Type Manager] FarmTypeManager/data farm data loaded successfully.
+[21:19:44 TRACE Farm Type Manager] Checking for saved objects that went missing overnight.
+[21:19:44 TRACE Farm Type Manager] Missing objects: 0. Respawned: 0. Not respawned due to obstructions: 0. Skipped due to missing maps: 0. Skipped due to missing item types: 0.
+[21:19:44 TRACE Farm Type Manager] Starting forage generation for this file: FarmTypeManager/data/jfjf_393972298.json
+[21:19:44 TRACE Farm Type Manager] Forage generation is disabled for this file.
+[21:19:44 TRACE Farm Type Manager] All files and content packs checked. Forage generation process complete.
+[21:19:44 TRACE Farm Type Manager] Starting large object generation for this file: FarmTypeManager/data/jfjf_393972298.json
+[21:19:44 TRACE Farm Type Manager] Large object generation is disabled for this file.
+[21:19:44 TRACE Farm Type Manager] All files and content packs checked. Large object generation process complete.
+[21:19:44 TRACE Farm Type Manager] Starting ore generation for this file: FarmTypeManager/data/jfjf_393972298.json
+[21:19:44 TRACE Farm Type Manager] Ore generation is disabled for this file.
+[21:19:44 TRACE Farm Type Manager] All files and content packs checked. Ore spawn process complete.
+[21:19:44 TRACE Farm Type Manager] Starting monster generation for this file: FarmTypeManager/data/jfjf_393972298.json
+[21:19:44 TRACE Farm Type Manager] Monster generation is disabled for this file.
+[21:19:44 TRACE Farm Type Manager] All files and content packs checked. Monster generation process complete.
+[21:19:44 TRACE Farm Type Manager] Spawning objects set to appear at time: 600...
+[21:19:44 TRACE Farm Type Manager] Spawn process complete. Time: 600. Total objects spawned: 0.
+[21:19:52 TRACE SpaceCore] Event: BeforeWarp
+[21:19:52 TRACE game] Warping to Farm

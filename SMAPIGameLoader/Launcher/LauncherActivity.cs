@@ -119,22 +119,37 @@ public class LauncherActivity : AppCompatActivity
 
     private void OnReadyToSetupLayoutPage()
     {
+
         //setup bind events
-        FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += (sender, e) =>
+        try
         {
-            SMAPIInstaller.OnClickInstallSMAPIZip();
-        };
-        FindViewById<Button>(ResourceConstant.Id.InstallSMAPIOnline).Click += (sender, e) =>
+            FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += (sender, e) =>
+            {
+                SMAPIInstaller.OnClickInstallSMAPIZip();
+            };
+            FindViewById<Button>(ResourceConstant.Id.InstallSMAPIOnline).Click += (sender, e) =>
+            {
+                SMAPIInstaller.OnClickInstallSMAPIOnline();
+            };
+
+            FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += (sender, e) =>
+            {
+                SMAPILogTool.OnClickUploadLog();
+            };
+
+            var startGameBtn = FindViewById<Button>(ResourceConstant.Id.StartGame);
+            startGameBtn.Click += (sender, e) => { OnClickStartGame(); };
+            var modManagerBtn = FindViewById<Button>(ResourceConstant.Id.ModManagerBtn);
+            modManagerBtn.Click += (sender, e) => { ActivityTool.SwapActivity<ModManagerActivity>(this, false); };
+
+            SMAPIInstaller.OnInstalledSMAPI += NotifyInstalledSMAPIInfo;
+        }
+        catch (Exception ex)
         {
-            SMAPIInstaller.OnClickInstallSMAPIOnline();
-        };
-
-        var startGameBtn = FindViewById<Button>(ResourceConstant.Id.StartGame);
-        startGameBtn.Click += (sender, e) => { OnClickStartGame(); };
-        var modManagerBtn = FindViewById<Button>(ResourceConstant.Id.ModManagerBtn);
-        modManagerBtn.Click += (sender, e) => { ActivityTool.SwapActivity<ModManagerActivity>(this, false); };
-
-        SMAPIInstaller.OnInstalledSMAPI += NotifyInstalledSMAPIInfo;
+            ToastNotifyTool.Notify("Error: Try to setup bind UI Event");
+            ErrorDialogTool.Show(ex);
+            return;
+        }
 
         //set launcher text info
         try

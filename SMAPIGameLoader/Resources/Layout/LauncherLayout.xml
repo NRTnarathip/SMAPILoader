@@ -72,13 +72,23 @@
                 />
 
             <Button
-                android:id="@+id/StartGame"
+                android:id="@+id/UploadLog"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Start Game" 
+                android:text="Share Log Error" 
 				android:textAllCaps="false"
                 android:layout_marginVertical="10dp"
                 />
+
+			<Button
+			   android:id="@+id/StartGame"
+			   android:layout_width="match_parent"
+			   android:layout_height="match_parent"
+			   android:text="Start Game"
+			   android:textAllCaps="false"
+			   android:layout_marginVertical="10dp"
+                />
+			
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

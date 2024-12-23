@@ -1,66 +1,50 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
+using System.Net.Http.Headers;
+using System.Text;
 
-internal class Program
+internal static class Program
 {
-    private static void Main(string[] args)
+    const string SMAPILogUrl = "https://smapi.io/log";
+
+    static async Task<HttpResponseMessage> PostHTTPRequestAsync(this HttpClient client,
+        string url, Dictionary<string, string> data)
     {
-        var st = new Stopwatch();
+        using HttpContent formContent = new FormUrlEncodedContent(data);
+        return await client.PostAsync(url, formContent).ConfigureAwait(false);
+    }
 
-        int task1Win = 0;
-        int task2Win = 0;
-
-        var srcWidth = 512 * 4;
-        var srcHeight = 64 * 4;
-        var dstWidth = srcWidth;
-        var dstHeight = srcHeight;
-        var srcPixels = new Color[srcWidth * srcHeight];
-        var dstPixels = new Color[dstWidth * dstHeight];
-        while (true)
+    private static async Task Main(string[] args)
+    {
+        try
         {
-            Console.WriteLine("");
-            Console.WriteLine("");
+            const string logFilePath = "SMAPI-latest.txt";
+            using HttpClient client = new();
+            client.BaseAddress = new Uri(SMAPILogUrl);
+            var logStringContent = File.ReadAllText(logFilePath);
 
-
-            st.Restart();
-            Parallel.For(0, dstWidth, x =>
+            var response = await client.PostHTTPRequestAsync(SMAPILogUrl, new()
             {
-                int sourceIndex = x * srcHeight;
-                int targetIndex = x * dstHeight;
-                Array.Copy(srcPixels, sourceIndex, dstPixels, targetIndex, srcHeight);
+                { "input", logStringContent }
             });
-            st.Stop();
-            double task1 = st.Elapsed.TotalMilliseconds;
-            Console.WriteLine("part 1: " + st.Elapsed.TotalMilliseconds);
-
-            st.Restart();
-            Parallel.For(0, dstHeight, y =>
+            // ตรวจสอบสถานะการตอบกลับ
+            if (response.IsSuccessStatusCode)
             {
-                int sourceIndex = y * srcWidth;
-                int targetIndex = y * dstWidth;
-                Array.Copy(srcPixels, sourceIndex, dstPixels, targetIndex, dstWidth);
-            });
-            st.Stop();
-            double task2 = st.Elapsed.TotalMilliseconds;
-            Console.WriteLine("part 2: " + st.Elapsed.TotalMilliseconds);
-
-            if (task1 < task2)
-            {
-                task1Win++;
-                Console.WriteLine("winter is Task1");
+                string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Link Url: " + response.RequestMessage.RequestUri);
             }
             else
             {
-                task2Win++;
-                Console.WriteLine("winter is Task2");
+                Console.WriteLine("Error: " + response.StatusCode);
             }
-
-            var totalTask = task1Win + task2Win;
-            Console.WriteLine("winRate Task1: " + (task1Win / (float)totalTask) * 100);
-
-            Console.WriteLine("");
-            Console.WriteLine("");
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception: " + ex.Message);
+        }
+
+        Console.ReadKey();
     }
 }

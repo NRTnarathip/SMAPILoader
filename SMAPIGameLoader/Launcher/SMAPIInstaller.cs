@@ -56,7 +56,7 @@ internal static class SMAPIInstaller
         }
         catch
         {
-            return null;
+            return new Version(0,0,0,0);
         }
     }
 

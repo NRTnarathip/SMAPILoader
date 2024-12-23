@@ -8,17 +8,14 @@ internal static class EntryGame
 {
     public static void LaunchGameActivity(Activity launcherActivity)
     {
-        Console.WriteLine("calling LaunchGameActivity()");
         TaskTool.Run(launcherActivity, async () =>
         {
-            Console.WriteLine("try calling LaunchGameActivityInternal");
             LaunchGameActivityInternal(launcherActivity);
         });
     }
 
     static void LaunchGameActivityInternal(Activity launcherActivity)
     {
-        Console.WriteLine("try start game..");
         //ToastNotifyTool.Notify("Starting Game..");
         //check game it's can launch with version
 
@@ -35,7 +32,6 @@ internal static class EntryGame
                 ToastNotifyTool.Notify("Please install SMAPI!!");
                 return;
             }
-            Console.WriteLine("Start Game Cloner");
 
             GameCloner.Setup();
 
