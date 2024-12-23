@@ -64,17 +64,20 @@ internal static class SMAPILogTool
         if (response.IsSuccessStatusCode)
         {
             var clipboardString = new StringBuilder();
-            clipboardString.AppendLine($"Launcher v{ApkTool.AppVersion}");
-            clipboardString.AppendLine($"SMAPI v{SMAPIInstaller.GetCurrentVersion()}");
-            clipboardString.AppendLine($"SMAPI Build {SMAPIInstaller.GetBuildCode()}");
-            clipboardString.AppendLine($"Game v{StardewApkTool.CurrentGameVersion}");
 
-            var linkLogForShare = response.RequestMessage.RequestUri.ToString();
-            clipboardString.AppendLine(linkLogForShare);
+            var logUrl = response.RequestMessage.RequestUri.ToString();
+
+            clipboardString.AppendLine($"### SMAPI Log Latest");
+            clipboardString.AppendLine($"> [Click Link Log Here]({logUrl})");
+            clipboardString.AppendLine($"> [Click Link Log Here]({logUrl})");
+            clipboardString.AppendLine($"### Current App Info");
+            clipboardString.AppendLine($"> Game {StardewApkTool.CurrentGameVersion}");
+            clipboardString.AppendLine($"> Launcher {ApkTool.AppVersion}");
+            clipboardString.AppendLine($"> SMAPI {SMAPIInstaller.GetCurrentVersion()} - {SMAPIInstaller.GetBuildCode()}");
 
             await Clipboard.SetTextAsync(clipboardString.ToString());
             DialogTool.Show("SMAPI Log Parser",
-                $"uploaded link {linkLogForShare}" +
+                $"uploaded link {logUrl}" +
                 $"\nyou can share link click 'paste' on discord");
         }
         else
