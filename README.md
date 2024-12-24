@@ -1,4 +1,7 @@
-# SMAPI Launcher For Android Stardew Valley 1.6
+# SMAPI Launcher
+
+![image](https://github.com/user-attachments/assets/526834b3-081b-4c76-b992-c06089412fc1)
+
 
 # 🌟 Key Features
 - No need patch game apk
@@ -8,13 +11,15 @@
 - Install & Update SMAPI by 1 click
 - Support device 64bit only
 - Mod Manager
+- Share Log with 1 click
 
 # 🍕 Upcoming Feature
 - Save Import & Export
-- Log Export, copy to clipboard
+- 
+# Discord Server SMAPI Thailand
+https://discord.com/invite/ETtycvcJjr
 
 # How To Install Wiki
 https://github.com/NRTnarathip/SMAPILoader/wiki/How-To-Install-SMAPI
 
-# Discord Server SMAPI Thailand
-https://discord.com/invite/ETtycvcJjr
+
