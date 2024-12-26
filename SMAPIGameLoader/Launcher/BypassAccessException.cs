@@ -56,6 +56,7 @@ internal static class BypassAccessException
     static void Log(string msg)
     {
         logLines.AppendLine(msg);
+        Console.WriteLine(msg);
     }
     static void Log(System.Exception ex) => Log(ex.ToString());
 
@@ -64,6 +65,9 @@ internal static class BypassAccessException
 
     [DllImport("libBypassAccessExceptionLib.so")]
     private static extern void ApplyBypass();
+
+    [DllImport("libBypassAccessExceptionLib.so")]
+    private static extern void ApplyBypass_x64();
 
     static void ApplyInternal_Arm64()
     {
@@ -109,8 +113,10 @@ internal static class BypassAccessException
 
     static void ApplyInternal_Intel_x64()
     {
-        var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
+        ApplyBypass_x64();
+        return;
 
+        var libHandle = dlopen("libmonosgen-2.0.so", 0x1);
         unsafe
         {
             IntPtr mono_method_can_access_field = dlsym(libHandle, "mono_method_can_access_field");

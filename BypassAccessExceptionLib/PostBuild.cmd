@@ -1,1 +1,1 @@
-xcopy "ARM64\Release\libBypassAccessExceptionLib.so" "..\SMAPIGameLoader\libs\arm64-v8a\libBypassAccessExceptionLib.so" /Y
+xcopy "ARM64\Release\libBypassAccessExceptionLib.so" "..\SMAPIGameLoader\libs\arm64-v8a" /Y

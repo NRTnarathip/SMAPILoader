@@ -3,6 +3,7 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <array>
+#include <vector>
 
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "SMAPI-Tag", __VA_ARGS__))
@@ -68,4 +69,54 @@ extern "C" void ApplyBypass()
 	}
 
 	LOGI("Done Apply Bypass");
+}
+
+extern "C" void ApplyBypass_x64() {
+	LOGI("Starting Apply Bypass for intel x64");
+	LOGI("try init");
+	char AppPackageName[] = "abc.smapi.gameloader";
+
+	LOGI("try get lib bmonosgen-2.0.so");
+	void* libHandle = dlopen("libmonosgen-2.0.so", RTLD_NOW);
+
+	LOGI("lib handle: %d", libHandle);
+
+	{
+		LOGI("try patch FieldAccessException");
+		uintptr_t mono_method_can_access_field = (uintptr_t)dlsym(libHandle, "mono_method_can_access_field");
+		LOGI("mono_method_can_access_field ptr: %d", mono_method_can_access_field);
+
+		std::vector<uint8_t> patchBytes = {
+			  0xB8, 0x01, 0x00, 0x00, 0x00, // MOV EAX, 1
+			  0x48, 0x83, 0xC4, 0x58,       // ADD RSP, 0x58
+			  0x5B,                         // POP RBX
+			  0x41, 0x5C,                   // POP R12
+			  0x41, 0x5D,                   // POP R13
+			  0x41, 0x5E,                   // POP R14
+			  0x41, 0x5F,                   // POP R15
+			  0x5D,                         // POP RBP
+			  0xC3
+		};
+		PatchBytes(mono_method_can_access_field + 0x132, patchBytes.data(), patchBytes.size());
+	}
+
+
+	{
+		LOGI("try patch MethodAccessException");
+
+		uintptr_t mono_method_can_access_method = (uintptr_t)dlsym(libHandle, "mono_method_can_access_method");
+		LOGI("mono_method_can_access_method: %d", mono_method_can_access_method);
+
+		uintptr_t mono_method_can_access_method_full = mono_method_can_access_method + 0x30;
+		LOGI("mono_method_can_access_method_full: %d", mono_method_can_access_method_full);
+
+		auto targetAddress = mono_method_can_access_method_full + 0x15;
+		LOGI("targetAddress: %d", targetAddress);
+		std::vector<uint8_t> patchBytes = {
+			0xEB, 0x09, //jump to return;
+		};
+		PatchBytes(targetAddress, patchBytes.data(), patchBytes.size());
+	}
+
+	LOGI("Done Apply Bypass for x64");
 }

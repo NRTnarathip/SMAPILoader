@@ -115,6 +115,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>"$(ProjectDir)PostBuildX64.cmd"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
@@ -163,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostBuild.cmd" />
+    <None Include="PostBuildX64.cmd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

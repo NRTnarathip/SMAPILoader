@@ -8,5 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PostBuild.cmd" />
+    <None Include="PostBuildX64.cmd" />
   </ItemGroup>
 </Project>
