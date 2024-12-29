@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 
 namespace SMAPIGameLoader.Launcher;
 
@@ -60,6 +61,8 @@ internal static class SMAPIInstaller
         }
     }
 
+
+#if false
     public static async void OnClickInstallSMAPIOnline()
     {
         try
@@ -126,19 +129,47 @@ internal static class SMAPIInstaller
             Console.WriteLine("error try to install SMAPI Zip: " + ex);
         }
     }
+#endif
+
+    static bool IsSMAPIZipFromPickFile(FileResult pick)
+    {
+        var fileName = pick.FileName;
+
+        if (fileName.EndsWith(".zip") is false)
+            return false;
+
+        if (fileName.StartsWith("SMAPI-") || fileName.StartsWith("SMAPI_"))
+        {
+            //check file size should less than PC
+            //on PC SMAPI-4.1.10-installer-for-developers.zip
+            //file size 40mb
+
+            //on Android SMAPI-4.1.10.2-(1735397682).zip
+            //file size 1.5mb
+            var fileInfo = new FileInfo(pick.FullPath);
+
+            //less than 30mb
+            return FileTool.ConvertBytesToMB(fileInfo.Length) <= 30;
+        }
+
+
+        return false;
+    }
+
     public static Action OnInstalledSMAPI;
     public static async void OnClickInstallSMAPIZip()
     {
         try
         {
 
-            var pick = await FilePickerTool.PickZipFile(title: "Please Pick File SMAPI-4.x.x.x.zip");
+            var pick = await FilePickerTool.PickZipFile(title: "Please Pick File SMAPI-4.x.x.xxxx.zip Android");
             if (pick == null)
                 return;
 
-            if (pick.FileName.StartsWith("SMAPI-") == false)
+            //assert SMAPI it's android
+            if (IsSMAPIZipFromPickFile(pick) is false)
             {
-                ToastNotifyTool.Notify("Please select file SMAPI-4.x.x.x.zip!!");
+                DialogTool.Show("SMAPI Installer Error", "Please select file SMAPI-4.x.x.xxxx.zip for Android");
                 return;
             }
 
