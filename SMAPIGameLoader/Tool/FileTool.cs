@@ -24,12 +24,32 @@ internal static class FileTool
         return bytes / (1024f * 1024f);
     }
 
-    internal static void MakeSureDirectory(string filePath)
+    internal static void MakeSureDirectory(string dir)
     {
-        Directory.CreateDirectory(filePath);
+        Directory.CreateDirectory(dir);
     }
     internal static void MakeSureFilePath(string filePath)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+        var dir = Path.GetDirectoryName(filePath);
+        MakeSureDirectory(dir);
+    }
+
+    internal static void ClearCache()
+    {
+        try
+        {
+
+            var dir = Application.Context.ExternalCacheDir;
+            if (dir.Exists())
+                dir.Delete();
+
+            dir = Application.Context.CacheDir;
+            if (dir.Exists())
+                dir.Delete();
+        }
+        catch (Exception ex)
+        {
+            ErrorDialogTool.Show(ex);
+        }
     }
 }

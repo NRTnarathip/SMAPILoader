@@ -56,7 +56,7 @@ internal static class SMAPIInstaller
         }
         catch
         {
-            return new Version(0,0,0,0);
+            return new Version(0, 0, 0, 0);
         }
     }
 
@@ -100,9 +100,6 @@ internal static class SMAPIInstaller
                         }
 
                         InstallSMAPIFromZipFile(smapiZipFilePath);
-
-                        //cleanup
-                        File.Delete(smapiZipFilePath);
 
                         TaskTool.NewLine("Successfully install SMAPI: " + smapiAssetFile.Name);
                         DialogTool.Show("Successfully Install SMAPI",
@@ -158,19 +155,28 @@ internal static class SMAPIInstaller
             Console.WriteLine(ex);
         }
     }
-    static void InstallSMAPIFromZipFile(string filePath)
+    static void InstallSMAPIFromZipFile(string smapiZipFilePath)
     {
-        using (var zip = ZipFile.OpenRead(filePath))
+        using (var zip = ZipFile.OpenRead(smapiZipFilePath))
         {
+            var stardewDir = GameAssemblyManager.AssembliesDirPath;
             foreach (var entry in zip.Entries)
             {
-                string baseFolderName = Path.GetDirectoryName(entry.FullName).Split(Path.DirectorySeparatorChar)[0];
-                var destFilePath = entry.FullName.Replace(baseFolderName + "/", "");
-                destFilePath = Path.Combine(GameAssemblyManager.AssembliesDirPath, destFilePath);
-                FileTool.MakeSureFilePath(destFilePath);
-                ZipFileTool.Extract(entry, destFilePath);
+                //remove first dir name
+                //example
+                //from 'SMAPI-4.1.10.2/Hello.dll'
+                //to 'Hello.dll'
+
+                string entryDirName = Path.GetDirectoryName(entry.FullName);
+                string[] directoryNames = entryDirName.Split(Path.DirectorySeparatorChar);
+                var rootDirName = directoryNames[0];
+                var newEntryFileName = entry.FullName.Remove(0, rootDirName.Length + 1);
+                var destExtractFilePath = Path.Combine(stardewDir, newEntryFileName);
+                ZipFileTool.Extract(entry, destExtractFilePath);
             }
         }
+
+        FileTool.ClearCache();
     }
     public const string StardewModdingAPIFileName = "StardewModdingAPI.dll";
     public static string GetInstallFilePath => Path.Combine(GameAssemblyManager.AssembliesDirPath, StardewModdingAPIFileName);
