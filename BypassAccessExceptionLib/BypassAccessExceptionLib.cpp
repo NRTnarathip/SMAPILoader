@@ -15,7 +15,7 @@ void PatchBytes(uintptr_t targetAddress, const uint8_t* bytes, size_t bytesLengt
 
 	LOGI("Page size: %d", getpagesize());
 	uintptr_t pageAlignedAddress = targetAddress & ~(getpagesize() - 1);
-	LOGI("Page pageAlignedAddresst: %d", pageAlignedAddress);
+	LOGI("Page page aligned address: %p", pageAlignedAddress);
 
 	auto error_mprotect = mprotect((void*)pageAlignedAddress, getpagesize(), PROT_READ | PROT_WRITE | PROT_EXEC);
 	LOGI("result mprotect: %i", error_mprotect);

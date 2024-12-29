@@ -80,7 +80,6 @@ internal static class mono_class_from_mono_type_internal_CrashFix
             };
             Console.WriteLine("try patch bytes...");
             PatchBytes(targetAddress, patchBytes, patchBytes.Length);
-            Console.WriteLine("patched");
         }
     }
 

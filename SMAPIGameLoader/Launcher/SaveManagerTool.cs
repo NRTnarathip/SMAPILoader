@@ -63,7 +63,6 @@ internal static class SaveManager
                     currentEntryFilePath = currentEntryFilePath.Remove(0, SkipEntrySavesName.Length);
 
                 var extractFilePath = Path.Combine(savesDirPath, currentEntryFilePath);
-                Console.WriteLine("try extract file: " + extractFilePath);
                 ZipFileTool.Extract(entry, extractFilePath);
                 var fileInfo = new FileInfo(extractFilePath);
                 if (fileInfo.Name == SaveGameInfo_FileName)
