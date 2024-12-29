@@ -63,10 +63,12 @@ internal static class BypassAccessException
     [DllImport("libc.so", SetLastError = true)]
     private static extern int mprotect(IntPtr addr, UIntPtr len, int prot);
 
-    [DllImport("libBypassAccessExceptionLib.so")]
+    public const string libName = "libBypassAccessExceptionLib.so";
+
+    [DllImport(libName)]
     private static extern void ApplyBypass();
 
-    [DllImport("libBypassAccessExceptionLib.so")]
+    [DllImport(libName)]
     private static extern void ApplyBypass_x64();
 
     static void ApplyInternal_Arm64()

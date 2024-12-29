@@ -114,6 +114,8 @@ public class LauncherActivity : AppCompatActivity
 
         //ready to apply patch bytes
         BypassAccessException.Apply();
+
+        mono_class_from_mono_type_internal_CrashFix.Apply();
     }
 
 

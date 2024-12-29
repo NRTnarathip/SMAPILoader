@@ -9,8 +9,9 @@
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "SMAPI-Tag", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "SMAPI-Tag", __VA_ARGS__))
 
+
 void PatchBytes(uintptr_t targetAddress, const uint8_t* bytes, size_t bytesLength) {
-	LOGI("Try patch byte at: %d", targetAddress);
+	LOGI("Try patch byte at: %p", (void*)targetAddress);
 
 	LOGI("Page size: %d", getpagesize());
 	uintptr_t pageAlignedAddress = targetAddress & ~(getpagesize() - 1);
@@ -22,8 +23,14 @@ void PatchBytes(uintptr_t targetAddress, const uint8_t* bytes, size_t bytesLengt
 	LOGI("try write memory, length of bytes: %i", bytesLength);
 	memcpy((void*)targetAddress, bytes, bytesLength);
 
-	LOGI("Done patch byte at: %d", targetAddress);
+	LOGI("Done patch byte at: %p", (void*)targetAddress);
 }
+
+extern "C" void PatchBytes(uintptr_t targetAddress, uint8_t bytes[], size_t bytesLength) {
+	auto bytesPointer = reinterpret_cast<const uint8_t*>(bytes);
+	PatchBytes(targetAddress, bytesPointer, bytesLength);
+}
+
 
 extern "C" void ApplyBypass()
 {
