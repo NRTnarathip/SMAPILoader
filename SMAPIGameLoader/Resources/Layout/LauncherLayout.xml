@@ -62,14 +62,14 @@
 				android:textAllCaps="false"
                 />
 
-            <Button
+            <!--<Button
                 android:id="@+id/SaveImportFromSavesZip"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Save Import From Saves.zip" 
                 android:layout_marginVertical="10dp"
 				android:textAllCaps="false"
-                />
+                />-->
 
 			<Button
 			   android:id="@+id/ModManagerBtn"

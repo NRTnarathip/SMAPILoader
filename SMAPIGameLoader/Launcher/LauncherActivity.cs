@@ -126,8 +126,9 @@ public class LauncherActivity : AppCompatActivity
         try
         {
             FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += SMAPIInstaller.OnClickInstallSMAPIZip;
-            FindViewById<Button>(ResourceConstant.Id.SaveImportFromSavesZip).Click += SaveManager.OnClickImportSaveZip;
             FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += SMAPILogTool.OnClickUploadLog;
+            //Work In Progress
+            //FindViewById<Button>(ResourceConstant.Id.SaveImportFromSavesZip).Click += SaveManager.OnClickImportSaveZip;
 
             var startGameBtn = FindViewById<Button>(ResourceConstant.Id.StartGame);
             startGameBtn.Click += (sender, e) => { OnClickStartGame(); };

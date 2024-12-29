@@ -30,8 +30,8 @@ internal static class BypassAccessException
         {
             Log("Try Apply BypassAccessException");
 
-            if (ArchitectureTool.IsIntel())
-                ApplyInternal_Intel_x64();
+            if (ArchitectureTool.IsX86Based())
+                ApplyInternal_x64();
             else
                 ApplyInternal_Arm64();
 
@@ -113,7 +113,7 @@ internal static class BypassAccessException
         }
     }
 
-    static void ApplyInternal_Intel_x64()
+    static void ApplyInternal_x64()
     {
         ApplyBypass_x64();
         return;
