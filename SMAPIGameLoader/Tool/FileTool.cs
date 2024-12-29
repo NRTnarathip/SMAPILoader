@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -52,4 +53,21 @@ internal static class FileTool
             ErrorDialogTool.Show(ex);
         }
     }
+
+    internal static void Delete(string filePath)
+    {
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+    }
+
+    internal static string GetFirstDirNameFromFilePath(string fileName)
+    {
+        string fileDirPath = Path.GetDirectoryName(fileName);
+        string[] dirNames = fileDirPath.Split(Path.DirectorySeparatorChar);
+        return dirNames.FirstOrDefault();
+    }
+
+    //beware don't use entry.Name, it's not works if it dir entry
+    internal static bool IsEntryDirectory(ZipArchiveEntry entry) => entry.FullName.EndsWith("/");
+    internal static bool IsEntryFile(ZipArchiveEntry entry) => !IsEntryDirectory(entry);
 }

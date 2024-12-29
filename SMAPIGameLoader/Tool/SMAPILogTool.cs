@@ -21,7 +21,7 @@ internal static class SMAPILogTool
     const string SMAPILogUrl = "https://smapi.io/log";
     const string SMAPILogFileName = "SMAPI-latest.txt";
 
-    public static async void OnClickUploadLog()
+    public static async void OnClickUploadLog(object sender, EventArgs eventArgs)
     {
         TaskTool.Run(ActivityTool.CurrentActivity, async () =>
         {

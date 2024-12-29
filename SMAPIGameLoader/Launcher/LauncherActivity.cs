@@ -125,19 +125,9 @@ public class LauncherActivity : AppCompatActivity
         //setup bind events
         try
         {
-            FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += (sender, e) =>
-            {
-                SMAPIInstaller.OnClickInstallSMAPIZip();
-            };
-            //FindViewById<Button>(ResourceConstant.Id.InstallSMAPIOnline).Click += (sender, e) =>
-            //{
-            //    SMAPIInstaller.OnClickInstallSMAPIOnline();
-            //};
-
-            FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += (sender, e) =>
-            {
-                SMAPILogTool.OnClickUploadLog();
-            };
+            FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += SMAPIInstaller.OnClickInstallSMAPIZip;
+            FindViewById<Button>(ResourceConstant.Id.SaveImportFromSavesZip).Click += SaveManager.OnClickImportSaveZip;
+            FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += SMAPILogTool.OnClickUploadLog;
 
             var startGameBtn = FindViewById<Button>(ResourceConstant.Id.StartGame);
             startGameBtn.Click += (sender, e) => { OnClickStartGame(); };

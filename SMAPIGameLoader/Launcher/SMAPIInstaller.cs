@@ -157,7 +157,7 @@ internal static class SMAPIInstaller
     }
 
     public static Action OnInstalledSMAPI;
-    public static async void OnClickInstallSMAPIZip()
+    public static async void OnClickInstallSMAPIZip(object sender, EventArgs eventArgs)
     {
         try
         {
