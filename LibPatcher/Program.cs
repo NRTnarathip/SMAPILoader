@@ -70,7 +70,7 @@ internal class Program
 
         //clone into local app
         //1 lib-modify.so
-        File.Copy(LibSrcPath, LibModifyOutputFileName, true);
+        File.Copy(LibOrigialCopyFilePath, LibModifyOutputFileName, true);
 
         Console.WriteLine("original hash: " + ComputeSHA256(LibOrigialCopyFilePath));
 
@@ -125,7 +125,7 @@ internal class Program
         //try patch function mono_method_can_access_method_full
 
         //debug print bytes
-        var patchTarget = mono_method_can_access_method_full;
+        var patchTarget = mono_method_can_access_method_full + 0x1c;
         byte[] patchBytes =
         {
             0x1F, 0x20, 0x03, 0xD5,
@@ -154,7 +154,7 @@ internal class Program
 
         Console.WriteLine($"Start {nameof(Patch_mono_class_from_mono_type_internalCrashFix)}");
 
-        long funcAddr = (long)GetFunctionOffsetVAFile("mono_method_can_access_field");
+        long funcAddr = (long)GetFunctionOffsetVAFile("mono_class_from_mono_type_internal");
         var patchTarget = funcAddr + 0x23c;
         byte[] patchData =
         {
