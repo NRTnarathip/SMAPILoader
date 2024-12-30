@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BypassAccessExceptionLib", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryViewer", "MemoryViewer\MemoryViewer.csproj", "{C7452172-2FA7-4188-B34E-44FE0AABB72B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPatcher", "LibPatcher\LibPatcher.csproj", "{3F5A7573-C08C-4110-AEE0-F2D50047D690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,18 @@ Global
 		{C7452172-2FA7-4188-B34E-44FE0AABB72B}.Release|ARM64.Build.0 = Release|Any CPU
 		{C7452172-2FA7-4188-B34E-44FE0AABB72B}.Release|x64.ActiveCfg = Release|Any CPU
 		{C7452172-2FA7-4188-B34E-44FE0AABB72B}.Release|x64.Build.0 = Release|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Debug|x64.Build.0 = Debug|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|ARM64.Build.0 = Release|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|x64.ActiveCfg = Release|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

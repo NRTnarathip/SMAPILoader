@@ -1,0 +1,44 @@
+﻿!!! need \8.0.10\runtimes\android-arm64\native\libmonosgen-2.0.so
+file hash256 = 3a2ae3237b0be6d5ed7c4bda0b2c5fa8b2836a0a6de20fc96b007fb7389571b4
+
+
+Patch Bytes in ghidra or any tool
+
+1. fix Method Access Exception
+in BypassAccessExceptionLib.cpp
+
+address = mono_method_can_access_method_full + 0x1c
+bytes = "1f 20 03 d5 of" x 5 
+!!or fill NOP x 5 time
+
+
+
+2. fix Field Access Exception
+in BypassAccessExceptionLib.cpp
+
+address = mono_method_can_access_field + 0x120
+bytes = '0x20, 0x00, 0x80, 0x52' is equal 'mov, 1'
+
+
+
+3. fix MonoMethodInfo GetParameters() crash on some DMD Method
+in mono_class_from_mono_type_internal_CrashFix.cs
+
+address = mono_class_from_mono_type_internal + 0x23c
+
+opcodes:
+	00302798 1f 01 00 f1     cmp        x8,#0x0
+	0030279c 20 01 88 9a     csel       x0,x9,x8,eq
+	003027a0 fd 7b c1 a8     ldp        x29=>local_10,x30,[sp], #0x10
+	003027a4 c0 03 5f d6     ret
+
+decode:
+    if (lVar2 != 0) {
+      lVar1 = lVar2;
+    }
+
+
+
+after patch you need to replace file as
+!! if you are use .net 8.0.10 
+C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Runtime.Mono.android-arm64\8.0.10\runtimes\android-arm64\native\libmonosgen-2.0.so

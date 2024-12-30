@@ -35,6 +35,7 @@
 		<IsAotCompatible>False</IsAotCompatible>
 		<AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
 		<RunAOTCompilation>False</RunAOTCompilation>
+		<EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Mono.Cecil" Version="0.11.5">
@@ -49,7 +50,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\AssemblyStore\AssemblyStore.csproj" />
-		<ProjectReference Include="..\BypassAccessExceptionLib\BypassAccessExceptionLib.vcxproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="0Harmony">

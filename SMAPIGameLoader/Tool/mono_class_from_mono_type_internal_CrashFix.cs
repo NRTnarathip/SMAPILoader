@@ -25,8 +25,8 @@ internal static class mono_class_from_mono_type_internal_CrashFix
     [DllImport("libdl.so")]
     static extern nint dlerror();
 
-    [DllImport(BypassAccessException.libName, CallingConvention = CallingConvention.Cdecl)]
-    static extern void PatchBytes(IntPtr targetAddress, byte[] bytes, IntPtr bytesLength);
+    //[DllImport(BypassAccessException.libName, CallingConvention = CallingConvention.Cdecl)]
+    //static extern void PatchBytes(IntPtr targetAddress, byte[] bytes, IntPtr bytesLength);
 
     public static void Apply()
     {
@@ -79,7 +79,7 @@ internal static class mono_class_from_mono_type_internal_CrashFix
                 0xc0, 0x03, 0x5f, 0xd6,
             };
             Console.WriteLine("try patch bytes...");
-            PatchBytes(targetAddress, patchBytes, patchBytes.Length);
+            //PatchBytes(targetAddress, patchBytes, patchBytes.Length);
         }
     }
 }
