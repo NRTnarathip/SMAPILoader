@@ -9,6 +9,8 @@
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "SMAPI-Tag", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "SMAPI-Tag", __VA_ARGS__))
 
+#if defined(__aarch64__)   // ARM64
+
 extern "C" void mono_arch_flush_icache(uint64_t code, int size)
 {
 	/* Don't rely on GCC's __clear_cache implementation, as it caches
@@ -40,6 +42,14 @@ extern "C" void mono_arch_flush_icache(uint64_t code, int size)
 
 	LOGI("Flush ICache at: %p, length: %i", (void*)code, size);
 }
+#else
+
+extern "C" void mono_arch_flush_icache(uint64_t code, int size)
+{
+	LOGI("Flush ICache not suport for x86-x64 chip ", (void*)code, size);
+}
+
+#endif
 
 void PatchBytes(uintptr_t targetAddress, const uint8_t* bytes, size_t bytesLength) {
 	LOGI("Try patch byte at: %p", (void*)targetAddress);
