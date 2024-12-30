@@ -7,6 +7,8 @@ Patch Bytes in ghidra or any tool
 1. fix Method Access Exception
 in BypassAccessExceptionLib.cpp
 
+mono_method_can_access_method_full = mono_method_can_access_method + 0x24
+
 address = mono_method_can_access_method_full + 0x1c
 bytes = "1f 20 03 d5 of" x 5 
 !!or fill NOP x 5 time
