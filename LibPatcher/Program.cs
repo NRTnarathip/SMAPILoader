@@ -2,6 +2,7 @@
 using ELFSharp.ELF.Sections;
 using ELFSharp.Utilities;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,30 +10,26 @@ using System.Text;
 internal class Program
 {
     const string PackageDirPath = @"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Runtime.Mono.android-arm64";
-    const string LibFileName = "libmonosgen-2.0.so";
+    const string LibSrcFileName = "libmonosgen-2.0.so";
     const string LibFileHashSha256Target = "3a2ae3237b0be6d5ed7c4bda0b2c5fa8b2836a0a6de20fc96b007fb7389571b4";
-    static string LibPath = Path.Combine(PackageDirPath, @"8.0.10\runtimes\android-arm64\native", LibFileName);
+    static string LibSrcPath = Path.Combine(PackageDirPath, @"8.0.10\runtimes\android-arm64\native", LibSrcFileName);
 
-    const string LibModifyOutput = "libmonosgen-2.0-arm64-v8a.so";
+    const string LibOriginalCopyFileName = "libmonosgen-2.0-original.so";
+    static string LibOrigialCopyFilePath = Path.Combine(PackageDirPath, @"8.0.10\runtimes\android-arm64\native",
+        LibOriginalCopyFileName);
 
-    private static void Main(string[] args)
+    const string LibModifyOutputFileName = "libmonosgen-2.0-modify.so";
+    const string LibModifyOutputFilePath = LibModifyOutputFileName;
+
+    static void Main(string[] args)
     {
 
-        var fileInfo = new FileInfo(LibPath);
-        Console.WriteLine($"lib file info: {fileInfo.Length} byte");
-        var fileHash = ComputeSHA256(LibPath);
-        Console.WriteLine($"hash: {fileHash}");
-
-        if (fileHash != LibFileHashSha256Target)
-        {
-            Console.WriteLine("file hash not match to: " + LibFileHashSha256Target);
-            Exit();
-        }
+        var fileInfo = new FileInfo(LibSrcPath);
 
         //ready
         try
         {
-            StartPachAll();
+            Run();
         }
         catch (Exception ex)
         {
@@ -42,25 +39,43 @@ internal class Program
         //close
         Exit();
     }
+    static void Exit()
+    {
+        Console.WriteLine("Press Any Key To Exit..");
+        Console.Read();
+        Environment.Exit(0);
+    }
+
     static ISymbolTable dynamicSymbolTable;
     static IELF LibReader;
     static Dictionary<string, SymbolEntry<UInt64>> monoMethodMap = new();
     static FileStream LibWriter = null;
-    static void StartPachAll()
+    static void Run()
     {
+        Console.WriteLine("Runing..");
+
         Console.WriteLine("Start Patch Lib...");
 
-        var currentOriginalLib = LibFileName;
+        //clone original first
+        if (File.Exists(LibOrigialCopyFilePath) is false)
+            File.Copy(LibSrcPath, LibOrigialCopyFilePath);
 
-        //clone temp original
-        File.Copy(LibPath, currentOriginalLib, true);
-        //clone result output modify lib
-        File.Copy(LibPath, LibModifyOutput, true);
+        //check verify original file hash
+        var fileHash = ComputeSHA256(LibOrigialCopyFilePath);
+        if (fileHash != LibFileHashSha256Target)
+        {
+            Console.WriteLine("file hash not match to: " + LibFileHashSha256Target);
+            Exit();
+        }
 
-        Console.WriteLine("original hash: " + ComputeSHA256(currentOriginalLib));
+        //clone into local app
+        //1 lib-modify.so
+        File.Copy(LibSrcPath, LibModifyOutputFileName, true);
+
+        Console.WriteLine("original hash: " + ComputeSHA256(LibOrigialCopyFilePath));
 
         //setup elf reader
-        LibReader = ELFReader.Load(currentOriginalLib);
+        LibReader = ELFReader.Load(LibOrigialCopyFilePath);
         dynamicSymbolTable = LibReader.GetSection(".dynsym") as ISymbolTable;
         foreach (SymbolEntry<UInt64> item in dynamicSymbolTable.Entries)
         {
@@ -71,24 +86,86 @@ internal class Program
         }
 
         //setup writer
-        LibWriter = File.Open(LibModifyOutput, FileMode.Open, FileAccess.ReadWrite);
+        LibWriter = File.Open(LibModifyOutputFileName, FileMode.Open, FileAccess.ReadWrite);
+
 
         //ready patch all
-
-        //1 patch Field Access Exception
         Patch_FieldAccessException();
-
+        Patch_MethodAccessException();
+        Patch_mono_class_from_mono_type_internalCrashFix();
 
 
         //cleanup
         LibWriter.Close();
+        LibReader.Dispose();
+        //close lib original file before delete it
+        var newHash = ComputeSHA256(LibModifyOutputFileName);
+        Console.WriteLine($"{LibModifyOutputFileName} file hash: " + newHash);
 
-        var newHash = ComputeSHA256(currentOriginalLib);
-        Console.WriteLine("new lib hash: " + newHash);
-
+        PostBuild();
 
         Console.WriteLine("Successfully Patch Lib");
     }
+
+    private static void PostBuild()
+    {
+        //copy push lib modify into package dir lib
+        //error can't access file path
+        //need admin permission
+        Console.WriteLine("Post Build...");
+        Console.WriteLine($"Try copy {LibModifyOutputFilePath} to {LibSrcPath}");
+        File.Copy(LibModifyOutputFilePath, LibSrcPath, true);
+    }
+
+    static void Patch_FieldAccessException()
+    {
+        Console.WriteLine($"Start {nameof(Patch_FieldAccessException)}");
+        long mono_method_can_access_method = (long)GetFunctionOffsetVAFile("mono_method_can_access_method");
+        var mono_method_can_access_method_full = mono_method_can_access_method + 0x24;
+        //try patch function mono_method_can_access_method_full
+
+        //debug print bytes
+        var patchTarget = mono_method_can_access_method_full;
+        byte[] patchBytes =
+        {
+            0x1F, 0x20, 0x03, 0xD5,
+            0x1F, 0x20, 0x03, 0xD5,
+            0x1F, 0x20, 0x03, 0xD5,
+            0x1F, 0x20, 0x03, 0xD5,
+            0x1F, 0x20, 0x03, 0xD5,
+        };
+
+        WriteByteArray(patchTarget, patchBytes);
+
+    }
+    static void Patch_MethodAccessException()
+    {
+        Console.WriteLine($"Start {nameof(Patch_MethodAccessException)}");
+
+        long funcAddr = (long)GetFunctionOffsetVAFile("mono_method_can_access_field");
+        var patchTarget = funcAddr + 0x120;
+        byte[] patchData = { 0x20, 0x00, 0x80, 0x52 };
+        WriteByteArray(patchTarget, patchData);
+
+
+    }
+    static void Patch_mono_class_from_mono_type_internalCrashFix()
+    {
+
+        Console.WriteLine($"Start {nameof(Patch_mono_class_from_mono_type_internalCrashFix)}");
+
+        long funcAddr = (long)GetFunctionOffsetVAFile("mono_method_can_access_field");
+        var patchTarget = funcAddr + 0x23c;
+        byte[] patchData =
+        {
+            0x1f ,0x01, 0x00, 0xf1,
+            0x20, 0x01, 0x88, 0x9a,
+            0xfd, 0x7b, 0xc1, 0xa8,
+            0xc0, 0x03, 0x5f, 0xd6,
+        };
+        WriteByteArray(patchTarget, patchData);
+    }
+
     static ulong GetFunctionOffsetVASection(string name) => GetFunctionOffsetVASection(GetFunction(name));
     static ulong GetFunctionOffsetVASection(SymbolEntry<UInt64> func)
     {
@@ -116,36 +193,12 @@ internal class Program
         return result;
     }
     static SymbolEntry<UInt64> GetFunction(string name) => monoMethodMap[name];
-    static void Patch_FieldAccessException()
-    {
-        Console.WriteLine($"Start {nameof(Patch_FieldAccessException)}");
-        var mono_method_can_access_method = GetFunctionOffsetVAFile("mono_method_can_access_method");
-        var mono_method_can_access_method_full = mono_method_can_access_method + 0x24;
-        //try patch function mono_method_can_access_method_full
-
-        //debug print bytes
-        var patchTarget = mono_method_can_access_method_full;
-        byte[] patchBytes =
-        {
-            0x1F, 0x20, 0x03, 0xD5,
-            0x1F, 0x20, 0x03, 0xD5,
-            0x1F, 0x20, 0x03, 0xD5,
-            0x1F, 0x20, 0x03, 0xD5,
-            0x1F, 0x20, 0x03, 0xD5,
-        };
-
-        Console.WriteLine("before patch");
-        DumpHex((int)patchTarget, patchBytes.Length);
-        //var section = mono_method_can_access_method.PointedSection;
-        //test 
-        Console.WriteLine();
-    }
-    static void WriteByteArray(byte[] bytes, long start)
+    static void WriteByteArray(long start, byte[] bytes)
     {
         LibWriter.Seek(start, SeekOrigin.Begin);
         LibWriter.Write(bytes);
     }
-    static void Read(byte[] bytes, long start)
+    static void ReadByteArray(byte[] bytes, long start)
     {
         LibWriter.Seek(start, SeekOrigin.Begin);
         LibWriter.Read(bytes);
@@ -159,7 +212,7 @@ internal class Program
     static void DumpHex(int start, int length)
     {
         byte[] bytes = new byte[length];
-        Read(bytes, start);
+        ReadByteArray(bytes, start);
         DumpHex(bytes);
     }
     static void DumpHex(byte[] bytes, int dumpRowLength = 4)
@@ -184,12 +237,7 @@ internal class Program
         Console.WriteLine(sb.ToString());
         Console.WriteLine("===== End Dump Memory =====");
     }
-
-    static void Exit()
-    {
-        Console.Read();
-    }
-    public static string ComputeSHA256(string filePath)
+    static string ComputeSHA256(string filePath)
     {
         using var sha256 = SHA256.Create();
         using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);

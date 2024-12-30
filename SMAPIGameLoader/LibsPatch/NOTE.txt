@@ -19,7 +19,8 @@ bytes = "1f 20 03 d5 of" x 5
 in BypassAccessExceptionLib.cpp
 
 address = mono_method_can_access_field + 0x120
-bytes = '0x20, 0x00, 0x80, 0x52' is equal 'mov, 1'
+bytes = 0x20, 0x00, 0x80, 0x52 
+is equal 'mov, 1'
 
 
 
