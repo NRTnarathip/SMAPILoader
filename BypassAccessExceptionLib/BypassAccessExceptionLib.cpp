@@ -9,6 +9,37 @@
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "SMAPI-Tag", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "SMAPI-Tag", __VA_ARGS__))
 
+extern "C" void mono_arch_flush_icache(uint64_t code, int size)
+{
+	/* Don't rely on GCC's __clear_cache implementation, as it caches
+	 * icache/dcache cache line sizes, that can vary between cores on
+	 * big.LITTLE architectures. */
+	uint64_t end = (uint64_t)(code + size);
+	LOGI("Flush ICache end at: %p", (void*)end);
+
+	uint64_t addr;
+	/* always go with cacheline size of 4 bytes as this code isn't perf critical
+	 * anyway. Reading the cache line size from a machine register can be racy
+	 * on a big.LITTLE architecture if the cores don't have the same cache line
+	 * sizes. */
+	const size_t icache_line_size = 4;
+	const size_t dcache_line_size = 4;
+
+	addr = (uint64_t)code & ~(uint64_t)(dcache_line_size - 1);
+	for (; addr < end; addr += dcache_line_size)
+		asm volatile("dc civac, %0" : : "r" (addr) : "memory");
+	asm volatile("dsb ish" : : : "memory");
+
+	addr = (uint64_t)code & ~(uint64_t)(icache_line_size - 1);
+	for (; addr < end; addr += icache_line_size)
+		asm volatile("ic ivau, %0" : : "r" (addr) : "memory");
+
+	asm volatile ("dsb ish" : : : "memory");
+	asm volatile ("isb" : : : "memory");
+
+
+	LOGI("Flush ICache at: %p, length: %i", (void*)code, size);
+}
 
 void PatchBytes(uintptr_t targetAddress, const uint8_t* bytes, size_t bytesLength) {
 	LOGI("Try patch byte at: %p", (void*)targetAddress);
@@ -22,6 +53,8 @@ void PatchBytes(uintptr_t targetAddress, const uint8_t* bytes, size_t bytesLengt
 
 	LOGI("try write memory, length of bytes: %i", bytesLength);
 	memcpy((void*)targetAddress, bytes, bytesLength);
+
+	mono_arch_flush_icache(targetAddress, bytesLength);
 
 	LOGI("Done patch byte at: %p", (void*)targetAddress);
 }
