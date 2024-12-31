@@ -14,6 +14,7 @@ internal static class ApkTool
 {
     public static int LauncherBuildCode => int.Parse(AppInfo.BuildString);
     public static Version AppVersion => AppInfo.Version;
+    public static string PackageName => AppInfo.PackageName;
 
     public static PackageInfo GetPackageInfo(string PackageName)
     {

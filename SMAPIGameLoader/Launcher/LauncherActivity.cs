@@ -112,13 +112,6 @@ public class LauncherActivity : AppCompatActivity
             return;
         }
 
-        //ready to apply patch bytes
-#if true
-        ToastNotifyTool.Notify("Warn!!, you are use debug code");
-#else
-        BypassAccessException.Apply();
-        mono_class_from_mono_type_internal_CrashFix.Apply();
-#endif
     }
 
 
@@ -129,7 +122,7 @@ public class LauncherActivity : AppCompatActivity
         try
         {
             FindViewById<Button>(ResourceConstant.Id.InstallSMAPIZip).Click += SMAPIInstaller.OnClickInstallSMAPIZip;
-            FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += SMAPILogTool.OnClickUploadLog;
+            FindViewById<Button>(ResourceConstant.Id.UploadLog).Click += LogParser.OnClickUploadLog;
             //Work In Progress
             //FindViewById<Button>(ResourceConstant.Id.SaveImportFromSavesZip).Click += SaveManager.OnClickImportSaveZip;
 

@@ -1,4 +1,7 @@
 ﻿using Android.App;
+using Android.Content;
+using Android.Content.PM;
+using Android.Provider;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,8 +15,9 @@ namespace SMAPIGameLoader;
 
 internal static class FileTool
 {
-    public static string ExternalFilesDir => Application.Context.GetExternalFilesDir(null).AbsolutePath;
-    public static string InternalFilesDir => Application.Context.FilesDir.AbsolutePath;
+    public static string ExternalFilesDir = Application.Context.GetExternalFilesDir(null).AbsolutePath;
+    public static string InternalFilesDir = Application.Context.FilesDir.AbsolutePath;
+    public static string ExternalAppDir = ExternalFilesDir.Substring(0, ExternalFilesDir.Length - 6);
     public static string SafePath(string path)
     {
         path = path.Replace("\\", "/");
@@ -70,4 +74,45 @@ internal static class FileTool
     //beware don't use entry.Name, it's not works if it dir entry
     internal static bool IsEntryDirectory(ZipArchiveEntry entry) => entry.FullName.EndsWith("/");
     internal static bool IsEntryFile(ZipArchiveEntry entry) => !IsEntryDirectory(entry);
+
+    internal static void OpenAppFilesExternalFilesDir(string additionPath)
+    {
+        string initPath = Path.Combine(ExternalFilesDir, additionPath);
+        OpenAppFiles(initPath);
+    }
+    const string BaseDocumentPrimaryPath = "content://com.android.externalstorage.documents/document/primary";
+    internal static void OpenAppFiles(string initDirPath)
+    {
+        const string filesPackageName = "com.google.android.documentsui";
+        const string filesActivityName = "com.android.documentsui.files.FilesActivity";
+        if (ApkTool.GetPackageInfo(filesPackageName) is null)
+        {
+            ErrorDialogTool.Show(new($"Not found app {filesPackageName}"), "Try Open Folder Mods");
+            return;
+        }
+
+        try
+        {
+            //check path not exist, use external files dir 
+            if (Directory.Exists(initDirPath) is false)
+            {
+                //default at ../files path
+                initDirPath = ExternalFilesDir;
+            }
+
+            //safe path!!
+            //remove path /storage/emulated/0
+            initDirPath = initDirPath.Replace("/storage/emulated/0/", "");
+            var uriString = $"{BaseDocumentPrimaryPath}%3A{initDirPath.Replace("/", "%2F")}";
+            Intent intent = new Intent(Intent.ActionView);
+            intent.SetDataAndType(Android.Net.Uri.Parse(uriString), "vnd.android.document/directory");
+            intent.SetClassName(filesPackageName, filesActivityName);
+            intent.AddFlags(ActivityFlags.NewTask);
+            Application.Context.StartActivity(intent);
+        }
+        catch (Exception ex)
+        {
+            ErrorDialogTool.Show(ex);
+        }
+    }
 }

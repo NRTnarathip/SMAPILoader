@@ -53,8 +53,15 @@ internal class ModManagerActivity : AppCompatActivity
             });
         };
 
+        FindViewById<Button>(Resource.Id.OpenFolderModsBtn).Click += OnClick_OpenFolderMods;
+
         //ready
         RefreshMods();
+    }
+
+    void OnClick_OpenFolderMods(object sender, EventArgs e)
+    {
+        FileTool.OpenAppFilesExternalFilesDir("Mods");
     }
 
     // mod folder path with manifest.json inside

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 
 namespace SMAPIGameLoader.Tool;
-internal static class SMAPILogTool
+internal static class LogParser
 {
     static async Task<HttpResponseMessage> PostHTTPRequestAsync(this HttpClient client,
        string url, Dictionary<string, string> data)
@@ -68,11 +68,11 @@ internal static class SMAPILogTool
             var logUrl = response.RequestMessage.RequestUri.ToString();
 
             clipboardString.AppendLine($"### SMAPI Log Latest");
-            clipboardString.AppendLine($"> [Click Link Log Here]({logUrl})");
-            clipboardString.AppendLine($"> [Click Link Log Here]({logUrl})");
+            clipboardString.AppendLine($"> ## [Click Link Log Here]({logUrl})");
             clipboardString.AppendLine($"### Current App Info");
             clipboardString.AppendLine($"> Game {StardewApkTool.CurrentGameVersion}");
-            clipboardString.AppendLine($"> Launcher {ApkTool.AppVersion}");
+            var appBuildCode = ApkTool.LauncherBuildCode;
+            clipboardString.AppendLine($"> Launcher {ApkTool.AppVersion} - {appBuildCode}");
             clipboardString.AppendLine($"> SMAPI {SMAPIInstaller.GetCurrentVersion()} - {SMAPIInstaller.GetBuildCode()}");
 
             await Clipboard.SetTextAsync(clipboardString.ToString());

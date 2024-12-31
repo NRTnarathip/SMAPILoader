@@ -43,5 +43,15 @@
 			android:textAllCaps="false"
             android:layout_weight="1"
             />
+		<Button
+		   android:id="@+id/OpenFolderModsBtn"
+		   android:layout_width="match_parent"
+		   android:layout_height="match_parent"
+		   android:text="Open Folder Mods"
+		   android:layout_marginBottom="30dp"
+		   android:textAllCaps="false"
+		   android:layout_weight="1"
+            />
+
     </LinearLayout>
 </LinearLayout>

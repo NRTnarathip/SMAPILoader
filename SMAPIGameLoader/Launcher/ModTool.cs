@@ -9,20 +9,27 @@ namespace SMAPIGameLoader.Launcher;
 
 internal static class ModTool
 {
-    public static string ModsDir => FileTool.ExternalFilesDir + "/Mods";
+    const string ModsDirName = "Mods";
+    public static string ModsDir { get; } = Path.Combine(FileTool.ExternalFilesDir, ModsDirName);
+
     public static string ManifiestFileName = "manifest.json";
     public static void FindManifestFile(string rootDirPath, List<string> manifestFiles)
     {
-
         try
         {
+            if (Directory.Exists(rootDirPath) is false)
+                return;
 
             //search current only 1
             var manifestFilePath = Path.Combine(rootDirPath, ManifiestFileName);
-            if (Path.Exists(manifestFilePath))
+            //assert manifest file invalid path
+            if (rootDirPath != ModsDir)
             {
-                manifestFiles.Add(manifestFilePath);
-                return;
+                if (Path.Exists(manifestFilePath))
+                {
+                    manifestFiles.Add(manifestFilePath);
+                    return;
+                }
             }
 
             //search with next folder

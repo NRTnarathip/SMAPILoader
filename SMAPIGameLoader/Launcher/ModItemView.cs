@@ -11,30 +11,35 @@ public class ModItemView
     public string VersionText = "Unknow";
     public string FolderPathText = "Unknow";
 
-    public readonly string modName;
-    public readonly string modVersion;
-    public readonly string modFolderPath;
+    public readonly string modName = "unknow";
+    public readonly string modVersion = "unknow";
+    public readonly string modFolderPath = "unknow";
 
     public ModItemView(string manifestFilePath, int modListIndex)
     {
-        var manifestText = File.ReadAllText(manifestFilePath);
-        var manifest = JObject.Parse(manifestText);
-
-        this.modName = manifest["Name"].ToString();
-        this.modVersion = manifest["Version"].ToString();
-
-        this.NameText = $"[{modListIndex + 1}]: {modName}";
-        this.VersionText = $"Version: {modVersion}";
         try
         {
+            var manifestText = File.ReadAllText(manifestFilePath);
+            var manifest = JObject.Parse(manifestText);
+
+            this.modName = manifest["Name"].ToString();
+            this.modVersion = manifest["Version"].ToString();
+
+            this.NameText = $"[{modListIndex + 1}]: {modName}";
+            this.VersionText = $"Version: {modVersion}";
+
             this.modFolderPath = Path.GetDirectoryName(manifestFilePath);
             var relativeModDir = modFolderPath.Substring(modFolderPath.IndexOf("/Mods") + 5);
             FolderPathText = $"Folder: {relativeModDir}";
         }
         catch (Exception ex)
         {
+            this.modFolderPath = Path.GetDirectoryName(manifestFilePath);
             FolderPathText = modFolderPath;
-            ErrorDialogTool.Show(ex, "Error can't decorate for mod path: " + this.modFolderPath);
+            ErrorDialogTool.Show(ex, "Error try parser mod folder path: " + this.modFolderPath);
         }
+
+        this.NameText = $"[{modListIndex + 1}]: {modName}";
+        this.VersionText = $"Version: {modVersion}";
     }
 }
