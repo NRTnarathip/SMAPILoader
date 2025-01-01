@@ -31,4 +31,6 @@ internal static class ApkTool
             return null;
         }
     }
+    public static bool IsInstalled(string packageName)
+        => GetPackageInfo(packageName) is not null;
 }

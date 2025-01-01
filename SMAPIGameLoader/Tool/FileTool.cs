@@ -83,14 +83,6 @@ internal static class FileTool
     const string BaseDocumentPrimaryPath = "content://com.android.externalstorage.documents/document/primary";
     internal static void OpenAppFiles(string initDirPath)
     {
-        const string filesPackageName = "com.google.android.documentsui";
-        const string filesActivityName = "com.android.documentsui.files.FilesActivity";
-        if (ApkTool.GetPackageInfo(filesPackageName) is null)
-        {
-            ErrorDialogTool.Show(new($"Not found app {filesPackageName}"), "Try Open Folder Mods");
-            return;
-        }
-
         try
         {
             //check path not exist, use external files dir 
@@ -105,10 +97,14 @@ internal static class FileTool
             initDirPath = initDirPath.Replace("/storage/emulated/0/", "");
             var uriString = $"{BaseDocumentPrimaryPath}%3A{initDirPath.Replace("/", "%2F")}";
             Intent intent = new Intent(Intent.ActionView);
-            intent.SetDataAndType(Android.Net.Uri.Parse(uriString), "vnd.android.document/directory");
-            intent.SetClassName(filesPackageName, filesActivityName);
-            intent.AddFlags(ActivityFlags.NewTask);
-            Application.Context.StartActivity(intent);
+            intent.SetDataAndType(Android.Net.Uri.Parse(uriString), DocumentsContract.Document.MimeTypeDir);
+
+            //ready
+            Intent chooser = Intent.CreateChooser(intent, "เลือกแอปสำหรับเปิดไฟล์นี้");
+            chooser.AddFlags(ActivityFlags.NewTask);
+
+            Application.Context.StartActivity(chooser);
+
         }
         catch (Exception ex)
         {
