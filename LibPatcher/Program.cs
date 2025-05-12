@@ -10,7 +10,6 @@ internal class Program
         //ready
         try
         {
-            PatchLibX64.Start();
             PatchLibArm64.Start();
         }
         catch (Exception ex)

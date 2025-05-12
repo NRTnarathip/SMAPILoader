@@ -90,6 +90,7 @@ internal static class TaskTool
     }
     public static void NewLine(string msg)
     {
+        Console.WriteLine("on TaskTool.NewLine: " + msg);
         RunMainThread(() =>
         {
             SetMessage(busyMessage + "\n" + msg);

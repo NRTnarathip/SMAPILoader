@@ -27,8 +27,9 @@ internal class PatchData
 internal abstract class BasePatchLib
 {
     public readonly PlatformEnum platform;
-    public readonly string PackageDirPath = @"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Runtime.Mono.android";
+    public readonly string PackageDirPath = @"C:\Users\narat\.nuget\packages\microsoft.netcore.app.runtime.mono.android";
     public const string LibSrcFileName = "libmonosgen-2.0.so";
+    public const string LibVersion = "8.0.10";
     public readonly string LibSrcPath;
 
     public const string LibOriginalBackupFileName = "libmonosgen-2.0-original.so";
@@ -50,13 +51,11 @@ internal abstract class BasePatchLib
         {
             PackageDirPath += "-arm64";
             LibModifyOutputFileName = LibModifyOutputFileName.Replace(".so", "-arm64.so");
-            LibSrcPath = Path.Combine(PackageDirPath, @"8.0.10\runtimes\android-arm64\native", LibSrcFileName);
+            LibSrcPath = Path.Combine(PackageDirPath, LibVersion, @"runtimes\android-arm64\native", LibSrcFileName);
         }
         else
         {
-            PackageDirPath += "-x64";
-            LibSrcPath = Path.Combine(PackageDirPath, @"8.0.10\runtimes\android-x64\native", LibSrcFileName);
-            LibModifyOutputFileName = LibModifyOutputFileName.Replace(".so", "-x64.so");
+            throw new Exception("not suppport other platform");
         }
 
         LibOrigialBackupFilePath = LibSrcPath.Replace(LibSrcFileName, LibOriginalBackupFileName);
@@ -85,6 +84,8 @@ internal abstract class BasePatchLib
         if (fileHash != hashTarget)
         {
             Console.WriteLine("file hash not match to: " + hashTarget);
+            Console.WriteLine("current your file: " + fileHash);
+            Console.WriteLine("at file: " + LibOrigialBackupFilePath);
             Exit();
         }
 
