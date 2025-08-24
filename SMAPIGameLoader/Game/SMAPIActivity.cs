@@ -210,6 +210,7 @@ public class SMAPIActivity : AndroidGameActivity
             "hu" => "A játék mentéséhez, és ahhoz, hogy a különböző platformok között hordozhasd a játékmentést, engedélyezned kell a külső tárhely olvasását/írását, Kérjük, a játékhoz engedélyezd ezeket.",
             "it" => "È necessaria l'autorizzazione a leggere/scrivere su un dispositivo di memorizzazione esterno per salvare la partita e per consentire di trasferire i salvataggi da e su altre piattaforme. Concedi l'autorizzazione per giocare.",
             "zh" => "《星露谷物语》请求获得授权用来保存游戏数据以及访问线上功能。",
+            "uk" => "Для збереження поступу гри та перенесення збережень із/на інші платформи потрібен дозвіл перегляду/запису на зовнішнє сховище. Будь ласка, надайте дозвіл, щоби почати гру.",
             _ => "Read/write to external storage permission is required to save the game, and to allow to you transfer saves to and from other platforms. Please give permission in order to play.",
         };
     }
@@ -228,6 +229,7 @@ public class SMAPIActivity : AndroidGameActivity
             "hu" => "Lépje be a telefonodon a Beállítások > Alkalmazások > Stardew Valley > Engedélyek menübe, majd engedélyezd a Tárhelyet a játékhoz.",
             "it" => "Nel telefono, vai su Impostazioni > Applicazioni > Stardew Valley > Autorizzazioni e attiva Memoria archiviazione per giocare.",
             "zh" => "可在“设置-权限隐私-按应用管理权限-星露谷物语”进行设置，并打开“电话”、“读取位置信息”、“存储”权限。",
+            "uk" => "На смартфоні перейдіть у Налаштування > Застосунки > Stardew Valley > Дозволи, та надайте доступ до Сховища, щоби почати гру.",
             _ => "Please go into phone Settings > Apps > Stardew Valley > Permissions, and enable Storage to play the game.",
         };
 
@@ -247,6 +249,7 @@ public class SMAPIActivity : AndroidGameActivity
             "hu" => "rendben",
             "it" => "ok",
             "zh" => "好",
+            "uk" => "OK",
             _ => "OK",
         };
     }
