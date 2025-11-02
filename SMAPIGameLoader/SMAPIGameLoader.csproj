@@ -56,9 +56,6 @@
 		<Reference Include="0Harmony">
 			<HintPath>..\SharedLibs\0Harmony.dll</HintPath>
 		</Reference>
-		<Reference Include="MonoGame.Framework">
-			<HintPath>..\..\..\Apks Latest File\assemblies\out\MonoGame.Framework.dll</HintPath>
-		</Reference>
 		<Reference Include="MonoMod.Backports">
 			<HintPath>..\SharedLibs\MonoMod.Backports.dll</HintPath>
 		</Reference>
@@ -77,12 +74,15 @@
 		<Reference Include="MonoMod.Utils">
 			<HintPath>..\SharedLibs\MonoMod.Utils.dll</HintPath>
 		</Reference>
+		<Reference Include="MonoGame.Framework">
+			<HintPath>..\..\SMAPI-Android-1.6\src\DependenciesDll\MonoGame.Framework.dll</HintPath>
+		</Reference>
 		<Reference Include="StardewValley">
-			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.dll</HintPath>
+			<HintPath>..\..\SMAPI-Android-1.6\src\DependenciesDll\StardewValley.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="StardewValley.GameData">
-			<HintPath>..\..\..\Apks Latest File\assemblies\out\StardewValley.GameData.dll</HintPath>
+			<HintPath>..\..\SMAPI-Android-1.6\src\DependenciesDll\StardewValley.GameData.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>

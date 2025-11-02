@@ -5,11 +5,6 @@ using System.Text;
 
 namespace LibPatcher;
 
-public enum PlatformEnum
-{
-    Arm64, X64
-}
-
 internal class PatchData
 {
     public string ExportFunctionName { get; }
@@ -24,12 +19,9 @@ internal class PatchData
     }
 }
 
-internal abstract class BasePatchLib
+internal abstract class LibPatcherBase
 {
-    public readonly PlatformEnum platform;
-    public readonly string PackageDirPath = @"C:\Users\narat\.nuget\packages\microsoft.netcore.app.runtime.mono.android";
     public const string LibSrcFileName = "libmonosgen-2.0.so";
-    public const string LibVersion = "8.0.10";
     public readonly string LibSrcPath;
 
     public const string LibOriginalBackupFileName = "libmonosgen-2.0-original.so";
@@ -43,21 +35,16 @@ internal abstract class BasePatchLib
     public Dictionary<string, SymbolEntry<UInt64>> monoMethodMap = new();
     public FileStream LibWriter = null;
 
-    internal BasePatchLib(PlatformEnum platform)
+    internal LibPatcherBase()
     {
-        this.platform = platform;
+        Console.Write("Package path: ");
+        string? PackageDirPath = Console.ReadLine();
+        if (PackageDirPath == null)
+            throw new Exception("please enter your package " +
+                "'microsoft.netcore.app.runtime.mono.android-arm64' dir path!!");
 
-        if (platform == PlatformEnum.Arm64)
-        {
-            PackageDirPath += "-arm64";
-            LibModifyOutputFileName = LibModifyOutputFileName.Replace(".so", "-arm64.so");
-            LibSrcPath = Path.Combine(PackageDirPath, LibVersion, @"runtimes\android-arm64\native", LibSrcFileName);
-        }
-        else
-        {
-            throw new Exception("not suppport other platform");
-        }
-
+        LibModifyOutputFileName = LibModifyOutputFileName.Replace(".so", "-arm64.so");
+        LibSrcPath = Path.Combine(PackageDirPath, @"runtimes\android-arm64\native", LibSrcFileName);
         LibOrigialBackupFilePath = LibSrcPath.Replace(LibSrcFileName, LibOriginalBackupFileName);
 
         //Start
@@ -114,7 +101,7 @@ internal abstract class BasePatchLib
         PatchData[] patches = [
             Patch_FieldAccessException(),
             Patch_MethodAccessException(),
-            Patch_mono_class_from_mono_type_internalCrashFix(),
+            //Patch_mono_class_from_mono_type_internalCrashFix(),
         ];
         foreach (var patchData in patches)
         {
