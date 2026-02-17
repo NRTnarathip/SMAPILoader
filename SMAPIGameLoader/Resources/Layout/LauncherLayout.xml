@@ -1,103 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
-        android:layout_marginTop="50dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center">
-    />
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/launcherInfoTextView"
-            android:textSize="16sp"
-            android:gravity="center_horizontal"
-            android:text="Launcher App Info..."
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    
-		<TextView
-            android:id="@+id/SMAPIInstallInfoTextView"
-			android:textSize="18sp"
-			android:gravity="center_horizontal"
-			android:text="SMAPI..."
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<LinearLayout
+			android:layout_marginTop="50dp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:gravity="center">
+		/>
 
-    </LinearLayout>
-   
-    <LinearLayout
-        android:gravity="center_vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="50dp"
-        android:layout_marginHorizontal="20dp"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginHorizontal="50dp"
-            android:gravity="center_horizontal"
-            >
-            <!--<Button
-                android:id="@+id/InstallSMAPIOnline"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Install SMAPI Online" 
-                android:layout_marginVertical="10dp"
-				android:textAllCaps="false"
-                />-->
-            <Button
-                android:id="@+id/InstallSMAPIZip"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Install SMAPI From Zip" 
-                android:layout_marginVertical="10dp"
-				android:textAllCaps="false"
-                />
+			<TextView
+				android:id="@+id/launcherInfoTextView"
+				android:textSize="16sp"
+				android:gravity="center_horizontal"
+				android:text="Launcher App Info..."
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
 
-            <!--<Button
-                android:id="@+id/SaveImportFromSavesZip"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Save Import From Saves.zip" 
-                android:layout_marginVertical="10dp"
-				android:textAllCaps="false"
-                />-->
+			<TextView
+				android:id="@+id/SMAPIInstallInfoTextView"
+				android:textSize="18sp"
+				android:gravity="center_horizontal"
+				android:text="SMAPI..."
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
 
-			<Button
-			   android:id="@+id/ModManagerBtn"
-			   android:layout_width="match_parent"
-			   android:layout_height="match_parent"
-			   android:text="Mod Manager"
-			   android:layout_marginVertical="10dp"
-				android:textAllCaps="false"
-                />
+		</LinearLayout>
 
-            <Button
-                android:id="@+id/UploadLog"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="Share Log" 
-				android:textAllCaps="false"
-                android:layout_marginVertical="10dp"
-                />
+		<LinearLayout
+			android:gravity="center_vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_gravity="center_vertical"
+			android:layout_marginBottom="50dp"
+			android:layout_marginHorizontal="20dp"
+			android:orientation="vertical">
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:layout_marginHorizontal="50dp"
+				android:gravity="center_horizontal"
+				>
+				<!--<Button
+					android:id="@+id/InstallSMAPIOnline"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:text="Install SMAPI Online"
+					android:layout_marginVertical="10dp"
+					android:textAllCaps="false"
+					/>-->
+				<Button
+					android:id="@+id/InstallSMAPIZip"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:text="Install SMAPI From Zip"
+					android:layout_marginVertical="10dp"
+					android:textAllCaps="false"
+					/>
 
-			<Button
-			   android:id="@+id/StartGame"
-			   android:layout_width="match_parent"
-			   android:layout_height="match_parent"
-			   android:text="Start Game"
-			   android:textAllCaps="false"
-			   android:layout_marginVertical="10dp"
-                />
-			
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+				<!--<Button
+					android:id="@+id/SaveImportFromSavesZip"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:text="Save Import From Saves.zip"
+					android:layout_marginVertical="10dp"
+					android:textAllCaps="false"
+					/>-->
+
+				<Button
+				   android:id="@+id/ModManagerBtn"
+				   android:layout_width="match_parent"
+				   android:layout_height="match_parent"
+				   android:text="Mod Manager"
+				   android:layout_marginVertical="10dp"
+					android:textAllCaps="false"
+					/>
+
+				<Button
+					android:id="@+id/UploadLog"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:text="Share Log"
+					android:textAllCaps="false"
+					android:layout_marginVertical="10dp"
+					/>
+
+				<Button
+				   android:id="@+id/StartGame"
+				   android:layout_width="match_parent"
+				   android:layout_height="match_parent"
+				   android:text="Start Game"
+				   android:textAllCaps="false"
+				   android:layout_marginVertical="10dp"
+					/>
+
+			</LinearLayout>
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>
