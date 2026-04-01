@@ -15,7 +15,7 @@
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
 			android:gravity="center">
-			/>
+		/>
 
 			<TextView
 				android:id="@+id/launcherInfoTextView"
