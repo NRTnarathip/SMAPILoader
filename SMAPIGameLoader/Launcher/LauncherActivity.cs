@@ -18,7 +18,7 @@ namespace SMAPIGameLoader.Launcher;
     Theme = "@style/AppTheme",
     AlwaysRetainTaskState = true,
     LaunchMode = LaunchMode.SingleInstance,
-    ScreenOrientation = ScreenOrientation.SensorPortrait
+    ScreenOrientation = ScreenOrientation.FullSensor
 )]
 public class LauncherActivity : AppCompatActivity
 {
