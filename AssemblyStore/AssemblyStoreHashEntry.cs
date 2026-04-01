@@ -21,5 +21,15 @@ namespace Xamarin.Android.AssemblyStore
             LocalStoreIndex = reader.ReadUInt32();
             StoreID = reader.ReadUInt32();
         }
+
+        /// <summary>V2 format: 12-byte entries (hash64 + mapping_index32)</summary>
+        internal AssemblyStoreHashEntry(BinaryReader reader, uint storeVersion)
+        {
+            Is32Bit = false;
+            Hash = reader.ReadUInt64();
+            MappingIndex = reader.ReadUInt32();
+            LocalStoreIndex = MappingIndex;
+            StoreID = 0;
+        }
     }
 }

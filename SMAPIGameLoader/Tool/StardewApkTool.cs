@@ -63,6 +63,29 @@ internal static class StardewApkTool
 
     public static Android.Content.Context GetContext => Application.Context;
     public static string? BaseApkPath => CurrentPackageInfo?.ApplicationInfo?.PublicSourceDir;
+    public static string? Arm64ApkPath
+    {
+        get
+        {
+            try
+            {
+                if (CurrentPackageInfo == null)
+                    return null;
+
+                if (IsGameFromPlayStore)
+                    return CurrentPackageInfo.ApplicationInfo.SplitSourceDirs?.FirstOrDefault(path => path.Contains("split_config.arm64"));
+
+                // Samsung: assemblies are in the base APK
+                return BaseApkPath;
+            }
+            catch (Exception ex)
+            {
+                ErrorDialogTool.Show(ex, "Error try to get Arm64ApkPath");
+                return null;
+            }
+        }
+    }
+
     public static string? ContentApkPath
     {
         get

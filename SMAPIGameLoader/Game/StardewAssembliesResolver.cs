@@ -1,6 +1,4 @@
-﻿extern alias MonoCecilAlias;
-
-using Mono.Cecil;
+﻿using Mono.Cecil;
 
 using System;
 using System.Collections.Generic;
