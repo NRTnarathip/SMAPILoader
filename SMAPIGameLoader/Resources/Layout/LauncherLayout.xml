@@ -50,14 +50,15 @@
 				android:layout_marginHorizontal="50dp"
 				android:gravity="center_horizontal"
 				>
-				<!--<Button
-					android:id="@+id/InstallSMAPIOnline"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:text="Install SMAPI Online"
-					android:layout_marginVertical="10dp"
-					android:textAllCaps="false"
-					/>-->
+				<Button
+				   android:id="@+id/StartGame"
+				   android:layout_width="match_parent"
+				   android:layout_height="match_parent"
+				   android:text="Start Game"
+				   android:textAllCaps="false"
+				   android:layout_marginVertical="10dp"
+					/>
+
 				<Button
 					android:id="@+id/InstallSMAPIZip"
 					android:layout_width="match_parent"
@@ -67,21 +68,12 @@
 					android:textAllCaps="false"
 					/>
 
-				<!--<Button
-					android:id="@+id/SaveImportFromSavesZip"
+				<Button
+					android:id="@+id/ModManagerBtn"
 					android:layout_width="match_parent"
 					android:layout_height="match_parent"
-					android:text="Save Import From Saves.zip"
+					android:text="Mod Manager"
 					android:layout_marginVertical="10dp"
-					android:textAllCaps="false"
-					/>-->
-
-				<Button
-				   android:id="@+id/ModManagerBtn"
-				   android:layout_width="match_parent"
-				   android:layout_height="match_parent"
-				   android:text="Mod Manager"
-				   android:layout_marginVertical="10dp"
 					android:textAllCaps="false"
 					/>
 
@@ -93,16 +85,7 @@
 					android:textAllCaps="false"
 					android:layout_marginVertical="10dp"
 					/>
-
-				<Button
-				   android:id="@+id/StartGame"
-				   android:layout_width="match_parent"
-				   android:layout_height="match_parent"
-				   android:text="Start Game"
-				   android:textAllCaps="false"
-				   android:layout_marginVertical="10dp"
-					/>
-
+				
 			</LinearLayout>
 		</LinearLayout>
 	</LinearLayout>
