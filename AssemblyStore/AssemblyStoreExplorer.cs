@@ -266,6 +266,7 @@ namespace Xamarin.Android.AssemblyStore
 
         void ReadStoreSetFromArchive(ZipArchive archive, string basePathInArchive)
         {
+            bool foundBlob = false;
             foreach (var entry in archive.Entries)
             {
                 if (!entry.FullName.StartsWith(basePathInArchive, StringComparison.Ordinal))
@@ -282,12 +283,106 @@ namespace Xamarin.Android.AssemblyStore
                 if (entry.FullName.EndsWith(".blob", StringComparison.Ordinal))
                 {
                     AddStore(new AssemblyStoreReader(stream, GetStoreArch(entry.FullName), keepStoreInMemory));
+                    foundBlob = true;
                 }
                 else if (entry.FullName.EndsWith(".manifest", StringComparison.Ordinal))
                 {
                     manifest = new AssemblyStoreManifestReader(stream);
                 }
             }
+
+            // .NET 9+ stores assemblies as ELF-wrapped .so files in lib/
+            if (!foundBlob)
+            {
+                ReadStoreSetFromArchiveElfFormat(archive);
+            }
+        }
+
+        /// <summary>
+        /// Read assembly stores from .NET 9+ format where blobs are ELF-wrapped .so files
+        /// at lib/{arch}/libassemblies.{arch}.blob.so
+        /// </summary>
+        void ReadStoreSetFromArchiveElfFormat(ZipArchive archive)
+        {
+            foreach (var entry in archive.Entries)
+            {
+                if (!entry.FullName.StartsWith("lib/", StringComparison.Ordinal))
+                    continue;
+
+                if (!entry.FullName.Contains("libassemblies.") || !entry.FullName.EndsWith(".blob.so", StringComparison.Ordinal))
+                    continue;
+
+                Logger(AssemblyStoreExplorerLogLevel.Info, $"Found ELF-wrapped assembly blob: {entry.FullName}");
+
+                using var elfStream = new MemoryStream();
+                using var entryStream = entry.Open();
+                entryStream.CopyTo(elfStream);
+                entryStream.Close();
+
+                var payloadStream = ExtractElfPayload(elfStream);
+                if (payloadStream != null)
+                {
+                    string? arch = null;
+                    // Extract arch from path like lib/arm64-v8a/libassemblies.arm64-v8a.blob.so
+                    string[] parts = entry.FullName.Split('/');
+                    if (parts.Length >= 2)
+                        arch = parts[1]; // e.g. "arm64-v8a"
+
+                    AddStore(new AssemblyStoreReader(payloadStream, arch, keepStoreInMemory));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Extract the 'payload' section from an ELF binary that wraps an assembly store blob.
+        /// </summary>
+        static MemoryStream? ExtractElfPayload(MemoryStream elfData)
+        {
+            elfData.Seek(0, SeekOrigin.Begin);
+            byte[] data = elfData.ToArray();
+
+            // Verify ELF magic
+            if (data.Length < 64 || data[0] != 0x7F || data[1] != (byte)'E' || data[2] != (byte)'L' || data[3] != (byte)'F')
+                return null;
+
+            bool is64 = data[4] == 2;
+            if (!is64)
+                return null; // Only 64-bit ELF supported
+
+            // Parse ELF64 header
+            ushort e_shentsize = BitConverter.ToUInt16(data, 0x3A);
+            ushort e_shnum = BitConverter.ToUInt16(data, 0x3C);
+            ushort e_shstrndx = BitConverter.ToUInt16(data, 0x3E);
+            ulong e_shoff = BitConverter.ToUInt64(data, 0x28);
+
+            // Read section name string table
+            ulong shstrOffset = BitConverter.ToUInt64(data, (int)(e_shoff + (ulong)e_shstrndx * e_shentsize + 0x18));
+            ulong shstrSize = BitConverter.ToUInt64(data, (int)(e_shoff + (ulong)e_shstrndx * e_shentsize + 0x20));
+
+            // Find 'payload' section
+            for (int i = 0; i < e_shnum; i++)
+            {
+                ulong entryOffset = e_shoff + (ulong)i * e_shentsize;
+                uint nameIdx = BitConverter.ToUInt32(data, (int)entryOffset);
+
+                // Read section name from string table
+                int nameStart = (int)(shstrOffset + nameIdx);
+                int nameEnd = nameStart;
+                while (nameEnd < data.Length && data[nameEnd] != 0)
+                    nameEnd++;
+
+                string name = System.Text.Encoding.ASCII.GetString(data, nameStart, nameEnd - nameStart);
+                if (name != "payload")
+                    continue;
+
+                ulong sectionOffset = BitConverter.ToUInt64(data, (int)(entryOffset + 0x18));
+                ulong sectionSize = BitConverter.ToUInt64(data, (int)(entryOffset + 0x20));
+
+                var payloadStream = new MemoryStream(data, (int)sectionOffset, (int)sectionSize);
+                return payloadStream;
+            }
+
+            return null;
         }
 
         void AddStore(AssemblyStoreReader reader)

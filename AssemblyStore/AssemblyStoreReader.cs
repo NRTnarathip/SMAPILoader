@@ -10,7 +10,8 @@ namespace Xamarin.Android.AssemblyStore
     {
         // These two constants must be identical to the native ones in src/monodroid/jni/xamarin-app.hh
         const uint ASSEMBLY_STORE_MAGIC = 0x41424158; // 'XABA', little-endian
-        const uint ASSEMBLY_STORE_FORMAT_VERSION = 1; // The highest format version this reader understands
+        const uint ASSEMBLY_STORE_FORMAT_VERSION_V1 = 1;
+        const uint ASSEMBLY_STORE_FORMAT_VERSION_V2 = 2; // .NET 9+ uses version 2 (with high bits as flags)
 
         MemoryStream? storeData;
 
@@ -43,10 +44,25 @@ namespace Xamarin.Android.AssemblyStore
                 ReadHeader(reader);
 
                 Assemblies = new List<AssemblyStoreAssembly>();
-                ReadLocalEntries(reader, Assemblies);
-                if (HasGlobalIndex)
+
+                if (Version <= 1)
                 {
-                    ReadGlobalIndex(reader, GlobalIndex32, GlobalIndex64);
+                    // V1 layout: header → local entries → global index
+                    ReadLocalEntries(reader, Assemblies);
+                    if (HasGlobalIndex)
+                    {
+                        ReadGlobalIndex(reader, GlobalIndex32, GlobalIndex64);
+                    }
+                }
+                else
+                {
+                    // V2 layout: header → hash index → local entries → name table → data
+                    if (HasGlobalIndex)
+                    {
+                        ReadGlobalIndex(reader, GlobalIndex32, GlobalIndex64);
+                    }
+                    ReadLocalEntries(reader, Assemblies);
+                    ReadNameTable(reader, Assemblies);
                 }
             }
         }
@@ -160,20 +176,34 @@ namespace Xamarin.Android.AssemblyStore
                 throw new InvalidOperationException("Invalid header magic number");
             }
 
-            Version = reader.ReadUInt32();
+            uint rawVersion = reader.ReadUInt32();
+            // V2 stores flags in the high bits, extract the base version number
+            uint baseVersion = rawVersion & 0xFF;
+            Version = baseVersion;
+
             if (Version == 0)
             {
                 throw new InvalidOperationException("Invalid version number: 0");
             }
 
-            if (Version > ASSEMBLY_STORE_FORMAT_VERSION)
+            if (Version > ASSEMBLY_STORE_FORMAT_VERSION_V2)
             {
-                throw new InvalidOperationException($"Store format version {Version} is higher than the one understood by this reader, {ASSEMBLY_STORE_FORMAT_VERSION}");
+                throw new InvalidOperationException($"Store format version {Version} is higher than the one understood by this reader, {ASSEMBLY_STORE_FORMAT_VERSION_V2}");
             }
 
             LocalEntryCount = reader.ReadUInt32();
             GlobalEntryCount = reader.ReadUInt32();
-            StoreID = reader.ReadUInt32();
+
+            if (Version <= 1)
+            {
+                StoreID = reader.ReadUInt32();
+            }
+            else
+            {
+                // V2: 5th field is index byte size, not store ID
+                uint indexByteSize = reader.ReadUInt32();
+                StoreID = 0; // V2 always has a single store with global index
+            }
         }
 
         void ReadLocalEntries(BinaryReader reader, List<AssemblyStoreAssembly> assemblies)
@@ -184,10 +214,39 @@ namespace Xamarin.Android.AssemblyStore
             }
         }
 
+        void ReadNameTable(BinaryReader reader, List<AssemblyStoreAssembly> assemblies)
+        {
+            for (int i = 0; i < assemblies.Count; i++)
+            {
+                uint nameLength = reader.ReadUInt32();
+                if (nameLength > 0 && nameLength < 512)
+                {
+                    byte[] nameBytes = reader.ReadBytes((int)nameLength);
+                    string name = Encoding.UTF8.GetString(nameBytes);
+                    // Strip .dll extension if present for consistency with v1 naming
+                    if (name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                        name = name.Substring(0, name.Length - 4);
+                    assemblies[i].Name = name;
+                }
+            }
+        }
+
         void ReadGlobalIndex(BinaryReader reader, List<AssemblyStoreHashEntry> index32, List<AssemblyStoreHashEntry> index64)
         {
-            ReadIndex(true, index32);
-            ReadIndex(false, index64);
+            if (Version == 1)
+            {
+                // V1: two separate indices (32-bit and 64-bit), 20 bytes per entry
+                ReadIndex(true, index32);
+                ReadIndex(false, index64);
+            }
+            else
+            {
+                // V2: single combined index, 12 bytes per entry (hash64 + mapping_index32)
+                for (uint i = 0; i < GlobalEntryCount; i++)
+                {
+                    index64.Add(new AssemblyStoreHashEntry(reader, Version));
+                }
+            }
 
             void ReadIndex(bool is32Bit, List<AssemblyStoreHashEntry> index)
             {
