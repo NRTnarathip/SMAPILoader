@@ -20,4 +20,6 @@ https://discord.com/invite/ETtycvcJjr
 # How To Install Wiki
 https://github.com/NRTnarathip/SMAPILoader/wiki/How-To-Install-SMAPI
 
-
+# Special Thanks
+- Eky-Team for creating guides and resources to patch .NET 8 to .NET 9
+- Pathoschild for support, guidance, and the community
