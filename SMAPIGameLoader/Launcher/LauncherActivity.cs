@@ -156,7 +156,7 @@ public class LauncherActivity : AppCompatActivity
             launcherInfoLines.AppendLine($"Support Game Version: {StardewApkTool.GameVersionSupport} Or Later");
             launcherInfoLines.AppendLine("Your Game Version: " + StardewApkTool.CurrentGameVersion);
             launcherInfoLines.AppendLine("Discord: Stardew SMAPI Thailand");
-            launcherInfoLines.AppendLine("Owner: NRTnarathip");
+            launcherInfoLines.AppendLine("Developer: NRTnarathip, Eky-Team");
 
             FindViewById<TextView>(ResourceConstant.Id.launcherInfoTextView).Text = launcherInfoLines.ToString();
 
