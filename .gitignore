@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /AppTestCode
 /AndroidGame
+cmdtools.zip
+android-sdk*
+libsapks/
