@@ -49,6 +49,12 @@ public class LauncherActivity : AppCompatActivity
         ProcessAdbExtras();
     }
 
+    protected override void OnActivityResult(int requestCode, Result resultCode, Android.Content.Intent? data)
+    {
+        base.OnActivityResult(requestCode, resultCode, data);
+        FilePickerTool.OnActivityResult(requestCode, resultCode, data);
+    }
+
     private void SetDarkMode()
     {
         AppCompatDelegate.DefaultNightMode = AppCompatDelegate.ModeNightYes;

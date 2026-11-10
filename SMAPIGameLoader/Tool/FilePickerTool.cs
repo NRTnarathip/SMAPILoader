@@ -1,4 +1,6 @@
 ﻿using Android;
+using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.App;
@@ -46,5 +48,39 @@ internal static class FilePickerTool
             FileTypes = FileTypeZip,
         };
         return await FilePicker.PickAsync(options);
+    }
+
+    const int CreateDocumentRequestCode = 4001;
+    static TaskCompletionSource<Android.Net.Uri> createDocumentTcs;
+
+    // Xamarin.Essentials 1.7 has no save picker, so this drives ACTION_CREATE_DOCUMENT directly.
+    public static Task<Android.Net.Uri> PickSaveLocation(string fileName, string mimeType)
+    {
+        var intent = new Intent(Intent.ActionCreateDocument);
+        intent.AddCategory(Intent.CategoryOpenable);
+        intent.SetType(mimeType);
+        intent.PutExtra(Intent.ExtraTitle, fileName);
+
+        // a second tap while the picker is open must not start another picker
+        if (createDocumentTcs is { Task.IsCompleted: false })
+            return Task.FromResult<Android.Net.Uri>(null);
+
+        // start first: if it throws (no Files app), no pending picker is left behind to block later exports
+        SMAPIGameLoader.Launcher.LauncherActivity.Instance.StartActivityForResult(intent, CreateDocumentRequestCode);
+        createDocumentTcs = new TaskCompletionSource<Android.Net.Uri>();
+        return createDocumentTcs.Task;
+    }
+
+    internal static void OnActivityResult(int requestCode, Result resultCode, Intent data)
+    {
+        if (requestCode != CreateDocumentRequestCode)
+            return;
+
+        var uri = resultCode == Result.Ok ? data?.Data : null;
+        if (uri != null && !Android.Provider.DocumentsContract.IsDocumentUri(Application.Context, uri))
+            createDocumentTcs?.TrySetException(new System.IO.IOException($"The picker returned a location that is not a document: {uri}"));
+        else
+            createDocumentTcs?.TrySetResult(uri);
+        createDocumentTcs = null;
     }
 }
