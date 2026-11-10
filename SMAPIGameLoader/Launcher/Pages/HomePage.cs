@@ -38,9 +38,11 @@ public class HomePage : LinearLayout
         // ===== Body =====
         var body = new LinearLayout(context) { Orientation = Orientation.Vertical };
         body.SetPadding(Ui.Dp(context, 16), Ui.Dp(context, 16), Ui.Dp(context, 16), 0);
-        AddView(body, new LayoutParams(
+        var scroll = new ScrollView(context);
+        scroll.AddView(body, new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
+        AddView(scroll, new LayoutParams(ViewGroup.LayoutParams.MatchParent, 0, 1f));
 
         // game is ready!
 
@@ -61,6 +63,14 @@ public class HomePage : LinearLayout
         PlayButton = CreateButton(context, "Launch Game", "#1565C0");
         PlayButton.Click += PlayButton_Click;
         body.AddView(PlayButton);
+
+        var exportSavesButton = CreateButton(context, "Export Saves", "#455A64");
+        exportSavesButton.Click += SaveManager.OnClickExportSaves;
+        body.AddView(exportSavesButton);
+
+        var importSavesButton = CreateButton(context, "Import Saves", "#455A64");
+        importSavesButton.Click += SaveManager.OnClickImportSaveZip;
+        body.AddView(importSavesButton);
     }
 
     // ===== Helper =====
