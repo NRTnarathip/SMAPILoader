@@ -16,14 +16,18 @@ internal class ModViewHolder : RecyclerView.ViewHolder
 
     private readonly TextView _name;
     private readonly TextView _version;
+    private readonly TextView _size;
+    private readonly TextView _date;
     private readonly Action<ModInfo, View> _onClicked;
     private ModInfo? _mod;
 
-    private ModViewHolder(View root, TextView name, TextView version,
-                          Action<ModInfo, View> onClicked) : base(root)
+    private ModViewHolder(View root, TextView name, TextView version, TextView size,
+                          TextView date, Action<ModInfo, View> onClicked) : base(root)
     {
         _name = name;
         _version = version;
+        _size = size;
+        _date = date;
         _onClicked = onClicked;
 
         root.Click += (s, e) =>
@@ -66,10 +70,36 @@ internal class ModViewHolder : RecyclerView.ViewHolder
             ViewGroup.LayoutParams.WrapContent)
         { TopMargin = Ui.Dp(context, 2) };
 
+        // แถวข้อมูลเสริม: ขนาดไฟล์ | วันที่
+        var metaRow = new LinearLayout(context) { Orientation = Orientation.Horizontal };
+        metaRow.LayoutParameters = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MatchParent,
+            ViewGroup.LayoutParams.WrapContent)
+        { TopMargin = Ui.Dp(context, 4) };
+
+        var size = CreateSecondaryText(context);
+        var date = CreateSecondaryText(context);
+        date.LayoutParameters = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WrapContent,
+            ViewGroup.LayoutParams.WrapContent)
+        { LeftMargin = Ui.Dp(context, 16) };
+
+        metaRow.AddView(size);
+        metaRow.AddView(date);
+
         column.AddView(name);
         column.AddView(version);
+        column.AddView(metaRow);
 
-        return new ModViewHolder(card, name, version, onClicked);
+        return new ModViewHolder(card, name, version, size, date, onClicked);
+    }
+
+    static TextView CreateSecondaryText(Context context)
+    {
+        var text = new TextView(context);
+        text.SetTextSize(ComplexUnitType.Sp, 11);
+        text.SetTextColor(Color.ParseColor("#9AA0A6"));
+        return text;
     }
 
     public void Bind(ModInfo mod)
@@ -77,6 +107,8 @@ internal class ModViewHolder : RecyclerView.ViewHolder
         _mod = mod;
         _name.Text = mod.NameUIText;
         _version.Text = mod.VersionUIText;
+        _size.Text = mod.SizeUIText;
+        _date.Text = mod.DateUIText;
         ItemView.Alpha = mod.Enabled ? 1f : DisabledAlpha;
     }
 }

@@ -19,6 +19,23 @@ public class ModInfo
 
     /// <summary>ขนาดรวมของโฟลเดอร์ mod (ไบต์) ใช้สำหรับ sort by size</summary>
     public long SizeBytes { get; private set; }
+    public bool HasSize { get; private set; }
+
+    public string DateUIText => LastModified == DateTime.MinValue
+        ? "—"
+        : LastModified.ToString("dd/MM/yyyy");
+
+    public string SizeUIText
+    {
+        get
+        {
+            if (HasSize is false)
+                return "—";
+
+            double kb = SizeBytes / 1024d;
+            return kb < 1024d ? $"{kb:0} KB" : $"{kb / 1024d:0.0} MB";
+        }
+    }
 
     string modFolderPath;
     string modManifestPath;
@@ -77,6 +94,7 @@ public class ModInfo
             foreach (var filePath in Directory.EnumerateFiles(modFolderPath, "*", SearchOption.AllDirectories))
                 total += new FileInfo(filePath).Length;
             SizeBytes = total;
+            HasSize = true;
         }
         catch (Exception ex)
         {

@@ -22,6 +22,8 @@ internal sealed class ModManagerPage : LinearLayout
     const string HeaderBackgroundColorHex = "#1A1D24";
     const string SecondaryTextColorHex = "#9AA0A6";
     const string SortButtonBackgroundHex = "#262A33";
+    const string SortModePrefKey = "mod_manager_sort_mode";
+    const string SortDescendingPrefKey = "mod_manager_sort_descending";
 
     const int MenuToggleMod = 1;
     const int MenuOpenFolder = 2;
@@ -42,12 +44,15 @@ internal sealed class ModManagerPage : LinearLayout
     private readonly TextView _sortButton;
     private readonly RecyclerView _list;
     private SortMode _sortMode = SortMode.Date;
+    private bool _sortDescending = true;
 
     public FloatingActionButton InstallFab { get; }
 
     public ModManagerPage(Context context) : base(context)
     {
         _context = context;
+        _sortMode = LoadSortMode();
+        _sortDescending = Preferences.Get(SortDescendingPrefKey, true);
         Orientation = Orientation.Vertical;
         LayoutParameters = new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
@@ -147,25 +152,57 @@ internal sealed class ModManagerPage : LinearLayout
     void SortButton_Click(object sender, EventArgs e)
     {
         var popup = new Android.Widget.PopupMenu(_context, _sortButton);
-        popup.Menu!.Add(0, MenuSortDate, 0, "Date");
-        popup.Menu.Add(0, MenuSortName, 1, "Name");
-        popup.Menu.Add(0, MenuSortSize, 2, "Size");
+        popup.Menu!.Add(0, MenuSortDate, 0, SortMenuTitle(SortMode.Date));
+        popup.Menu.Add(0, MenuSortName, 1, SortMenuTitle(SortMode.Name));
+        popup.Menu.Add(0, MenuSortSize, 2, SortMenuTitle(SortMode.Size));
         popup.Menu.SetGroupCheckable(0, true, true);
         popup.Menu.FindItem(CurrentSortMenuItemId)?.SetChecked(true);
 
         popup.MenuItemClick += (s, args) =>
         {
+            SortMode selected;
             switch (args.Item!.ItemId)
             {
-                case MenuSortDate: _sortMode = SortMode.Date; break;
-                case MenuSortName: _sortMode = SortMode.Name; break;
-                case MenuSortSize: _sortMode = SortMode.Size; break;
+                case MenuSortDate: selected = SortMode.Date; break;
+                case MenuSortName: selected = SortMode.Name; break;
+                case MenuSortSize: selected = SortMode.Size; break;
                 default: return;
             }
+
+            if (selected == _sortMode)
+            {
+                // กดโหมดเดิมซ้ำ = สลับทิศทาง
+                _sortDescending = !_sortDescending;
+            }
+            else
+            {
+                _sortMode = selected;
+                _sortDescending = DefaultDescending(selected);
+            }
+
+            SaveSortState();
             ApplySort();
         };
 
         popup.Show();
+    }
+
+    // ค่าเริ่มต้นของแต่ละโหมด: Date/Size ใหม่สุด-ใหญ่สุดก่อน, Name ก่อนตามตัวอักษร
+    static bool DefaultDescending(SortMode mode) => mode != SortMode.Name;
+
+    string SortMenuTitle(SortMode mode) =>
+        mode == _sortMode ? $"{mode} {(_sortDescending ? "↓" : "↑")}" : mode.ToString();
+
+    static SortMode LoadSortMode()
+    {
+        int stored = Preferences.Get(SortModePrefKey, (int)SortMode.Date);
+        return Enum.IsDefined(typeof(SortMode), stored) ? (SortMode)stored : SortMode.Date;
+    }
+
+    void SaveSortState()
+    {
+        Preferences.Set(SortModePrefKey, (int)_sortMode);
+        Preferences.Set(SortDescendingPrefKey, _sortDescending);
     }
 
     int CurrentSortMenuItemId => _sortMode switch
@@ -177,17 +214,17 @@ internal sealed class ModManagerPage : LinearLayout
 
     void ApplySort()
     {
-        Comparison<ModInfo> comparison = _sortMode switch
+        Comparison<ModInfo> ascending = _sortMode switch
         {
             SortMode.Name => (a, b) => string.Compare(
                 a.NameUIText, b.NameUIText, StringComparison.OrdinalIgnoreCase),
-            SortMode.Size => (a, b) => b.SizeBytes.CompareTo(a.SizeBytes),
-            _ => (a, b) => b.LastModified.CompareTo(a.LastModified),
+            SortMode.Size => (a, b) => a.SizeBytes.CompareTo(b.SizeBytes),
+            _ => (a, b) => a.LastModified.CompareTo(b.LastModified),
         };
 
-        _mods.Sort(comparison);
+        _mods.Sort((a, b) => _sortDescending ? ascending(b, a) : ascending(a, b));
         _adapter.NotifyDataSetChanged();
-        _sortButton.Text = $"Sort: {_sortMode} ▾";
+        _sortButton.Text = $"Sort: {_sortMode} {(_sortDescending ? "↓" : "↑")}";
     }
 
     void RefreshMods()
@@ -223,8 +260,8 @@ internal sealed class ModManagerPage : LinearLayout
     }
 
     /// <summary>
-    /// คำนวณขนาดโฟลเดอร์ของทุก mod ใน background thread (ใช้ตอน sort by size)
-    /// แล้ว sort ใหม่บน main thread เมื่อเสร็จ
+    /// คำนวณขนาดโฟลเดอร์ของทุก mod ใน background thread (ใช้แสดงผลและ sort by size)
+    /// แล้ว sort + rebind ใหม่บน main thread เมื่อเสร็จ
     /// </summary>
     void RecomputeModSizes()
     {
@@ -237,11 +274,7 @@ internal sealed class ModManagerPage : LinearLayout
             foreach (var mod in snapshot)
                 mod.ComputeSize();
 
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                if (_sortMode == SortMode.Size)
-                    ApplySort();
-            });
+            MainThread.BeginInvokeOnMainThread(ApplySort);
         });
     }
 
