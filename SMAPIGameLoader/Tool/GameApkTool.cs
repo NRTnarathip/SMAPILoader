@@ -111,7 +111,7 @@ internal static class GameApkTool
     {
         get
         {
-            return new(1, 16, 15, 3);
+            return new(1, 6, 15, 3);
         }
     }
 
@@ -121,10 +121,11 @@ internal static class GameApkTool
         {
             try
             {
-                return new Version(CurrentPackageInfo?.VersionName);
+                return new Version(CurrentPackageInfo.VersionName);
             }
             catch (Exception ex)
             {
+                ToastNotifyTool.Notify(ex.ToString());
                 return new Version(0, 0, 0, 0);
             }
         }

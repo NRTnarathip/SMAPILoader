@@ -9,10 +9,14 @@ namespace SMAPIGameLoader.Launcher.Pages;
 
 public class HomePage : LinearLayout
 {
-    const string LaunchGameText = "Launch Game";
-    const string GameNotInstalledText = "Game Not Installed\nDownload Now!";
+    enum PlayGameState
+    {
+        GameNotInstalled,
+        GameInstalled,
+        GameInstalledButNotSupport,
+    }
 
-    readonly Button _playButton;
+    readonly Button _playGameButton;
 
     public HomePage(Context context) : base(context)
     {
@@ -46,11 +50,33 @@ public class HomePage : LinearLayout
         body.AddView(new GameInfoCard(context), cardLayoutParams);
         body.AddView(new SMAPIInfoCard(context), cardLayoutParams);
 
-        _playButton = CreatePrimaryButton(context, LaunchGameText);
-        _playButton.Click += OnPlayButtonClick;
-        body.AddView(_playButton);
+        _playGameButton = CreatePrimaryButton(context, GetPlayGameButtonText());
+        _playGameButton.Click += OnPlayButtonClick;
+        body.AddView(_playGameButton);
+    }
 
-        UpdatePlayButton();
+    PlayGameState GetPlayGameState()
+    {
+        if (GameApkTool.IsInstalled is false)
+            return PlayGameState.GameNotInstalled;
+        if (GameApkTool.IsGameVersionSupport is false)
+            return PlayGameState.GameInstalledButNotSupport;
+        return PlayGameState.GameInstalled;
+    }
+
+    string GetPlayGameButtonText()
+    {
+        switch (GetPlayGameState())
+        {
+            case PlayGameState.GameNotInstalled:
+                return "Download Game From Store";
+            case PlayGameState.GameInstalledButNotSupport:
+                return "Please Update Game";
+            case PlayGameState.GameInstalled:
+                return "Play Game";
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     static LinearLayout CreateBody(Context context)
@@ -87,11 +113,6 @@ public class HomePage : LinearLayout
             BottomMargin = Ui.Dp(context, 8)
         };
         return button;
-    }
-
-    void UpdatePlayButton()
-    {
-        _playButton.Text = GameApkTool.IsInstalled ? LaunchGameText : GameNotInstalledText;
     }
 
     void OnPlayButtonClick(object sender, EventArgs e)

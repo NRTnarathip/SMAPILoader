@@ -95,6 +95,10 @@ public abstract class InfoCard : CardView
         value.SetTextSize(ComplexUnitType.Sp, 14);
         value.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
         value.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        value.Gravity = GravityFlags.End | GravityFlags.CenterVertical;
+        value.SetMaxLines(3);
+        value.SetLineSpacing(0, 1.15f);
+        value.SetPadding(Ui.Dp(Context, 16), 0, 0, 0);
         row.AddView(value);
 
         Content.AddView(row);

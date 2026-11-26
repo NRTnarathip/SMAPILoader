@@ -17,11 +17,12 @@ public class GameInfoCard : InfoCard
         SetStatus(status, installed, InstalledStatusText, NotInstalledStatusText);
         AddDivider();
 
-        AddTextLine($"Your Game Version: {GameApkTool.CurrentGameVersion}", 15, emphasized: true);
-        AddTextLine($"Support Minimum Version: {GameApkTool.SupportMinimumGameVersion}");
-        AddTextLine($"Verify: {GetVerifyText(installed)}");
-        AddTextLine($"Launcher Version: {AppInfo.VersionString}");
-        AddTextLine(GetLauncherBuildText());
+        AddRow("Your Game Version").Text = GameApkTool.CurrentGameVersion.ToString();
+        AddRow("Minimum Requirements Version").Text = GameApkTool.SupportMinimumGameVersion.ToString();
+        AddRow("Is Game Support").Text = GameApkTool.IsGameVersionSupport.ToString();
+        AddRow("Verify").Text = GetVerifyText(installed);
+        AddRow("Launcher Version").Text = AppInfo.VersionString;
+        AddRow("Build").Text = GetLauncherBuildText();
     }
 
     static string GetVerifyText(bool installed)
@@ -40,6 +41,6 @@ public class GameInfoCard : InfoCard
         var buildTime = DateTimeOffset
             .FromUnixTimeSeconds(long.Parse(AppInfo.BuildString))
             .ToLocalTime();
-        return $"Build: {buildTime:HH:mm:ss dd/MM/yyyy} (d/m/y)";
+        return $"{buildTime:HH:mm:ss dd/MM/yyyy} (d/m/y)";
     }
 }
