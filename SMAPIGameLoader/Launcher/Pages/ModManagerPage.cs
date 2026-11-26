@@ -17,8 +17,6 @@ namespace SMAPIGameLoader.Launcher.Pages;
 
 internal sealed class ModManagerPage : LinearLayout
 {
-    const string HeaderBackgroundColorHex = "#1A1D24";
-    const string SortButtonBackgroundHex = "#262A33";
     const string SortModePrefKey = "mod_manager_sort_mode";
     const string SortDescendingPrefKey = "mod_manager_sort_descending";
 
@@ -36,7 +34,7 @@ internal sealed class ModManagerPage : LinearLayout
     private readonly Context _context;
     private readonly List<ModInfo> _mods = new();
     private readonly ModAdapter _adapter;
-    private readonly TextView _emptyText;
+    private readonly LinearLayout _emptyView;
     private readonly TextView _sortButton;
     private readonly ImageButton _installButton;
     private readonly RecyclerView _list;
@@ -49,36 +47,19 @@ internal sealed class ModManagerPage : LinearLayout
         _sortMode = LoadSortMode();
         _sortDescending = Preferences.Get(SortDescendingPrefKey, true);
         Orientation = Orientation.Vertical;
+        SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
         LayoutParameters = new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent);
 
-        // ===== Header =====
-        var headerBox = new LinearLayout(context) { Orientation = Orientation.Vertical };
-        headerBox.SetBackgroundColor(Color.ParseColor(HeaderBackgroundColorHex));
-        headerBox.Elevation = Ui.Dp(context, 6);
-        headerBox.SetPadding(Ui.Dp(context, 16), Ui.Dp(context, 20), Ui.Dp(context, 16), Ui.Dp(context, 12));
-
-        var titleRow = new LinearLayout(context) { Orientation = Orientation.Horizontal };
-        titleRow.SetGravity(GravityFlags.CenterVertical);
-
-        var header = new TextView(context) { Text = "Mod Manager" };
-        header.SetTextSize(ComplexUnitType.Sp, 22);
-        header.SetTextColor(Color.White);
-        header.SetTypeface(null, TypefaceStyle.Bold);
-        header.SetSingleLine(true);
-        header.Ellipsize = TextUtils.TruncateAt.End;
-
+        // ===== Header (ใช้ PageHeader ร่วมกับ HomePage เพื่อให้ title ตรงกัน) =====
+        var pageHeader = new PageHeader(context, "Mod Manager");
         _installButton = CreateInstallButton(context);
         _sortButton = CreateSortButton(context);
+        pageHeader.Actions.AddView(_installButton);
+        pageHeader.Actions.AddView(_sortButton);
 
-        titleRow.AddView(header, new LinearLayout.LayoutParams(
-            0, ViewGroup.LayoutParams.WrapContent, 1f));
-        titleRow.AddView(_installButton);
-        titleRow.AddView(_sortButton);
-        headerBox.AddView(titleRow);
-
-        AddView(headerBox, new LayoutParams(
+        AddView(pageHeader, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
 
@@ -89,7 +70,9 @@ internal sealed class ModManagerPage : LinearLayout
 
         _adapter = new ModAdapter(context, _mods, OnClickedModItem);
         _list = new RecyclerView(context);
-        _list.SetPadding(0, Ui.Dp(context, 8), 0, Ui.Dp(context, 8));
+        _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
+        _list.SetPadding(0, Ui.Dp(context, 12), 0, Ui.Dp(context, 16));
+        _list.SetClipToPadding(false);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
 
@@ -100,13 +83,25 @@ internal sealed class ModManagerPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
 
-        _emptyText = new TextView(context)
-        {
-            Text = "No mods found.",
-            Gravity = GravityFlags.Center
-        };
-        _emptyText.SetTextSize(ComplexUnitType.Sp, 16);
-        body.AddView(_emptyText, new FrameLayout.LayoutParams(
+        var emptyView = new LinearLayout(context) { Orientation = Orientation.Vertical };
+        emptyView.SetGravity(GravityFlags.Center);
+        _emptyView = emptyView;
+
+        var emptyText = new TextView(context) { Text = "No mods found." };
+        emptyText.SetTextSize(ComplexUnitType.Sp, 16);
+        emptyText.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        emptyText.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        emptyText.Gravity = GravityFlags.Center;
+        emptyView.AddView(emptyText);
+
+        var emptyHint = new TextView(context) { Text = "Tap + to install your first mod." };
+        emptyHint.SetTextSize(ComplexUnitType.Sp, 13);
+        emptyHint.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        emptyHint.Gravity = GravityFlags.Center;
+        emptyHint.SetPadding(0, Ui.Dp(context, 6), 0, 0);
+        emptyView.AddView(emptyHint);
+
+        body.AddView(emptyView, new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
 
@@ -117,8 +112,9 @@ internal sealed class ModManagerPage : LinearLayout
     {
         var button = new ImageButton(context);
         button.SetImageResource(Android.Resource.Drawable.IcInputAdd);
-        button.SetColorFilter(Color.White);
-        button.Background = Ui.CreateRippleDrawable(context, SortButtonBackgroundHex, 20);
+        button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.AccentHex));
+        button.Background = Ui.CreateRippleDrawable(
+            context, LauncherTheme.SurfaceVariantHex, 20);
         button.ContentDescription = "Install mod";
         button.SetPadding(
             Ui.Dp(context, 10), Ui.Dp(context, 10),
@@ -139,12 +135,14 @@ internal sealed class ModManagerPage : LinearLayout
             Clickable = true,
             Focusable = true
         };
-        button.SetTextSize(ComplexUnitType.Sp, 13);
-        button.SetTextColor(Color.White);
+        button.SetTextSize(ComplexUnitType.Sp, 12);
+        button.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         button.SetPadding(
-            Ui.Dp(context, 14), Ui.Dp(context, 8),
-            Ui.Dp(context, 14), Ui.Dp(context, 8));
-        button.Background = Ui.CreateRippleDrawable(context, SortButtonBackgroundHex, 16);
+            Ui.Dp(context, 12), Ui.Dp(context, 9),
+            Ui.Dp(context, 12), Ui.Dp(context, 9));
+        button.Background = Ui.CreateRippleDrawable(
+            context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
         button.Click += SortButton_Click;
         return button;
     }
@@ -253,7 +251,7 @@ internal sealed class ModManagerPage : LinearLayout
         RecomputeModSizes();
 
         bool empty = _mods.Count == 0;
-        _emptyText.Visibility = empty ? ViewStates.Visible : ViewStates.Gone;
+        _emptyView.Visibility = empty ? ViewStates.Visible : ViewStates.Gone;
         _list.Visibility = empty ? ViewStates.Gone : ViewStates.Visible;
     }
 

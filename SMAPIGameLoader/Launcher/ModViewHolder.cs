@@ -12,7 +12,6 @@ namespace SMAPIGameLoader.Launcher;
 
 internal class ModViewHolder : RecyclerView.ViewHolder
 {
-    const string CardBackgroundColorHex = "#1A1D24";
     const float DisabledAlpha = 0.45f;
 
     private readonly View _content;
@@ -39,12 +38,12 @@ internal class ModViewHolder : RecyclerView.ViewHolder
     {
         var card = new CardView(context)
         {
-            Radius = Ui.Dp(context, 10),
-            CardElevation = Ui.Dp(context, 2),
+            Radius = Ui.Dp(context, 14),
+            CardElevation = 0,
             UseCompatPadding = true
         };
-        card.SetCardBackgroundColor(Color.ParseColor(CardBackgroundColorHex));
-        int sideMargin = Ui.Dp(context, 12);
+        card.SetCardBackgroundColor(LauncherTheme.Parse(LauncherTheme.CardBackgroundHex));
+        int sideMargin = Ui.Dp(context, 16);
         card.LayoutParameters = new RecyclerView.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
@@ -56,20 +55,20 @@ internal class ModViewHolder : RecyclerView.ViewHolder
 
         // สองบรรทัดต่อการ์ด (ชื่อ / version · size · date) เพื่อให้ list ยาว ๆ ดูแน่นและอ่านง่าย
         var column = new LinearLayout(context) { Orientation = Orientation.Vertical };
-        column.SetPadding(Ui.Dp(context, 14), Ui.Dp(context, 10),
-                          Ui.Dp(context, 14), Ui.Dp(context, 10));
+        column.SetPadding(Ui.Dp(context, 16), Ui.Dp(context, 12),
+                          Ui.Dp(context, 16), Ui.Dp(context, 12));
         card.AddView(column);
 
         var name = new TextView(context);
         name.SetTextSize(ComplexUnitType.Sp, 15);
-        name.SetTextColor(Color.White);
-        name.SetTypeface(null, TypefaceStyle.Bold);
+        name.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        name.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         name.SetSingleLine(true);
         name.Ellipsize = TextUtils.TruncateAt.End;
 
         var detail = new TextView(context);
         detail.SetTextSize(ComplexUnitType.Sp, 12);
-        detail.SetTextColor(Color.ParseColor("#9AA0A6"));
+        detail.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         detail.SetSingleLine(true);
         detail.Ellipsize = TextUtils.TruncateAt.End;
         detail.LayoutParameters = new LinearLayout.LayoutParams(

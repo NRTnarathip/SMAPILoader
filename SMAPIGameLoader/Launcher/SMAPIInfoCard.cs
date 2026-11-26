@@ -9,9 +9,6 @@ namespace SMAPIGameLoader.Launcher;
 
 public class SMAPIInfoCard : InfoCard
 {
-    const string PrimaryButtonColorHex = "#1565C0";
-    const string OutlineColorHex = "#33FFFFFF";
-
     readonly TextView _version;
     readonly TextView _buildCode;
     readonly TextView _buildDate;
@@ -80,16 +77,19 @@ public class SMAPIInfoCard : InfoCard
         var button = new Button(Context) { Text = text };
         button.SetAllCaps(false);
         button.SetTextSize(ComplexUnitType.Sp, 14);
-        button.SetTypeface(null, TypefaceStyle.Bold);
-        button.SetTextColor(Color.White);
+        button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        button.SetTextColor(primary
+            ? LauncherTheme.Parse(LauncherTheme.TextOnPrimaryHex)
+            : LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
         button.SetMinWidth(Ui.Dp(Context, 96));
         button.SetMinHeight(Ui.Dp(Context, 44));
+        button.StateListAnimator = null;
         button.SetPadding(
             Ui.Dp(Context, 18), 0,
             Ui.Dp(Context, 18), 0);
         button.Background = primary
-            ? Ui.CreateRippleDrawable(Context, PrimaryButtonColorHex, 10)
-            : Ui.CreateRippleDrawable(Context, null, 10, OutlineColorHex);
+            ? Ui.CreateRippleDrawable(Context, LauncherTheme.PrimaryHex, LauncherTheme.ChipRadiusDp)
+            : Ui.CreateRippleDrawable(Context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
         button.Click += onClick;
         return button;
     }

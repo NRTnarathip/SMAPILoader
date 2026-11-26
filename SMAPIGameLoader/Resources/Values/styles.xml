@@ -19,5 +19,27 @@
 		<item name="colorPrimaryDark">@color/purple_700</item>
 		<item name="colorAccent">@color/teal_200</item>
 	</style>
+
+	<!-- โทนเดียวกับ LauncherTheme (Launcher/LauncherTheme.cs) — ใช้กับ dialog/popup ของระบบ -->
+	<style name="Theme.SMAPILauncher" parent="Theme.Material3.DayNight.NoActionBar">
+		<item name="colorPrimary">#2E7D32</item>
+		<item name="colorOnPrimary">#FFFFFF</item>
+		<item name="colorPrimaryContainer">#1F3A26</item>
+		<item name="colorOnPrimaryContainer">#8CE0A0</item>
+		<item name="colorSecondary">#8AD49A</item>
+		<item name="colorOnSecondary">#0D1116</item>
+		<item name="colorSurface">#191F29</item>
+		<item name="colorOnSurface">#E9EDF2</item>
+		<item name="colorSurfaceVariant">#232B37</item>
+		<item name="colorOnSurfaceVariant">#94A0B0</item>
+		<item name="colorOutline">#33FFFFFF</item>
+		<item name="android:colorBackground">#0D1116</item>
+		<item name="colorOnBackground">#E9EDF2</item>
+		<item name="android:windowBackground">#0D1116</item>
+		<item name="android:statusBarColor">#141A21</item>
+		<item name="android:navigationBarColor">#12171E</item>
+		<item name="android:windowLightStatusBar">false</item>
+		<item name="android:windowLightNavigationBar">false</item>
+	</style>
 	
 </resources>

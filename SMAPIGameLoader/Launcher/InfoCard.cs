@@ -14,20 +14,13 @@ namespace SMAPIGameLoader.Launcher;
 /// </summary>
 public abstract class InfoCard : CardView
 {
-    protected const string CardBackgroundColorHex = "#1A1D24";
-    protected const string StatusOkColorHex = "#2E7D32";
-    protected const string StatusErrorColorHex = "#C62828";
-    protected const string DividerColorHex = "#22FFFFFF";
-    protected const string SecondaryTextColorHex = "#9AA0A6";
-    protected const string PrimaryTextColorHex = "#E8EAED";
-
     protected LinearLayout Content { get; }
 
     protected InfoCard(Context context) : base(context)
     {
-        SetCardBackgroundColor(Color.ParseColor(CardBackgroundColorHex));
-        Radius = Ui.Dp(context, 16);
-        CardElevation = Ui.Dp(context, 3);
+        SetCardBackgroundColor(LauncherTheme.Parse(LauncherTheme.CardBackgroundHex));
+        Radius = Ui.Dp(context, LauncherTheme.CardRadiusDp);
+        CardElevation = 0;
         UseCompatPadding = false;
         LayoutParameters = new ViewGroup.MarginLayoutParams(
             ViewGroup.LayoutParams.MatchParent,
@@ -35,8 +28,8 @@ public abstract class InfoCard : CardView
 
         Content = new LinearLayout(context) { Orientation = Orientation.Vertical };
         Content.SetPadding(
-            Ui.Dp(context, 20), Ui.Dp(context, 18),
-            Ui.Dp(context, 20), Ui.Dp(context, 18));
+            Ui.Dp(context, 18), Ui.Dp(context, 16),
+            Ui.Dp(context, 18), Ui.Dp(context, 16));
         AddView(Content);
     }
 
@@ -47,8 +40,8 @@ public abstract class InfoCard : CardView
 
         var title = new TextView(Context) { Text = titleText };
         title.SetTextSize(ComplexUnitType.Sp, titleSizeSp);
-        title.SetTextColor(Color.White);
-        title.SetTypeface(null, TypefaceStyle.Bold);
+        title.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        title.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         title.LetterSpacing = 0.01f;
         header.AddView(title, new LinearLayout.LayoutParams(
             0, ViewGroup.LayoutParams.WrapContent, 1f)
@@ -67,19 +60,22 @@ public abstract class InfoCard : CardView
         TextView status, bool isActive, string activeText, string inactiveText)
     {
         status.Text = isActive ? activeText : inactiveText;
+        status.SetTextColor(LauncherTheme.Parse(
+            isActive ? LauncherTheme.StatusOkTextHex : LauncherTheme.StatusErrorTextHex));
         if (status.Background is GradientDrawable background)
-            background.SetColor(Color.ParseColor(isActive ? StatusOkColorHex : StatusErrorColorHex));
+            background.SetColor(LauncherTheme.Parse(
+                isActive ? LauncherTheme.StatusOkBackgroundHex : LauncherTheme.StatusErrorBackgroundHex));
     }
 
     protected void AddDivider()
     {
         var divider = new View(Context);
-        divider.SetBackgroundColor(Color.ParseColor(DividerColorHex));
+        divider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
         Content.AddView(divider, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent, Ui.Dp(Context, 1))
         {
             TopMargin = Ui.Dp(Context, 14),
-            BottomMargin = Ui.Dp(Context, 10)
+            BottomMargin = Ui.Dp(Context, 8)
         });
     }
 
@@ -87,18 +83,18 @@ public abstract class InfoCard : CardView
     {
         var row = new LinearLayout(Context) { Orientation = Orientation.Horizontal };
         row.SetGravity(GravityFlags.CenterVertical);
-        row.SetPadding(0, Ui.Dp(Context, 6), 0, Ui.Dp(Context, 6));
+        row.SetPadding(0, Ui.Dp(Context, 7), 0, Ui.Dp(Context, 7));
 
         var key = new TextView(Context) { Text = label };
-        key.SetTextSize(ComplexUnitType.Sp, 14);
-        key.SetTextColor(Color.ParseColor(SecondaryTextColorHex));
+        key.SetTextSize(ComplexUnitType.Sp, 13);
+        key.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         row.AddView(key, new LinearLayout.LayoutParams(
             0, ViewGroup.LayoutParams.WrapContent, 1f));
 
         var value = new TextView(Context) { Text = "-" };
         value.SetTextSize(ComplexUnitType.Sp, 14);
-        value.SetTextColor(Color.White);
-        value.SetTypeface(null, TypefaceStyle.Bold);
+        value.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        value.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         row.AddView(value);
 
         Content.AddView(row);
@@ -109,10 +105,12 @@ public abstract class InfoCard : CardView
     {
         var textView = new TextView(Context) { Text = text };
         textView.SetTextSize(ComplexUnitType.Sp, textSizeSp);
-        textView.SetTextColor(Color.ParseColor(
-            emphasized ? PrimaryTextColorHex : SecondaryTextColorHex));
-        textView.SetTypeface(null, emphasized ? TypefaceStyle.Bold : TypefaceStyle.Normal);
-        textView.SetLineSpacing(0, 1.2f);
+        textView.SetTextColor(LauncherTheme.Parse(
+            emphasized ? LauncherTheme.TextPrimaryHex : LauncherTheme.TextSecondaryHex));
+        textView.SetTypeface(
+            emphasized ? LauncherTheme.TitleTypeface : LauncherTheme.BodyTypeface,
+            TypefaceStyle.Normal);
+        textView.SetLineSpacing(0, 1.25f);
         Content.AddView(textView, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
@@ -126,15 +124,15 @@ public abstract class InfoCard : CardView
     {
         var status = new TextView(context);
         status.SetTextSize(ComplexUnitType.Sp, 11);
-        status.SetTextColor(Color.White);
-        status.SetTypeface(null, TypefaceStyle.Bold);
+        status.SetTextColor(LauncherTheme.Parse(LauncherTheme.StatusErrorTextHex));
+        status.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         status.LetterSpacing = 0.03f;
         status.SetIncludeFontPadding(false);
         status.Gravity = GravityFlags.Center;
         status.SetPadding(
             Ui.Dp(context, 10), Ui.Dp(context, 5),
             Ui.Dp(context, 10), Ui.Dp(context, 5));
-        status.Background = CreateStatusBadgeBackground(context, StatusErrorColorHex);
+        status.Background = CreateStatusBadgeBackground(context, LauncherTheme.StatusErrorBackgroundHex);
         return status;
     }
 
@@ -143,7 +141,7 @@ public abstract class InfoCard : CardView
         var background = new GradientDrawable();
         background.SetShape(ShapeType.Rectangle);
         background.SetCornerRadius(Ui.Dp(context, 100));
-        background.SetColor(Color.ParseColor(colorHex));
+        background.SetColor(LauncherTheme.Parse(colorHex));
         return background;
     }
 }

@@ -9,8 +9,6 @@ namespace SMAPIGameLoader.Launcher.Pages;
 
 public class HomePage : LinearLayout
 {
-    const string LaunchButtonColorHex = "#1565C0";
-    const string HeaderBackgroundColorHex = "#1A1D24";
     const string LaunchGameText = "Launch Game";
     const string GameNotInstalledText = "Game Not Installed\nDownload Now!";
 
@@ -19,11 +17,14 @@ public class HomePage : LinearLayout
     public HomePage(Context context) : base(context)
     {
         Orientation = Orientation.Vertical;
+        SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
         LayoutParameters = new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent);
 
-        AddView(CreateHeader(context), new LayoutParams(
+        string headerTitle = "SMAPI Launcher";
+        if (ApkTool.IsDebugMode) headerTitle += " (Debug)";
+        AddView(new PageHeader(context, headerTitle), new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
 
@@ -39,65 +40,50 @@ public class HomePage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
         {
-            BottomMargin = Ui.Dp(context, 16)
+            BottomMargin = Ui.Dp(context, 12)
         };
 
         body.AddView(new GameInfoCard(context), cardLayoutParams);
         body.AddView(new SMAPIInfoCard(context), cardLayoutParams);
 
-        _playButton = CreatePrimaryButton(context, LaunchGameText, LaunchButtonColorHex);
+        _playButton = CreatePrimaryButton(context, LaunchGameText);
         _playButton.Click += OnPlayButtonClick;
         body.AddView(_playButton);
 
         UpdatePlayButton();
     }
 
-    static LinearLayout CreateHeader(Context context)
-    {
-        var headerBox = new LinearLayout(context) { Orientation = Orientation.Vertical };
-        headerBox.SetBackgroundColor(Color.ParseColor(HeaderBackgroundColorHex));
-        headerBox.Elevation = Ui.Dp(context, 4);
-        headerBox.SetPadding(
-            Ui.Dp(context, 20), Ui.Dp(context, 48),
-            Ui.Dp(context, 20), Ui.Dp(context, 18));
-
-        string headerTitle = "SMAPI Launcher";
-        if (ApkTool.IsDebugMode) headerTitle += " (Debug)";
-        var header = new TextView(context) { Text = headerTitle };
-        header.SetTextSize(ComplexUnitType.Sp, 22);
-        header.SetTextColor(Color.White);
-        header.SetTypeface(null, TypefaceStyle.Bold);
-        header.LetterSpacing = 0.01f;
-        headerBox.AddView(header);
-        return headerBox;
-    }
-
     static LinearLayout CreateBody(Context context)
     {
         var body = new LinearLayout(context) { Orientation = Orientation.Vertical };
         body.SetPadding(
-            Ui.Dp(context, 20), Ui.Dp(context, 20),
-            Ui.Dp(context, 20), Ui.Dp(context, 20));
+            Ui.Dp(context, 16), Ui.Dp(context, 16),
+            Ui.Dp(context, 16), Ui.Dp(context, 20));
         return body;
     }
 
-    static Button CreatePrimaryButton(Context context, string text, string colorHex)
+    static Button CreatePrimaryButton(Context context, string text)
     {
         var button = new Button(context) { Text = text };
         button.SetAllCaps(false);
-        button.SetTextColor(Color.White);
+        button.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextOnPrimaryHex));
         button.SetTextSize(ComplexUnitType.Sp, 17);
-        button.SetTypeface(null, TypefaceStyle.Bold);
+        button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        button.LetterSpacing = 0.01f;
+        button.SetCompoundDrawablesWithIntrinsicBounds(Resource.Drawable.ic_play, 0, 0, 0);
+        button.CompoundDrawablePadding = Ui.Dp(context, 10);
         button.SetMinHeight(Ui.Dp(context, 56));
+        button.StateListAnimator = null;
         button.SetPadding(
             Ui.Dp(context, 24), Ui.Dp(context, 14),
             Ui.Dp(context, 24), Ui.Dp(context, 14));
-        button.Background = Ui.CreateRippleDrawable(context, colorHex, 14);
+        button.Background = Ui.CreateRippleDrawable(
+            context, LauncherTheme.PrimaryHex, LauncherTheme.ButtonRadiusDp);
         button.LayoutParameters = new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
         {
-            TopMargin = Ui.Dp(context, 4),
+            TopMargin = Ui.Dp(context, 8),
             BottomMargin = Ui.Dp(context, 8)
         };
         return button;

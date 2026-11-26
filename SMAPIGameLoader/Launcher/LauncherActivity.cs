@@ -20,7 +20,7 @@ namespace SMAPIGameLoader.Launcher;
 [Activity(
     Label = "SMAPI Launcher",
     MainLauncher = true,
-    Theme = "@style/Theme.Material3.DayNight.NoActionBar",
+    Theme = "@style/Theme.SMAPILauncher",
     AlwaysRetainTaskState = true,
     LaunchMode = LaunchMode.SingleInstance,
     ScreenOrientation = ScreenOrientation.FullSensor
@@ -88,6 +88,8 @@ public class LauncherActivity : AppCompatActivity
     private void SetDarkMode()
     {
         AppCompatDelegate.DefaultNightMode = AppCompatDelegate.ModeNightYes;
+        Window?.SetStatusBarColor(LauncherTheme.Parse(LauncherTheme.HeaderBackgroundHex));
+        Window?.SetNavigationBarColor(LauncherTheme.Parse(LauncherTheme.NavBarBackgroundHex));
     }
 
     /// <summary>
@@ -149,25 +151,41 @@ public class LauncherActivity : AppCompatActivity
         _container.AddView(_modPage);
 
         // Bottom navigation อยู่ล่างสุด
-        _nav = new BottomNavigationView(this);
+        _nav = new BottomNavigationView(this)
+        {
+            ItemActiveIndicatorEnabled = false
+        };
+        _nav.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.NavBarBackgroundHex));
+        _nav.Elevation = 0;
+        _nav.ItemIconTintList = LauncherTheme.BottomNavItemColors();
+        _nav.ItemTextColor = LauncherTheme.BottomNavItemColors();
+        _nav.ItemIconSize = Ui.Dp(this, 22);
         _nav.SelectedItemId = HomeId;
-        _nav.Menu.Add(0, HomeId, 0, "Home").SetIcon(Android.Resource.Drawable.IcMenuMyCalendar);
-        _nav.Menu.Add(0, ModManagerId, 1, "Mods").SetIcon(Android.Resource.Drawable.IcMenuAgenda);
+        _nav.Menu.Add(0, HomeId, 0, "Home").SetIcon(Resource.Drawable.ic_nav_home);
+        _nav.Menu.Add(0, ModManagerId, 1, "Mods").SetIcon(Resource.Drawable.ic_nav_mods);
         _nav.ItemSelected += (s, e) =>
         {
             ShowPage(e.Item!.ItemId);
             e.Handled = true;
         };
 
+        // เส้นคั่นบาง ๆ ระหว่าง content กับ bottom nav
+        var navDivider = new View(this);
+        navDivider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
+        var navContainer = new LinearLayout(this) { Orientation = Orientation.Vertical };
+        navContainer.AddView(navDivider, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, Ui.Dp(this, 1)));
+        navContainer.AddView(_nav);
 
         // Root: แนวตั้ง ใช้เต็มจอ
         var root = new LinearLayout(this) { Orientation = Orientation.Vertical };
+        root.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
         root.LayoutParameters = new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent);
 
         root.AddView(_container);
-        root.AddView(_nav);
+        root.AddView(navContainer);
         SetContentView(root);
 
         // run first page
