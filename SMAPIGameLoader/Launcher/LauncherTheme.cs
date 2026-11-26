@@ -17,6 +17,9 @@ internal static class LauncherTheme
     public const string SurfaceVariantHex = "#232B37";
     public const string NavBarBackgroundHex = "#12171E";
 
+    // การ์ดที่กำลังถูกเลือก/เปิด action อยู่
+    public const string SelectedCardBackgroundHex = "#1F3A26";
+
     // สีหลัก (เขียว Stardew) และสีเน้น
     public const string PrimaryHex = "#2E7D32";
     public const string AccentHex = "#8AD49A";

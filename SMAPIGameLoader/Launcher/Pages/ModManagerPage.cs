@@ -1,7 +1,6 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Graphics;
-using Android.Text;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
@@ -20,11 +19,6 @@ internal sealed class ModManagerPage : LinearLayout
 {
     const string SortModePrefKey = "mod_manager_sort_mode";
     const string SortDescendingPrefKey = "mod_manager_sort_descending";
-
-    const int MenuToggleMod = 1;
-    const int MenuOpenFolder = 2;
-    const int MenuShowManifest = 3;
-    const int MenuDeleteMod = 4;
 
     const int MenuSortDate = 11;
     const int MenuSortName = 12;
@@ -275,26 +269,123 @@ internal sealed class ModManagerPage : LinearLayout
         });
     }
 
-    private void OnClickedModItem(ModInfo mod, View anchor)
+    private void OnClickedModItem(ModInfo mod, View anchor) => ShowModActions(mod, anchor);
+
+    /// <summary>
+    /// Popup แบบ anchored: โผล่ใต้กล่อง mod ที่กด ชิดขอบซ้าย
+    /// ถ้าด้านล่างไม่พอจะพลิกขึ้นด้านบนของ item แทน (ไม่ให้ล้นขอบจอ)
+    /// </summary>
+    private void ShowModActions(ModInfo mod, View anchor)
     {
-        var popup = new Android.Widget.PopupMenu(_context, anchor);
-        popup.Menu!.Add(0, MenuToggleMod, 0, mod.Enabled ? "Toggle Off" : "Toggle On");
-        popup.Menu.Add(0, MenuOpenFolder, 1, "Open Folder");
-        popup.Menu.Add(0, MenuShowManifest, 2, "Show manifest.json");
-        popup.Menu.Add(0, MenuDeleteMod, 3, "Delete");
+        var content = new LinearLayout(_context) { Orientation = Orientation.Vertical };
+        content.SetPadding(0, UI.Dp(_context, 6), 0, UI.Dp(_context, 6));
 
-        popup.MenuItemClick += (s, e) =>
+        var popup = new PopupWindow(
+            content, UI.Dp(_context, 224), ViewGroup.LayoutParams.WrapContent, true);
+        popup.SetBackgroundDrawable(LauncherTheme.CreateSurfaceDrawable(
+            _context, LauncherTheme.CardBackgroundHex,
+            LauncherTheme.ChipRadiusDp + 2, LauncherTheme.DividerHex));
+        popup.Elevation = UI.Dp(_context, 8);
+        popup.OutsideTouchable = true;
+
+        AddActionRow(content, popup, Resource.Drawable.ic_power,
+            mod.Enabled ? "Toggle Off" : "Toggle On", null, () => ToggleMod(mod));
+        AddActionRow(content, popup, Resource.Drawable.ic_folder,
+            "Open Folder", null, () => OpenModFolder(mod));
+        AddActionRow(content, popup, Resource.Drawable.ic_code,
+            "Show manifest.json", null, () => ShowManifest(mod));
+
+        var divider = new View(_context);
+        divider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
+        content.AddView(divider, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, UI.Dp(_context, 1))
         {
-            switch (e.Item!.ItemId)
-            {
-                case MenuToggleMod: ToggleMod(mod); break;
-                case MenuOpenFolder: OpenModFolder(mod); break;
-                case MenuShowManifest: ShowManifest(mod); break;
-                case MenuDeleteMod: OnClickDeleteMod(mod); break;
-            }
-        };
+            LeftMargin = UI.Dp(_context, 12),
+            RightMargin = UI.Dp(_context, 12),
+            TopMargin = UI.Dp(_context, 4),
+            BottomMargin = UI.Dp(_context, 4)
+        });
 
-        popup.Show();
+        AddActionRow(content, popup, Resource.Drawable.ic_delete,
+            "Delete", LauncherTheme.StatusErrorTextHex, () => OnClickDeleteMod(mod));
+
+        // วัดความสูงจริงก่อน show เพื่อเลือกทิศวางได้แน่นอน
+        // (PopupWindow ที่ปล่อยเป็น WrapContent จะคำนวณตำแหน่งตอน layout แล้วล้นจอได้)
+        int popupWidth = UI.Dp(_context, 224);
+        content.Measure(
+            MeasureSpec.MakeMeasureSpec(popupWidth, MeasureSpecMode.AtMost),
+            MeasureSpec.MakeMeasureSpec(0, MeasureSpecMode.Unspecified));
+        popup.Height = content.MeasuredHeight;
+
+        int gap = UI.Dp(_context, 4);
+        var location = new int[2];
+        anchor.GetLocationInWindow(location);
+        int spaceBelow = anchor.RootView.Height - (location[1] + anchor.Height) - gap;
+        int offsetY = popup.Height <= spaceBelow
+            ? gap
+            : -(anchor.Height + popup.Height + gap);
+
+        SetModHighlight(anchor, true);
+        popup.DismissEvent += (s, e) => SetModHighlight(anchor, false);
+        popup.ShowAsDropDown(anchor, 0, offsetY);
+    }
+
+    /// <summary>ไฮไลต์การ์ด mod ที่กำลังเปิด popup อยู่ (พื้นเขียวเข้ม)</summary>
+    private void SetModHighlight(View view, bool on)
+    {
+        if (view is not AndroidX.CardView.Widget.CardView card)
+            return;
+
+        card.SetCardBackgroundColor(LauncherTheme.Parse(on
+            ? LauncherTheme.SelectedCardBackgroundHex
+            : LauncherTheme.CardBackgroundHex));
+    }
+
+    private void AddActionRow(LinearLayout parent, PopupWindow popup, int iconRes,
+                              string label, string tintHex, Action action)
+    {
+        var row = new LinearLayout(_context)
+        {
+            Orientation = Orientation.Horizontal,
+            Clickable = true,
+            Focusable = true
+        };
+        row.SetGravity(GravityFlags.CenterVertical);
+        row.SetMinimumHeight(UI.Dp(_context, 46));
+        row.SetPadding(UI.Dp(_context, 16), 0, UI.Dp(_context, 16), 0);
+        row.Background = UI.CreateRippleDrawable(_context, null, LauncherTheme.ChipRadiusDp);
+
+        var rowParams = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+        {
+            LeftMargin = UI.Dp(_context, 4),
+            RightMargin = UI.Dp(_context, 4)
+        };
+        parent.AddView(row, rowParams);
+
+        var color = LauncherTheme.Parse(tintHex ?? LauncherTheme.TextPrimaryHex);
+
+        var icon = new ImageView(_context);
+        icon.SetImageResource(iconRes);
+        icon.SetColorFilter(color);
+        icon.LayoutParameters = new LinearLayout.LayoutParams(
+            UI.Dp(_context, 20), UI.Dp(_context, 20));
+        row.AddView(icon);
+
+        var text = new TextView(_context) { Text = label };
+        text.SetTextSize(ComplexUnitType.Sp, 14);
+        text.SetTextColor(color);
+        text.SetTypeface(LauncherTheme.BodyTypeface, TypefaceStyle.Normal);
+        text.LayoutParameters = new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 1f)
+        { LeftMargin = UI.Dp(_context, 14) };
+        row.AddView(text);
+
+        row.Click += (s, e) =>
+        {
+            popup.Dismiss();
+            action();
+        };
     }
 
     private void ToggleMod(ModInfo mod)
