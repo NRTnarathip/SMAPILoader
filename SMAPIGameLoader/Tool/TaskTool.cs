@@ -1,9 +1,11 @@
 ﻿using Android.App;
 using Android.Views;
 using Android.Widget;
+using Google.Android.Material.Dialog;
 using System;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
+using AppCompatAlertDialog = AndroidX.AppCompat.App.AlertDialog;
 
 namespace SMAPIGameLoader;
 
@@ -47,7 +49,7 @@ internal static class TaskTool
         busyDialog.Dismiss();
         busyDialog = null;
     }
-    static AlertDialog busyDialog;
+    static AppCompatAlertDialog busyDialog;
     static string busyMessage;
     public static void RunMainThread(Action func)
     {
@@ -126,8 +128,7 @@ internal static class TaskTool
         CloseBusyDialog();
 
         Console.WriteLine("try set busy dialog");
-        var dialogBuilder = new AlertDialog.Builder(LastActivity);
-        busyDialog = dialogBuilder.Create();
+        busyDialog = new MaterialAlertDialogBuilder(LastActivity).Create();
         busyDialog.SetTitle("Busy Task");
 
         SetMessage("please wait...");

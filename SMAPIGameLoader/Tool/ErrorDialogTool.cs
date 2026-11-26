@@ -1,4 +1,4 @@
-﻿using Android.App;
+﻿using Google.Android.Material.Dialog;
 using SMAPIGameLoader.Tool;
 using System;
 using Xamarin.Essentials;
@@ -27,15 +27,11 @@ internal static class ErrorDialogTool
             return;
         }
 
-        var dialog = new AlertDialog.Builder(ActivityTool.CurrentActivity);
-        var alert = dialog.Create();
-        alert.SetTitle(title);
-        alert.SetMessage(exception.ToString());
-        alert.SetButton("OK", (c, ev) =>
-        {
-            // Ok button click task  
-        });
-        alert.Show();
+        new MaterialAlertDialogBuilder(ActivityTool.CurrentActivity)
+            .SetTitle(title)
+            .SetMessage(exception.ToString())
+            .SetPositiveButton("OK", (c, ev) => { })
+            .Show();
 
         Clipboard.SetTextAsync(exception.ToString());
     }

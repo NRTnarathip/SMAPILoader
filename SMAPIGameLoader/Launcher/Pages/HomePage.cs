@@ -16,7 +16,7 @@ public class HomePage : LinearLayout
         GameInstalledButNotSupport,
     }
 
-    readonly Button _playGameButton;
+    readonly PrimaryActionButton _playGameButton;
 
     public HomePage(Context context) : base(context)
     {
@@ -88,23 +88,9 @@ public class HomePage : LinearLayout
         return body;
     }
 
-    static Button CreatePrimaryButton(Context context, string text)
+    static PrimaryActionButton CreatePrimaryButton(Context context, string text)
     {
-        var button = new Button(context) { Text = text };
-        button.SetAllCaps(false);
-        button.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextOnPrimaryHex));
-        button.SetTextSize(ComplexUnitType.Sp, 17);
-        button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
-        button.LetterSpacing = 0.01f;
-        button.SetCompoundDrawablesWithIntrinsicBounds(Resource.Drawable.ic_play, 0, 0, 0);
-        button.CompoundDrawablePadding = Ui.Dp(context, 10);
-        button.SetMinHeight(Ui.Dp(context, 56));
-        button.StateListAnimator = null;
-        button.SetPadding(
-            Ui.Dp(context, 24), Ui.Dp(context, 14),
-            Ui.Dp(context, 24), Ui.Dp(context, 14));
-        button.Background = Ui.CreateRippleDrawable(
-            context, LauncherTheme.PrimaryHex, LauncherTheme.ButtonRadiusDp);
+        var button = new PrimaryActionButton(context, text, Resource.Drawable.ic_play);
         button.LayoutParameters = new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)

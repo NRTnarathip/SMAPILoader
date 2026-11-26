@@ -20,6 +20,7 @@ public class McpDebugReceiver : BroadcastReceiver
     {
         ["MCP_GoHomePage"] = _ => Navigate(LauncherActivity.HomeId),
         ["MCP_GoModManagerPage"] = _ => Navigate(LauncherActivity.ModManagerId),
+        ["MCP_GoLogPage"] = _ => Navigate(LauncherActivity.LogPageId),
         ["MCP_GetState"] = _ => LauncherActivity.Instance.CurrentPageName,
     };
 

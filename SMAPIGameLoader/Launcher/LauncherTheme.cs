@@ -35,6 +35,10 @@ internal static class LauncherTheme
     public const string StatusErrorTextHex = "#F1A0A6";
     public const string StatusErrorBackgroundHex = "#3A1F22";
 
+    // ระดับของ log
+    public const string WarningTextHex = "#E8C07D";
+    public const string LogContinuationHex = "#C3CBD6";
+
     // รัศมีมุม
     public const float CardRadiusDp = 18;
     public const float ButtonRadiusDp = 16;

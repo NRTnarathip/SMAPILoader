@@ -32,6 +32,12 @@
 		<item name="colorOnSurface">#E9EDF2</item>
 		<item name="colorSurfaceVariant">#232B37</item>
 		<item name="colorOnSurfaceVariant">#94A0B0</item>
+		<!-- M3 container tokens: dialog/popup ของระบบจึงเข้มเท่าธีมเรา -->
+		<item name="colorSurfaceContainerLowest">#0D1116</item>
+		<item name="colorSurfaceContainerLow">#12171E</item>
+		<item name="colorSurfaceContainer">#141A21</item>
+		<item name="colorSurfaceContainerHigh">#1B222C</item>
+		<item name="colorSurfaceContainerHighest">#232B37</item>
 		<item name="colorOutline">#33FFFFFF</item>
 		<item name="android:colorBackground">#0D1116</item>
 		<item name="colorOnBackground">#E9EDF2</item>

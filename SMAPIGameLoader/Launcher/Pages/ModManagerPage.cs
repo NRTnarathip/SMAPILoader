@@ -6,6 +6,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
+using Google.Android.Material.Dialog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -331,7 +332,7 @@ internal sealed class ModManagerPage : LinearLayout
         var scroll = new ScrollView(_context);
         scroll.AddView(textView);
 
-        new AlertDialog.Builder(_context)
+        new MaterialAlertDialogBuilder(_context)
             .SetTitle("manifest.json")
             .SetView(scroll)
             .SetPositiveButton("Close", (s, e) => { })
@@ -352,7 +353,7 @@ internal sealed class ModManagerPage : LinearLayout
 
     private void OnClickDeleteMod(ModInfo mod)
     {
-        new AlertDialog.Builder(_context)
+        new MaterialAlertDialogBuilder(_context)
             .SetTitle("Delete Mod!")
             .SetMessage($"Do you want delete \"{mod.NameUIText}\"?")
             .SetPositiveButton("Yes", (s, e) =>

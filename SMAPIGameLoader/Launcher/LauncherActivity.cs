@@ -130,6 +130,7 @@ public class LauncherActivity : AppCompatActivity
 
     public const int HomeId = 1;
     public const int ModManagerId = 2;
+    public const int LogPageId = 3;
 
     /// <summary>ชื่อหน้าปัจจุบัน (ใช้โดย McpDebugReceiver/GetState)</summary>
     public string CurrentPageName { get; private set; } = "home";
@@ -137,6 +138,7 @@ public class LauncherActivity : AppCompatActivity
     private FrameLayout _container = null!;
     private View _homePage = null!;
     private ModManagerPage _modPage = null!;
+    private LogPage _logPage = null!;
     private BottomNavigationView _nav = null!;
 
     private void SetupLauncherPage()
@@ -147,8 +149,10 @@ public class LauncherActivity : AppCompatActivity
 
         _homePage = new HomePage(this);
         _modPage = new ModManagerPage(this);
+        _logPage = new LogPage(this);
         _container.AddView(_homePage);
         _container.AddView(_modPage);
+        _container.AddView(_logPage);
 
         // Bottom navigation อยู่ล่างสุด
         _nav = new BottomNavigationView(this)
@@ -163,6 +167,7 @@ public class LauncherActivity : AppCompatActivity
         _nav.SelectedItemId = HomeId;
         _nav.Menu.Add(0, HomeId, 0, "Home").SetIcon(Resource.Drawable.ic_nav_home);
         _nav.Menu.Add(0, ModManagerId, 1, "Mods").SetIcon(Resource.Drawable.ic_nav_mods);
+        _nav.Menu.Add(0, LogPageId, 2, "Log").SetIcon(Resource.Drawable.ic_nav_log);
         _nav.ItemSelected += (s, e) =>
         {
             ShowPage(e.Item!.ItemId);
@@ -196,7 +201,17 @@ public class LauncherActivity : AppCompatActivity
     {
         _homePage.Visibility = itemId == HomeId ? ViewStates.Visible : ViewStates.Gone;
         _modPage.Visibility = itemId == ModManagerId ? ViewStates.Visible : ViewStates.Gone;
-        CurrentPageName = itemId == ModManagerId ? "mods" : "home";
+        _logPage.Visibility = itemId == LogPageId ? ViewStates.Visible : ViewStates.Gone;
+
+        if (itemId == LogPageId)
+            _logPage.Reload();
+
+        CurrentPageName = itemId switch
+        {
+            ModManagerId => "mods",
+            LogPageId => "log",
+            _ => "home",
+        };
     }
 
     /// <summary>นำทางไปหน้าที่กำหนด (ใช้โดย McpDebugReceiver) — ต้องเรียกบน main thread</summary>

@@ -1,9 +1,5 @@
-﻿using Android.App;
+﻿using Google.Android.Material.Dialog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Essentials;
 
 namespace SMAPIGameLoader.Tool;
@@ -17,7 +13,8 @@ internal class DialogTool
     {
         TaskTool.RunMainThread(() =>
         {
-            var builder = new AlertDialog.Builder(ActivityTool.CurrentActivity);
+            // MaterialAlertDialogBuilder เพื่อให้ dialog ใช้สีพื้นตามธีม launcher
+            var builder = new MaterialAlertDialogBuilder(ActivityTool.CurrentActivity);
             builder.SetPositiveButton(buttonOKName, (sender, e) =>
             {
                 onClickYes?.Invoke();
