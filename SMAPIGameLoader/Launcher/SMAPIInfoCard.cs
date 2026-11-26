@@ -1,4 +1,6 @@
 using Android.Content;
+using Android.Graphics;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using System;
@@ -7,6 +9,9 @@ namespace SMAPIGameLoader.Launcher;
 
 public class SMAPIInfoCard : InfoCard
 {
+    const string PrimaryButtonColorHex = "#1565C0";
+    const string OutlineColorHex = "#33FFFFFF";
+
     readonly TextView _version;
     readonly TextView _buildCode;
     readonly TextView _buildDate;
@@ -25,18 +30,18 @@ public class SMAPIInfoCard : InfoCard
 
         var actions = new LinearLayout(Context) { Orientation = Orientation.Horizontal };
         actions.SetGravity(GravityFlags.CenterHorizontal);
-        actions.SetPadding(0, Ui.Dp(Context, 12), 0, 0);
+        actions.SetPadding(0, Ui.Dp(Context, 16), 0, 0);
 
-        _uninstallButton = CreateActionButton("Uninstall", OnClickUninstall);
+        _uninstallButton = CreateActionButton("Uninstall", OnClickUninstall, primary: false);
         actions.AddView(_uninstallButton, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
-
-        _installButton = CreateActionButton("Install", OnClickInstall);
-        actions.AddView(_installButton, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
         {
-            RightMargin = Ui.Dp(Context, 8)
+            RightMargin = Ui.Dp(Context, 10)
         });
+
+        _installButton = CreateActionButton("Install", OnClickInstall, primary: true);
+        actions.AddView(_installButton, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
 
         Content.AddView(actions);
 
@@ -55,6 +60,7 @@ public class SMAPIInfoCard : InfoCard
 
         _installButton.Text = installed ? "Update SMAPI" : "Install SMAPI";
         _uninstallButton.Enabled = installed;
+        _uninstallButton.Alpha = installed ? 1f : 0.4f;
     }
 
     void OnClickUninstall(object sender, EventArgs e)
@@ -69,10 +75,21 @@ public class SMAPIInfoCard : InfoCard
         SMAPIInstaller.OnClickInstallSMAPIZip(sender, e);
     }
 
-    Button CreateActionButton(string text, EventHandler onClick)
+    Button CreateActionButton(string text, EventHandler onClick, bool primary)
     {
         var button = new Button(Context) { Text = text };
         button.SetAllCaps(false);
+        button.SetTextSize(ComplexUnitType.Sp, 14);
+        button.SetTypeface(null, TypefaceStyle.Bold);
+        button.SetTextColor(Color.White);
+        button.SetMinWidth(Ui.Dp(Context, 96));
+        button.SetMinHeight(Ui.Dp(Context, 44));
+        button.SetPadding(
+            Ui.Dp(Context, 18), 0,
+            Ui.Dp(Context, 18), 0);
+        button.Background = primary
+            ? Ui.CreateRippleDrawable(Context, PrimaryButtonColorHex, 10)
+            : Ui.CreateRippleDrawable(Context, null, 10, OutlineColorHex);
         button.Click += onClick;
         return button;
     }

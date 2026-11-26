@@ -43,7 +43,7 @@ internal sealed class ModManagerPage : LinearLayout
         headerBox.SetPadding(Ui.Dp(context, 20), Ui.Dp(context, 48), Ui.Dp(context, 20), Ui.Dp(context, 16));
 
         var header = new TextView(context) { Text = "Mod Manager" };
-        header.SetTextSize(ComplexUnitType.Sp, 20);
+        header.SetTextSize(ComplexUnitType.Sp, 22);
         header.SetTextColor(Color.White);
         header.SetTypeface(null, TypefaceStyle.Bold);
         headerBox.AddView(header);
