@@ -13,6 +13,7 @@
 | `MemoryViewer/` | Console tool | `net8.0` | เครื่องมือ debug memory |
 | `SharedLibs/` | Binaries | — | Harmony/MonoMod ที่ build สำหรับ .NET 9 + native `libmonosgen-2.0.so` |
 | `docs/building.md` | Docs | — | ขั้นตอน build ฉบับเต็ม (อ่านก่อน build) |
+| `docs/adb-command-bridge.md` | Docs | — | debug-only adb bridge (`app.mcp.CMD`) สำหรับสั่งนำทางหน้า Home/Mod Manager |
 
 - Solution: `SMAPILoader.sln` — มี 4 project ข้างต้น
 - `global.json` pin .NET SDK `9.0.312` (`rollForward: latestFeature`)
@@ -25,8 +26,8 @@ game DLLs ที่ `../SMAPI-Android-1.6/src/DependenciesDll/`, และ custo
 (รายละเอียดใน `docs/building.md`)
 
 ```bash
-# Windows — งาน dev ใช้ config "Dev AI" (เร็วสุด: arm64 เดียว, assembly store, ไม่ trim/AOT)
-.\build-dev-ai.cmd
+# Windows — งาน dev ใช้ config "Dev" (เร็วสุด: arm64 เดียว, assembly store, ไม่ trim/AOT)
+.\build-dev.cmd
 
 # ปล่อย build
 dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c Release ^
@@ -35,7 +36,7 @@ dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c Release ^
 ```
 
 - **Verification gate = build ผ่าน** เพราะไม่มี test suite อย่าอ้างว่า "น่าจะทำงาน" โดยไม่ build ถ้าทำได้
-- APK อยู่ใต้ `SMAPIGameLoader/bin/<Config>/net9.0-android/` (`Dev AI` หรือ `Release`) — ชื่อไฟล์จริงให้ดูจาก output/build docs อย่า hardcode
+- APK อยู่ใต้ `SMAPIGameLoader/bin/<Config>/net9.0-android/` (`Dev` หรือ `Release`) — ชื่อไฟล์จริงให้ดูจาก output/build docs อย่า hardcode
 - `SMAPIGameLoader.csproj` มี target `RestoreDotnetTools` ที่รัน `dotnet tool restore` ก่อน restore — ถ้าล้มเหลวและไม่เกี่ยวกับงาน ให้รายงาน ไม่ต้องแก้ถาวร
 - `docs/building.md` บางส่วนอาจล้าสมัย (เช่นยังอ้างชื่อ `StardewApkTool.cs` ซึ่งปัจจุบันคือ `Tool/GameApkTool.cs`) — ตรวจโค้ดจริงก่อนเชื่อ docs
 

@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<Configurations>Dev;Release</Configurations>
 		<TargetFramework>net9.0-android</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<ApplicationId>com.companyname.SMAPIGameLoader</ApplicationId>
@@ -33,20 +34,9 @@
 		<AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
 		<RunAOTCompilation>False</RunAOTCompilation>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<AndroidEnableSGenConcurrent>True</AndroidEnableSGenConcurrent>
-		<AndroidKeyStore>True</AndroidKeyStore>
-		<AndroidSigningStorePass>android</AndroidSigningStorePass>
-		<AndroidSigningKeyAlias>androiddebugkey</AndroidSigningKeyAlias>
-		<AndroidSigningKeyPass>android</AndroidSigningKeyPass>
-		<IsAotCompatible>False</IsAotCompatible>
-		<AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
-		<RunAOTCompilation>False</RunAOTCompilation>
-		<EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
-	</PropertyGroup>
-	<!-- Dev AI: config สำหรับ dev loop ที่เร็วที่สุด (build/ติดตั้ง/ทดสอบ)
-	     config ที่ไม่ใช่ Debug/Release จะถูก SDK มองเป็น Release-like จึงต้อง override ให้ครบ -->
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev AI|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev|AnyCPU'">
+		<!-- Dev คือ debug mode หลักของโปรเจกต์ จึงต้องมี DEBUG ให้โค้ด debug-only (เช่น McpDebugReceiver) ถูกคอมไพล์ด้วย -->
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
 		<EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
 		<AndroidUseAssemblyStore>True</AndroidUseAssemblyStore>
@@ -125,8 +115,8 @@
 			<PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
-	<!-- mgcb tools ไม่ได้ใช้ใน build ปกติ: ข้ามใน Dev AI เพื่อตัดเวลาออก -->
-	<Target Name="RestoreDotnetTools" BeforeTargets="Restore" Condition="'$(Configuration)' != 'Dev AI'">
+	<!-- mgcb tools ไม่ได้ใช้ใน build ปกติ: ข้ามใน Dev เพื่อตัดเวลาออก -->
+	<Target Name="RestoreDotnetTools" BeforeTargets="Restore" Condition="'$(Configuration)' != 'Dev'">
 		<Message Text="Restoring dotnet tools" Importance="High" />
 		<Exec Command="dotnet tool restore" />
 	</Target>

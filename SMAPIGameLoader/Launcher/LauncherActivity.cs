@@ -1,5 +1,6 @@
 using _Microsoft.Android.Resource.Designer;
 using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
@@ -47,6 +48,41 @@ public class LauncherActivity : AppCompatActivity
 
         //run utils scripts
         ProcessAdbExtras();
+
+#if DEBUG
+        RegisterMcpReceiver();
+#endif
+    }
+
+#if DEBUG
+    private McpDebugReceiver? _mcpReceiver;
+
+    private void RegisterMcpReceiver()
+    {
+        _mcpReceiver = new McpDebugReceiver();
+        var filter = new IntentFilter(McpDebugReceiver.Action);
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
+            RegisterReceiver(_mcpReceiver, filter, ReceiverFlags.Exported);
+        else
+            RegisterReceiver(_mcpReceiver, filter);
+    }
+
+    private void UnregisterMcpReceiver()
+    {
+        if (_mcpReceiver is null)
+            return;
+
+        UnregisterReceiver(_mcpReceiver);
+        _mcpReceiver = null;
+    }
+#endif
+
+    protected override void OnDestroy()
+    {
+#if DEBUG
+        UnregisterMcpReceiver();
+#endif
+        base.OnDestroy();
     }
 
     private void SetDarkMode()
@@ -90,8 +126,11 @@ public class LauncherActivity : AppCompatActivity
         }
     }
 
-    private const int HomeId = 1;
-    private const int ModsId = 2;
+    public const int HomeId = 1;
+    public const int ModManagerId = 2;
+
+    /// <summary>ชื่อหน้าปัจจุบัน (ใช้โดย McpDebugReceiver/GetState)</summary>
+    public string CurrentPageName { get; private set; } = "home";
 
     private FrameLayout _container = null!;
     private View _homePage = null!;
@@ -113,7 +152,7 @@ public class LauncherActivity : AppCompatActivity
         _nav = new BottomNavigationView(this);
         _nav.SelectedItemId = HomeId;
         _nav.Menu.Add(0, HomeId, 0, "Home").SetIcon(Android.Resource.Drawable.IcMenuMyCalendar);
-        _nav.Menu.Add(0, ModsId, 1, "Mods").SetIcon(Android.Resource.Drawable.IcMenuAgenda);
+        _nav.Menu.Add(0, ModManagerId, 1, "Mods").SetIcon(Android.Resource.Drawable.IcMenuAgenda);
         _nav.ItemSelected += (s, e) =>
         {
             ShowPage(e.Item!.ItemId);
@@ -138,13 +177,76 @@ public class LauncherActivity : AppCompatActivity
     private void ShowPage(int itemId)
     {
         _homePage.Visibility = itemId == HomeId ? ViewStates.Visible : ViewStates.Gone;
-        _modPage.Visibility = itemId == ModsId ? ViewStates.Visible : ViewStates.Gone;
+        _modPage.Visibility = itemId == ModManagerId ? ViewStates.Visible : ViewStates.Gone;
+        CurrentPageName = itemId == ModManagerId ? "mods" : "home";
+    }
+
+    /// <summary>นำทางไปหน้าที่กำหนด (ใช้โดย McpDebugReceiver) — ต้องเรียกบน main thread</summary>
+    public void NavigateTo(int itemId)
+    {
+        if (_nav.SelectedItemId == itemId)
+            ShowPage(itemId);
+        else
+            _nav.SelectedItemId = itemId; // ItemSelected handler -> ShowPage
     }
 
     public void OnClickStartGame()
     {
         Console.WriteLine("On click start game");
-        EntryGame.LaunchGameActivity(this);
+        LaunchGameActivity(this);
         Console.WriteLine("done continue UI runner");
     }
+
+    public static void LaunchGameActivity(Activity launcherActivity)
+    {
+        TaskTool.Run(launcherActivity, async () =>
+        {
+            LaunchGameActivityInternal(launcherActivity);
+        });
+    }
+
+    static void LaunchGameActivityInternal(Activity launcherActivity)
+    {
+        //ToastNotifyTool.Notify("Starting Game..");
+        //check game it's can launch with version
+
+        try
+        {
+            if (GameApkTool.IsGameVersionSupport is false)
+            {
+                ToastNotifyTool.Notify("Not support game version: " + GameApkTool.CurrentGameVersion + ", please update game");
+                return;
+            }
+
+            if (SMAPIInstaller.IsInstalled is false)
+            {
+                ToastNotifyTool.Notify("Please install SMAPI!!");
+                return;
+            }
+
+            GameCloner.Setup();
+
+            // Dev เป็น debug build (define DEBUG) จึงไม่ควรเข้าเกมได้
+#if DEBUG
+            ToastNotifyTool.Notify("Error can't start game on Debug Mode");
+            return;
+#endif
+
+            StartSMAPIActivity(launcherActivity);
+        }
+        catch (Exception ex)
+        {
+            ToastNotifyTool.Notify("Error:LaunchGameActivity: " + ex.ToString());
+        }
+    }
+    //prevent Load Game Assembly in scope function LaunchGameActivityInternal()
+    static void StartSMAPIActivity(Activity launcherActivity)
+    {
+        var intent = new Intent(launcherActivity, typeof(SMAPIActivity));
+        intent.AddFlags(ActivityFlags.ClearTask);
+        intent.AddFlags(ActivityFlags.NewTask);
+        launcherActivity.StartActivity(intent);
+        launcherActivity.Finish();
+    }
+
 }

@@ -8,7 +8,7 @@
           "scrcpy-mcp"
         ],
         "env": {
-          "SCRCPY_SERVER_PATH": "C:\\Users\\narat\\Desktop\\Stardew Valley Android\\scrcpy-win64-v3.3.4\\scrcpy-server"
+          "SCRCPY_SERVER_PATH": "C:\\scrcpy-win64\\scrcpy-server"
         }
       }
     }

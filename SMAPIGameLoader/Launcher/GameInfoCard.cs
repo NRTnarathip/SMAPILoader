@@ -13,7 +13,7 @@ public class GameInfoCard : InfoCard
     {
         var installed = GameApkTool.IsInstalled;
 
-        var status = AddHeader("App Game");
+        var status = AddHeader("Launcher & Game");
         SetStatus(status, installed, InstalledStatusText, NotInstalledStatusText);
         AddDivider();
 
