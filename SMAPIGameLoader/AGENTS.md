@@ -50,6 +50,10 @@ dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c "Dev" `
 - ผลลัพธ์: `SMAPIGameLoader/bin/Dev/net9.0-android/abc.smapi.gameloader-Signed.apk` (~36 MB)
 - เวลาที่วัดได้บนเครื่องนี้: full build ~58 s, build หลังแก้ไฟล์ 1 ไฟล์ ~23 s
 - รองรับ **arm64 เท่านั้น** (ตรงกับข้อจำกัดของโปรเจกต์) — เครื่องทดสอบต้องเป็น arm64
+- `Dev` define `DEBUG` และโค้ดบล็อกการเข้าเกมเมื่อ DEBUG → ทดสอบ gameplay ต้องใช้ `Release`
+- `tools.cmd` auto-detect SDK/JDK/ADB; override ด้วย `ANDROID_HOME`/`ANDROID_SDK_ROOT`, `JAVA_HOME`, `ANDROID_SERIAL`
+- `RestoreDotnetTools` (target ใน csproj) รัน `dotnet tool restore` เมื่อ config ไม่ใช่ Dev —
+  ถ้าล้มเหลวและไม่เกี่ยวกับงาน ให้รายงาน ไม่ต้องแก้ถาวร
 
 `Dev` แทนที่ `Debug` เดิมทั้งหมด (fast deploy ใช้กับ workflow ตรวจ UI บนเครื่องจริงไม่ได้) และ `Release` ใช้เฉพาะตอนปล่อย build
 โดยไม่ต้องแก้อะไรใน csproj
@@ -118,7 +122,39 @@ Fallback เมื่อ MCP ใช้งานไม่ได้: `adb install 
 - คง dark theme / Material 3 และข้อความ UI ภาษาอังกฤษตามเดิม เว้นแต่ผู้ใช้สั่งเปลี่ยน
 - งาน UI ต้อง build ผ่าน + ติดตั้ง + ตรวจบนอุปกรณ์จริงด้วย mobile-mcp ก่อนรายงานว่าเสร็จ
 
-## 7. Skills — ใช้เท่าที่จำเป็น
+## 7. Technical constraints — ห้ามทำลาย
+
+- คง `net9.0-android` และอ้าง game DLLs จาก `../../SMAPI-Android-1.6/src/DependenciesDll/`
+  (`MonoGame.Framework`, `StardewValley`, `StardewValley.GameData`) — ห้ามเปลี่ยนเป็น NuGet
+- Harmony/MonoMod ใน `SharedLibs/` ต้องเป็น build ที่รองรับ .NET 9 (stock Harmony 2.3.x ใช้ไม่ได้
+  เพราะ `System.Reflection.Emit.LocalBuilder` เป็น abstract) — ห้ามแทนด้วย NuGet ปกติ
+- ใช้ custom `libmonosgen-2.0.so` จาก `SharedLibs/native/arm64-v8a/` แทน runtime ใน SDK pack
+  เพราะต้องปลดล็อก reflection ให้ Harmony/SMAPI
+- Assembly store read order — v2: header → hash index → local entries → name table → data;
+  v1: header → local entries → hash index. ห้ามสลับ
+- Split APK: รองรับ `base.apk` + `split_config.arm64_v8a.apk` + `split_content.apk` (Play Store)
+  และกรณี Samsung ที่ assembly อยู่ใน base APK — ดู `Tool/GameApkTool.cs`
+- แก้ format ของ assembly store ต้องแก้ reader และ entry parser พร้อมกัน และอัปเดต `docs/building.md`
+  ("Assembly Store v2 Format Support") ถ้าพฤติกรรมเปลี่ยน
+- 64-bit เท่านั้น (`IntPtr.Size == 8`) — ห้ามเพิ่ม fallback 32-bit
+- ห้าม hand-edit binary ใน `SharedLibs/`, `libs/`, `Resources/` โดยไม่ตรวจผลกระทบ
+
+## 8. C# style
+
+ทำตามไฟล์รอบข้างก่อน; ถ้าไฟล์นั้นไม่มี pattern ชัดเจน:
+
+- Namespace: file-scoped สำหรับไฟล์ใหม่ (`namespace SMAPIGameLoader.Tool;`) — อย่าเปลี่ยนไฟล์เดิม
+  ที่เป็น block-scoped; namespace ไม่ผูกกับโฟลเดอร์ (`Tool/`+`Game/` ส่วนใหญ่ใช้ `SMAPIGameLoader`,
+  `Launcher/` ใช้ `.Launcher`, pages ใช้ `.Launcher.Pages`)
+- หนึ่ง type ต่อไฟล์ ชื่อไฟล์ = ชื่อ type
+- `PascalCase` type/method/property/const; `_camelCase` private instance field; `camelCase` local/param;
+  static helper class ชื่อ `XxxTool` และ `internal static class`
+- 4 spaces, Allman braces; idioms `is null`, `is not null`, `is false`, target-typed `new(...)`
+- Nullable เปิดเฉพาะ project ที่ csproj เปิด — `SMAPIGameLoader` ปิดอยู่ ห้ามเหมาใส่ `?`/`!`
+- ไม่เพิ่ม NuGet ถ้าของเดิมพอ และไม่ bump pin ที่ไม่เกี่ยวกับงาน
+- คงคอมเมนต์ภาษาไทย/อังกฤษเดิม; เพิ่มใหม่เฉพาะ constraint ที่โค้ดสื่อเองไม่ได้
+
+## 9. Skills — ใช้เท่าที่จำเป็น
 
 หลักการ: skill เป็นตัวช่วยเสริมคุณภาพงาน UI ไม่ใช่ขั้นตอนบังคับ
 
@@ -166,7 +202,7 @@ python .agents/skills/ui-ux-pro-max/scripts/search.py "disabled state clarity" -
 หรือเอกสารนำเสนอ ไม่เกี่ยวกับ programmatic C# View ของ Launcher
 `find-skills`, `reverse-engineer-anything` — ใช้เมื่อผู้ใช้สั่งเท่านั้น
 
-## 8. Checklist ก่อนส่งงาน UI
+## 10. Checklist ก่อนส่งงาน UI
 
 - [ ] build 0 errors
 - [ ] `mobile_install_app` และ `mobile_launch_app` สำเร็จ

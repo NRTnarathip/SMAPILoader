@@ -44,7 +44,7 @@ public class HomePage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
         {
-            BottomMargin = Ui.Dp(context, 12)
+            BottomMargin = UI.Dp(context, 12)
         };
 
         body.AddView(new GameInfoCard(context), cardLayoutParams);
@@ -83,8 +83,8 @@ public class HomePage : LinearLayout
     {
         var body = new LinearLayout(context) { Orientation = Orientation.Vertical };
         body.SetPadding(
-            Ui.Dp(context, 16), Ui.Dp(context, 16),
-            Ui.Dp(context, 16), Ui.Dp(context, 20));
+            UI.Dp(context, 16), UI.Dp(context, 16),
+            UI.Dp(context, 16), UI.Dp(context, 20));
         return body;
     }
 
@@ -95,8 +95,8 @@ public class HomePage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
         {
-            TopMargin = Ui.Dp(context, 8),
-            BottomMargin = Ui.Dp(context, 8)
+            TopMargin = UI.Dp(context, 8),
+            BottomMargin = UI.Dp(context, 8)
         };
         return button;
     }

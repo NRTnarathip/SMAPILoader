@@ -163,7 +163,7 @@ public class LauncherActivity : AppCompatActivity
         _nav.Elevation = 0;
         _nav.ItemIconTintList = LauncherTheme.BottomNavItemColors();
         _nav.ItemTextColor = LauncherTheme.BottomNavItemColors();
-        _nav.ItemIconSize = Ui.Dp(this, 22);
+        _nav.ItemIconSize = UI.Dp(this, 22);
         _nav.SelectedItemId = HomeId;
         _nav.Menu.Add(0, HomeId, 0, "Home").SetIcon(Resource.Drawable.ic_nav_home);
         _nav.Menu.Add(0, ModManagerId, 1, "Mods").SetIcon(Resource.Drawable.ic_nav_mods);
@@ -179,7 +179,7 @@ public class LauncherActivity : AppCompatActivity
         navDivider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
         var navContainer = new LinearLayout(this) { Orientation = Orientation.Vertical };
         navContainer.AddView(navDivider, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, Ui.Dp(this, 1)));
+            ViewGroup.LayoutParams.MatchParent, UI.Dp(this, 1)));
         navContainer.AddView(_nav);
 
         // Root: แนวตั้ง ใช้เต็มจอ

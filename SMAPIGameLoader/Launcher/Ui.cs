@@ -6,7 +6,7 @@ using Android.Util;
 
 namespace SMAPIGameLoader.Launcher;
 
-public static class Ui
+public static class UI
 {
     const string RippleColorHex = "#33FFFFFF";
 

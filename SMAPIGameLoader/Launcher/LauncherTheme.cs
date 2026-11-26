@@ -72,10 +72,10 @@ internal static class LauncherTheme
     {
         var drawable = new Android.Graphics.Drawables.GradientDrawable();
         drawable.SetShape(Android.Graphics.Drawables.ShapeType.Rectangle);
-        drawable.SetCornerRadius(Ui.Dp(context, radiusDp));
+        drawable.SetCornerRadius(UI.Dp(context, radiusDp));
         drawable.SetColor(Parse(fillHex));
         if (strokeHex is not null)
-            drawable.SetStroke(Ui.Dp(context, 1), Parse(strokeHex));
+            drawable.SetStroke(UI.Dp(context, 1), Parse(strokeHex));
         return drawable;
     }
 }

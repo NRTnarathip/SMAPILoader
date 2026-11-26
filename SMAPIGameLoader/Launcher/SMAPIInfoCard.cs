@@ -27,13 +27,13 @@ public class SMAPIInfoCard : InfoCard
 
         var actions = new LinearLayout(Context) { Orientation = Orientation.Horizontal };
         actions.SetGravity(GravityFlags.CenterHorizontal);
-        actions.SetPadding(0, Ui.Dp(Context, 16), 0, 0);
+        actions.SetPadding(0, UI.Dp(Context, 16), 0, 0);
 
         _uninstallButton = CreateActionButton("Uninstall", OnClickUninstall, primary: false);
         actions.AddView(_uninstallButton, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
         {
-            RightMargin = Ui.Dp(Context, 10)
+            RightMargin = UI.Dp(Context, 10)
         });
 
         _installButton = CreateActionButton("Install", OnClickInstall, primary: true);
@@ -81,15 +81,15 @@ public class SMAPIInfoCard : InfoCard
         button.SetTextColor(primary
             ? LauncherTheme.Parse(LauncherTheme.TextOnPrimaryHex)
             : LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
-        button.SetMinWidth(Ui.Dp(Context, 96));
-        button.SetMinHeight(Ui.Dp(Context, 44));
+        button.SetMinWidth(UI.Dp(Context, 96));
+        button.SetMinHeight(UI.Dp(Context, 44));
         button.StateListAnimator = null;
         button.SetPadding(
-            Ui.Dp(Context, 18), 0,
-            Ui.Dp(Context, 18), 0);
+            UI.Dp(Context, 18), 0,
+            UI.Dp(Context, 18), 0);
         button.Background = primary
-            ? Ui.CreateRippleDrawable(Context, LauncherTheme.PrimaryHex, LauncherTheme.ChipRadiusDp)
-            : Ui.CreateRippleDrawable(Context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
+            ? UI.CreateRippleDrawable(Context, LauncherTheme.PrimaryHex, LauncherTheme.ChipRadiusDp)
+            : UI.CreateRippleDrawable(Context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
         button.Click += onClick;
         return button;
     }

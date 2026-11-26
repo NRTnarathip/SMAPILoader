@@ -38,8 +38,8 @@ internal sealed class LogEntryAdapter : RecyclerView.Adapter
         text.SetLineSpacing(0, 1.15f);
         text.SetTextIsSelectable(false);
         text.SetPadding(
-            Ui.Dp(context, 16), Ui.Dp(context, 3),
-            Ui.Dp(context, 16), Ui.Dp(context, 3));
+            UI.Dp(context, 16), UI.Dp(context, 3),
+            UI.Dp(context, 16), UI.Dp(context, 3));
 
         return new LineHolder(text);
     }

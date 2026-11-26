@@ -38,12 +38,12 @@ internal class ModViewHolder : RecyclerView.ViewHolder
     {
         var card = new CardView(context)
         {
-            Radius = Ui.Dp(context, 14),
+            Radius = UI.Dp(context, 14),
             CardElevation = 0,
             UseCompatPadding = true
         };
         card.SetCardBackgroundColor(LauncherTheme.Parse(LauncherTheme.CardBackgroundHex));
-        int sideMargin = Ui.Dp(context, 8);
+        int sideMargin = UI.Dp(context, 8);
         card.LayoutParameters = new RecyclerView.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
@@ -54,8 +54,8 @@ internal class ModViewHolder : RecyclerView.ViewHolder
 
         // สองบรรทัดต่อการ์ด (ชื่อ / version · size · date) เพื่อให้ list ยาว ๆ ดูแน่นและอ่านง่าย
         var column = new LinearLayout(context) { Orientation = Orientation.Vertical };
-        column.SetPadding(Ui.Dp(context, 16), Ui.Dp(context, 10),
-                          Ui.Dp(context, 16), Ui.Dp(context, 10));
+        column.SetPadding(UI.Dp(context, 16), UI.Dp(context, 10),
+                          UI.Dp(context, 16), UI.Dp(context, 10));
         card.AddView(column);
 
         var name = new TextView(context);
@@ -73,7 +73,7 @@ internal class ModViewHolder : RecyclerView.ViewHolder
         detail.LayoutParameters = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
-        { TopMargin = Ui.Dp(context, 3) };
+        { TopMargin = UI.Dp(context, 3) };
 
         column.AddView(name);
         column.AddView(detail);

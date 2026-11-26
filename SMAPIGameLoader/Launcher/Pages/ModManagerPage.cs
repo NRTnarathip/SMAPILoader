@@ -72,7 +72,7 @@ internal sealed class ModManagerPage : LinearLayout
         _adapter = new ModAdapter(context, _mods, OnClickedModItem);
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
-        _list.SetPadding(0, Ui.Dp(context, 12), 0, Ui.Dp(context, 16));
+        _list.SetPadding(0, UI.Dp(context, 12), 0, UI.Dp(context, 16));
         _list.SetClipToPadding(false);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
@@ -99,7 +99,7 @@ internal sealed class ModManagerPage : LinearLayout
         emptyHint.SetTextSize(ComplexUnitType.Sp, 13);
         emptyHint.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         emptyHint.Gravity = GravityFlags.Center;
-        emptyHint.SetPadding(0, Ui.Dp(context, 6), 0, 0);
+        emptyHint.SetPadding(0, UI.Dp(context, 6), 0, 0);
         emptyView.AddView(emptyHint);
 
         body.AddView(emptyView, new FrameLayout.LayoutParams(
@@ -114,16 +114,16 @@ internal sealed class ModManagerPage : LinearLayout
         var button = new ImageButton(context);
         button.SetImageResource(Android.Resource.Drawable.IcInputAdd);
         button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.AccentHex));
-        button.Background = Ui.CreateRippleDrawable(
+        button.Background = UI.CreateRippleDrawable(
             context, LauncherTheme.SurfaceVariantHex, 20);
         button.ContentDescription = "Install mod";
         button.SetPadding(
-            Ui.Dp(context, 10), Ui.Dp(context, 10),
-            Ui.Dp(context, 10), Ui.Dp(context, 10));
+            UI.Dp(context, 10), UI.Dp(context, 10),
+            UI.Dp(context, 10), UI.Dp(context, 10));
 
-        int size = Ui.Dp(context, 40);
+        int size = UI.Dp(context, 40);
         button.LayoutParameters = new LinearLayout.LayoutParams(size, size)
-        { RightMargin = Ui.Dp(context, 8) };
+        { RightMargin = UI.Dp(context, 8) };
         button.Click += InstallButton_Click;
         return button;
     }
@@ -140,9 +140,9 @@ internal sealed class ModManagerPage : LinearLayout
         button.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
         button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         button.SetPadding(
-            Ui.Dp(context, 12), Ui.Dp(context, 9),
-            Ui.Dp(context, 12), Ui.Dp(context, 9));
-        button.Background = Ui.CreateRippleDrawable(
+            UI.Dp(context, 12), UI.Dp(context, 9),
+            UI.Dp(context, 12), UI.Dp(context, 9));
+        button.Background = UI.CreateRippleDrawable(
             context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
         button.Click += SortButton_Click;
         return button;
@@ -326,7 +326,7 @@ internal sealed class ModManagerPage : LinearLayout
         textView.SetTextIsSelectable(true);
         textView.Text = manifestText;
 
-        int padding = Ui.Dp(_context, 16);
+        int padding = UI.Dp(_context, 16);
         textView.SetPadding(padding, padding, padding, padding);
 
         var scroll = new ScrollView(_context);

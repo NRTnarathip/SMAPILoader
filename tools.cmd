@@ -2,13 +2,14 @@
 setlocal EnableExtensions
 
 rem ============================================================
-rem  SMAPI Loader build/install helper
+rem  SMAPI Loader build/install/launch helper
 rem
 rem  Usage:
 rem    tools.cmd build <dev^|release>      build only
 rem    tools.cmd install <dev^|release>    install existing APK
 rem    tools.cmd dev                       build Dev, then install
 rem    tools.cmd release                   build Release, then install
+rem    tools.cmd run                       launch the installed app
 rem    tools.cmd help
 rem
 rem  Extra args after the command are forwarded to "dotnet build", e.g.
@@ -39,6 +40,8 @@ if /i "%ACTION%"=="release" (
     set "ACTION=all"
     set "TARGET=release"
 )
+
+if /i "%ACTION%"=="run" goto :resolve_env
 
 if /i "%TARGET%"=="dev" (
     set "CONFIG=Dev"
@@ -78,6 +81,7 @@ shift
 goto :collect_extra
 :collected
 
+if /i "%ACTION%"=="run" goto :do_run
 if /i "%ACTION%"=="all" set "DO_INSTALL=1"
 if /i "%ACTION%"=="install" goto :do_install
 
@@ -117,15 +121,28 @@ if errorlevel 1 (
 echo [tools] done
 exit /b 0
 
+:do_run
+echo [tools] launch abc.smapi.gameloader
+call "%ADB%" shell am force-stop abc.smapi.gameloader
+rem monkey resolves the MAIN/LAUNCHER activity itself, so the crc64 class name never goes stale
+call "%ADB%" shell monkey -p abc.smapi.gameloader -c android.intent.category.LAUNCHER 1 >nul 2>&1
+if errorlevel 1 (
+    echo [tools] launch failed
+    exit /b 1
+)
+echo [tools] done
+exit /b 0
+
 :usage
 echo.
-echo  SMAPI Loader build/install helper
+echo  SMAPI Loader build/install/launch helper
 echo.
 echo  Usage:
 echo    tools.cmd build ^<dev^|release^>      build only
 echo    tools.cmd install ^<dev^|release^>    install existing APK
 echo    tools.cmd dev                       build Dev, then install
 echo    tools.cmd release                   build Release, then install
+echo    tools.cmd run                       launch the installed app
 echo    tools.cmd help
 echo.
 echo  Examples:

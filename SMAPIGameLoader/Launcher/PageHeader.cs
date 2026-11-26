@@ -24,13 +24,13 @@ internal sealed class PageHeader : LinearLayout
     {
         Orientation = Orientation.Horizontal;
         SetGravity(GravityFlags.CenterVertical);
-        SetMinimumHeight(Ui.Dp(context, RowHeightDp)
-            + Ui.Dp(context, 18) + Ui.Dp(context, 14));
+        SetMinimumHeight(UI.Dp(context, RowHeightDp)
+            + UI.Dp(context, 18) + UI.Dp(context, 14));
         SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.HeaderBackgroundHex));
-        Elevation = Ui.Dp(context, 3);
+        Elevation = UI.Dp(context, 3);
         SetPadding(
-            Ui.Dp(context, 16), Ui.Dp(context, 18),
-            Ui.Dp(context, 16), Ui.Dp(context, 14));
+            UI.Dp(context, 16), UI.Dp(context, 18),
+            UI.Dp(context, 16), UI.Dp(context, 14));
 
         Title = new TextView(context) { Text = titleText };
         Title.SetTextSize(ComplexUnitType.Sp, 22);
@@ -39,7 +39,7 @@ internal sealed class PageHeader : LinearLayout
         Title.LetterSpacing = 0.01f;
         Title.SetSingleLine(true);
         Title.Ellipsize = TextUtils.TruncateAt.End;
-        Title.SetMinimumHeight(Ui.Dp(context, RowHeightDp));
+        Title.SetMinimumHeight(UI.Dp(context, RowHeightDp));
         Title.Gravity = GravityFlags.CenterVertical;
 
         Actions = new LinearLayout(context) { Orientation = Orientation.Horizontal };
@@ -47,7 +47,7 @@ internal sealed class PageHeader : LinearLayout
 
         AddView(Title, new LayoutParams(0, ViewGroup.LayoutParams.WrapContent, 1f)
         {
-            RightMargin = Ui.Dp(context, 12)
+            RightMargin = UI.Dp(context, 12)
         });
         AddView(Actions, new LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));

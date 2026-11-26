@@ -19,7 +19,7 @@ public abstract class InfoCard : CardView
     protected InfoCard(Context context) : base(context)
     {
         SetCardBackgroundColor(LauncherTheme.Parse(LauncherTheme.CardBackgroundHex));
-        Radius = Ui.Dp(context, LauncherTheme.CardRadiusDp);
+        Radius = UI.Dp(context, LauncherTheme.CardRadiusDp);
         CardElevation = 0;
         UseCompatPadding = false;
         LayoutParameters = new ViewGroup.MarginLayoutParams(
@@ -28,8 +28,8 @@ public abstract class InfoCard : CardView
 
         Content = new LinearLayout(context) { Orientation = Orientation.Vertical };
         Content.SetPadding(
-            Ui.Dp(context, 18), Ui.Dp(context, 16),
-            Ui.Dp(context, 18), Ui.Dp(context, 16));
+            UI.Dp(context, 18), UI.Dp(context, 16),
+            UI.Dp(context, 18), UI.Dp(context, 16));
         AddView(Content);
     }
 
@@ -46,7 +46,7 @@ public abstract class InfoCard : CardView
         header.AddView(title, new LinearLayout.LayoutParams(
             0, ViewGroup.LayoutParams.WrapContent, 1f)
         {
-            RightMargin = Ui.Dp(Context, 12)
+            RightMargin = UI.Dp(Context, 12)
         });
 
         var status = CreateStatusBadge(Context);
@@ -72,10 +72,10 @@ public abstract class InfoCard : CardView
         var divider = new View(Context);
         divider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
         Content.AddView(divider, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, Ui.Dp(Context, 1))
+            ViewGroup.LayoutParams.MatchParent, UI.Dp(Context, 1))
         {
-            TopMargin = Ui.Dp(Context, 14),
-            BottomMargin = Ui.Dp(Context, 8)
+            TopMargin = UI.Dp(Context, 14),
+            BottomMargin = UI.Dp(Context, 8)
         });
     }
 
@@ -83,7 +83,7 @@ public abstract class InfoCard : CardView
     {
         var row = new LinearLayout(Context) { Orientation = Orientation.Horizontal };
         row.SetGravity(GravityFlags.CenterVertical);
-        row.SetPadding(0, Ui.Dp(Context, 7), 0, Ui.Dp(Context, 7));
+        row.SetPadding(0, UI.Dp(Context, 7), 0, UI.Dp(Context, 7));
 
         var key = new TextView(Context) { Text = label };
         key.SetTextSize(ComplexUnitType.Sp, 13);
@@ -98,7 +98,7 @@ public abstract class InfoCard : CardView
         value.Gravity = GravityFlags.End | GravityFlags.CenterVertical;
         value.SetMaxLines(3);
         value.SetLineSpacing(0, 1.15f);
-        value.SetPadding(Ui.Dp(Context, 16), 0, 0, 0);
+        value.SetPadding(UI.Dp(Context, 16), 0, 0, 0);
         row.AddView(value);
 
         Content.AddView(row);
@@ -119,7 +119,7 @@ public abstract class InfoCard : CardView
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
         {
-            TopMargin = Ui.Dp(Context, emphasized ? 2 : 6)
+            TopMargin = UI.Dp(Context, emphasized ? 2 : 6)
         });
         return textView;
     }
@@ -134,8 +134,8 @@ public abstract class InfoCard : CardView
         status.SetIncludeFontPadding(false);
         status.Gravity = GravityFlags.Center;
         status.SetPadding(
-            Ui.Dp(context, 10), Ui.Dp(context, 5),
-            Ui.Dp(context, 10), Ui.Dp(context, 5));
+            UI.Dp(context, 10), UI.Dp(context, 5),
+            UI.Dp(context, 10), UI.Dp(context, 5));
         status.Background = CreateStatusBadgeBackground(context, LauncherTheme.StatusErrorBackgroundHex);
         return status;
     }
@@ -144,7 +144,7 @@ public abstract class InfoCard : CardView
     {
         var background = new GradientDrawable();
         background.SetShape(ShapeType.Rectangle);
-        background.SetCornerRadius(Ui.Dp(context, 100));
+        background.SetCornerRadius(UI.Dp(context, 100));
         background.SetColor(LauncherTheme.Parse(colorHex));
         return background;
     }

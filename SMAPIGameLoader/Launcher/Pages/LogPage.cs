@@ -89,8 +89,8 @@ internal sealed class LogPage : LinearLayout
         var chipsRow = new LinearLayout(context) { Orientation = Orientation.Horizontal };
         chipsRow.SetGravity(GravityFlags.CenterVertical);
         chipsRow.SetPadding(
-            Ui.Dp(context, 16), Ui.Dp(context, 10),
-            Ui.Dp(context, 16), Ui.Dp(context, 2));
+            UI.Dp(context, 16), UI.Dp(context, 10),
+            UI.Dp(context, 16), UI.Dp(context, 2));
 
         foreach (var kind in FilterKinds)
         {
@@ -111,8 +111,8 @@ internal sealed class LogPage : LinearLayout
         _metaText.SetSingleLine(true);
         _metaText.Ellipsize = TextUtils.TruncateAt.End;
         _metaText.SetPadding(
-            Ui.Dp(context, 16), Ui.Dp(context, 2),
-            Ui.Dp(context, 16), Ui.Dp(context, 6));
+            UI.Dp(context, 16), UI.Dp(context, 2),
+            UI.Dp(context, 16), UI.Dp(context, 6));
         AddView(_metaText);
 
         // ===== Body =====
@@ -123,7 +123,7 @@ internal sealed class LogPage : LinearLayout
         _adapter = new LogEntryAdapter();
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
-        _list.SetPadding(0, Ui.Dp(context, 4), 0, Ui.Dp(context, 12));
+        _list.SetPadding(0, UI.Dp(context, 4), 0, UI.Dp(context, 12));
         _list.SetClipToPadding(false);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetItemAnimator(null);
@@ -141,14 +141,14 @@ internal sealed class LogPage : LinearLayout
         var pagerDivider = new View(context);
         pagerDivider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
         AddView(pagerDivider, new LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, Ui.Dp(context, 1)));
+            ViewGroup.LayoutParams.MatchParent, UI.Dp(context, 1)));
 
         var pager = new LinearLayout(context) { Orientation = Orientation.Horizontal };
         pager.SetGravity(GravityFlags.CenterVertical);
         pager.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.NavBarBackgroundHex));
         pager.SetPadding(
-            Ui.Dp(context, 12), Ui.Dp(context, 6),
-            Ui.Dp(context, 12), Ui.Dp(context, 6));
+            UI.Dp(context, 12), UI.Dp(context, 6),
+            UI.Dp(context, 12), UI.Dp(context, 6));
 
         _prevButton = CreatePagerButton(context, Resource.Drawable.ic_chevron_left, "Previous page");
         _prevButton.Click += (s, e) => GoToPage(_page - 1);
@@ -162,8 +162,8 @@ internal sealed class LogPage : LinearLayout
         pager.AddView(_pageText, new LinearLayout.LayoutParams(
             0, ViewGroup.LayoutParams.WrapContent, 1f)
         {
-            LeftMargin = Ui.Dp(context, 8),
-            RightMargin = Ui.Dp(context, 8)
+            LeftMargin = UI.Dp(context, 8),
+            RightMargin = UI.Dp(context, 8)
         });
 
         _nextButton = CreatePagerButton(context, Resource.Drawable.ic_chevron_right, "Next page");
@@ -173,10 +173,10 @@ internal sealed class LogPage : LinearLayout
         var pagerSeparator = new View(context);
         pagerSeparator.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
         pager.AddView(pagerSeparator, new LinearLayout.LayoutParams(
-            Ui.Dp(context, 1), Ui.Dp(context, 20))
+            UI.Dp(context, 1), UI.Dp(context, 20))
         {
-            LeftMargin = Ui.Dp(context, 8),
-            RightMargin = Ui.Dp(context, 8)
+            LeftMargin = UI.Dp(context, 8),
+            RightMargin = UI.Dp(context, 8)
         });
 
         var topButton = CreatePagerButton(context, Resource.Drawable.ic_to_top, "Scroll to top");
@@ -191,7 +191,7 @@ internal sealed class LogPage : LinearLayout
         };
         pager.AddView(bottomButton, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
-        { LeftMargin = Ui.Dp(context, 8) });
+        { LeftMargin = UI.Dp(context, 8) });
 
         AddView(pager, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
@@ -225,12 +225,12 @@ internal sealed class LogPage : LinearLayout
         chip.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         chip.SetIncludeFontPadding(false);
         chip.SetPadding(
-            Ui.Dp(context, 10), Ui.Dp(context, 5),
-            Ui.Dp(context, 10), Ui.Dp(context, 5));
+            UI.Dp(context, 10), UI.Dp(context, 5),
+            UI.Dp(context, 10), UI.Dp(context, 5));
         chip.LayoutParameters = new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WrapContent,
             ViewGroup.LayoutParams.WrapContent)
-        { RightMargin = Ui.Dp(context, 6) };
+        { RightMargin = UI.Dp(context, 6) };
 
         ApplyChipStyle(chip, IsFilterEnabled(kind));
 
@@ -253,11 +253,11 @@ internal sealed class LogPage : LinearLayout
 
         var background = new GradientDrawable();
         background.SetShape(ShapeType.Rectangle);
-        background.SetCornerRadius(Ui.Dp(Context, LauncherTheme.ChipRadiusDp));
+        background.SetCornerRadius(UI.Dp(Context, LauncherTheme.ChipRadiusDp));
         background.SetColor(LauncherTheme.Parse(
             selected ? LauncherTheme.StatusOkBackgroundHex : LauncherTheme.SurfaceVariantHex));
         if (selected)
-            background.SetStroke(Ui.Dp(Context, 1),
+            background.SetStroke(UI.Dp(Context, 1),
                 LauncherTheme.Parse(LauncherTheme.StatusOkTextHex));
 
         chip.Background = background;
@@ -285,16 +285,16 @@ internal sealed class LogPage : LinearLayout
         var button = new ImageButton(context);
         button.SetImageResource(iconResId);
         button.SetColorFilter(LauncherTheme.Parse(tintHex));
-        button.Background = Ui.CreateRippleDrawable(
+        button.Background = UI.CreateRippleDrawable(
             context, LauncherTheme.SurfaceVariantHex, 20);
         button.ContentDescription = description;
         button.SetPadding(
-            Ui.Dp(context, 10), Ui.Dp(context, 10),
-            Ui.Dp(context, 10), Ui.Dp(context, 10));
+            UI.Dp(context, 10), UI.Dp(context, 10),
+            UI.Dp(context, 10), UI.Dp(context, 10));
 
-        int size = Ui.Dp(context, 40);
+        int size = UI.Dp(context, 40);
         button.LayoutParameters = new LinearLayout.LayoutParams(size, size)
-        { RightMargin = Ui.Dp(context, 8) };
+        { RightMargin = UI.Dp(context, 8) };
         return button;
     }
 
@@ -303,14 +303,14 @@ internal sealed class LogPage : LinearLayout
         var button = new ImageButton(context);
         button.SetImageResource(iconResId);
         button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
-        button.Background = Ui.CreateRippleDrawable(
+        button.Background = UI.CreateRippleDrawable(
             context, LauncherTheme.SurfaceVariantHex, 20);
         button.ContentDescription = description;
         button.SetPadding(
-            Ui.Dp(context, 8), Ui.Dp(context, 8),
-            Ui.Dp(context, 8), Ui.Dp(context, 8));
+            UI.Dp(context, 8), UI.Dp(context, 8),
+            UI.Dp(context, 8), UI.Dp(context, 8));
 
-        int size = Ui.Dp(context, 40);
+        int size = UI.Dp(context, 40);
         button.LayoutParameters = new LinearLayout.LayoutParams(size, size);
         return button;
     }
@@ -320,7 +320,7 @@ internal sealed class LogPage : LinearLayout
     {
         var empty = new LinearLayout(context) { Orientation = Orientation.Vertical };
         empty.SetGravity(GravityFlags.Center);
-        empty.SetPadding(Ui.Dp(context, 24), 0, Ui.Dp(context, 24), 0);
+        empty.SetPadding(UI.Dp(context, 24), 0, UI.Dp(context, 24), 0);
 
         title = new TextView(context);
         title.SetTextSize(ComplexUnitType.Sp, 16);
@@ -333,7 +333,7 @@ internal sealed class LogPage : LinearLayout
         hint.SetTextSize(ComplexUnitType.Sp, 13);
         hint.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         hint.Gravity = GravityFlags.Center;
-        hint.SetPadding(0, Ui.Dp(context, 6), 0, 0);
+        hint.SetPadding(0, UI.Dp(context, 6), 0, 0);
         empty.AddView(hint);
 
         detail = new TextView(context);
@@ -342,7 +342,7 @@ internal sealed class LogPage : LinearLayout
         detail.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         detail.Gravity = GravityFlags.Center;
         detail.SetLineSpacing(0, 1.15f);
-        detail.SetPadding(0, Ui.Dp(context, 14), 0, 0);
+        detail.SetPadding(0, UI.Dp(context, 14), 0, 0);
         empty.AddView(detail);
 
         return empty;

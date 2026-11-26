@@ -22,18 +22,18 @@ internal sealed class PrimaryActionButton : FrameLayout
     {
         Clickable = true;
         Focusable = true;
-        SetMinimumHeight(Ui.Dp(context, 56));
-        Background = Ui.CreateRippleDrawable(
+        SetMinimumHeight(UI.Dp(context, 56));
+        Background = UI.CreateRippleDrawable(
             context, LauncherTheme.PrimaryHex, LauncherTheme.ButtonRadiusDp);
 
         var icon = new ImageView(context);
         icon.SetImageResource(iconResId);
         icon.ImportantForAccessibility = ImportantForAccessibility.No;
         var iconParams = new LayoutParams(
-            Ui.Dp(context, IconSizeDp), Ui.Dp(context, IconSizeDp))
+            UI.Dp(context, IconSizeDp), UI.Dp(context, IconSizeDp))
         {
             Gravity = GravityFlags.Start | GravityFlags.CenterVertical,
-            LeftMargin = Ui.Dp(context, IconInsetDp)
+            LeftMargin = UI.Dp(context, IconInsetDp)
         };
         AddView(icon, iconParams);
 
@@ -47,9 +47,9 @@ internal sealed class PrimaryActionButton : FrameLayout
         _label.Ellipsize = TextUtils.TruncateAt.End;
         // padding ซ้าย/ขวาเท่ากัน เพื่อให้ข้อความ center ของปุ่มจริง
         // (ค่าที่เผื่อไว้ต้องกว้างกว่าไอคอน ไม่งั้นข้อความยาวจะทับไอคอน)
-        int sidePadding = Ui.Dp(context, IconInsetDp + IconSizeDp + 8);
-        _label.SetPadding(sidePadding, Ui.Dp(context, 14),
-            sidePadding, Ui.Dp(context, 14));
+        int sidePadding = UI.Dp(context, IconInsetDp + IconSizeDp + 8);
+        _label.SetPadding(sidePadding, UI.Dp(context, 14),
+            sidePadding, UI.Dp(context, 14));
         AddView(_label);
 
         UpdateContentDescription();
