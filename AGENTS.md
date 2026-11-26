@@ -25,14 +25,17 @@ game DLLs ที่ `../SMAPI-Android-1.6/src/DependenciesDll/`, และ custo
 (รายละเอียดใน `docs/building.md`)
 
 ```bash
-# Windows
+# Windows — งาน dev ใช้ config "Dev AI" (เร็วสุด: arm64 เดียว, assembly store, ไม่ trim/AOT)
+.\build-dev-ai.cmd
+
+# ปล่อย build
 dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c Release ^
   -p:AndroidSdkDirectory="%LOCALAPPDATA%\Android\Sdk" ^
   -p:JavaSdkDirectory="C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot"
 ```
 
-- **Verification gate = build ผ่าน** เพราะไม่มี test suite อย่าอ้างว่า "น่าจะ работает" โดยไม่ build ถ้าทำได้
-- APK อยู่ใต้ `SMAPIGameLoader/bin/Release/net9.0-android/` — ชื่อไฟล์จริงให้ดูจาก output/build docs อย่า hardcode
+- **Verification gate = build ผ่าน** เพราะไม่มี test suite อย่าอ้างว่า "น่าจะทำงาน" โดยไม่ build ถ้าทำได้
+- APK อยู่ใต้ `SMAPIGameLoader/bin/<Config>/net9.0-android/` (`Dev AI` หรือ `Release`) — ชื่อไฟล์จริงให้ดูจาก output/build docs อย่า hardcode
 - `SMAPIGameLoader.csproj` มี target `RestoreDotnetTools` ที่รัน `dotnet tool restore` ก่อน restore — ถ้าล้มเหลวและไม่เกี่ยวกับงาน ให้รายงาน ไม่ต้องแก้ถาวร
 - `docs/building.md` บางส่วนอาจล้าสมัย (เช่นยังอ้างชื่อ `StardewApkTool.cs` ซึ่งปัจจุบันคือ `Tool/GameApkTool.cs`) — ตรวจโค้ดจริงก่อนเชื่อ docs
 

@@ -44,6 +44,35 @@
 		<RunAOTCompilation>False</RunAOTCompilation>
 		<EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
 	</PropertyGroup>
+	<!-- Dev AI: config สำหรับ dev loop ที่เร็วที่สุด (build/ติดตั้ง/ทดสอบ)
+	     config ที่ไม่ใช่ Debug/Release จะถูก SDK มองเป็น Release-like จึงต้อง override ให้ครบ -->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dev AI|AnyCPU'">
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+		<AndroidUseAssemblyStore>True</AndroidUseAssemblyStore>
+		<RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
+		<PublishTrimmed>False</PublishTrimmed>
+		<AndroidLinkMode>None</AndroidLinkMode>
+		<RunAOTCompilation>False</RunAOTCompilation>
+		<AndroidEnableProfiledAot>False</AndroidEnableProfiledAot>
+		<AndroidEnableLLVM>False</AndroidEnableLLVM>
+		<AndroidEnableMarshalMethods>False</AndroidEnableMarshalMethods>
+		<IsAotCompatible>False</IsAotCompatible>
+		<AndroidEnableSGenConcurrent>True</AndroidEnableSGenConcurrent>
+		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+		<AndroidKeyStore>True</AndroidKeyStore>
+		<AndroidSigningStorePass>android</AndroidSigningStorePass>
+		<AndroidSigningKeyAlias>androiddebugkey</AndroidSigningKeyAlias>
+		<AndroidSigningKeyPass>android</AndroidSigningKeyPass>
+		<EnableNETAnalyzers>False</EnableNETAnalyzers>
+		<RunAnalyzers>False</RunAnalyzers>
+		<AnalysisLevel>none</AnalysisLevel>
+		<!-- pdb เก็บไว้ใน bin เพื่ออ่าน stack trace แต่ไม่ยัดเข้า APK
+		     (SDK จะเปิด AndroidIncludeDebugSymbols ให้เองเมื่อ Optimize ไม่ใช่ True) -->
+		<DebugSymbols>True</DebugSymbols>
+		<DebugType>portable</DebugType>
+		<Optimize>True</Optimize>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="Mono.Cecil" Version="0.11.5" />
@@ -96,7 +125,8 @@
 			<PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
-	<Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+	<!-- mgcb tools ไม่ได้ใช้ใน build ปกติ: ข้ามใน Dev AI เพื่อตัดเวลาออก -->
+	<Target Name="RestoreDotnetTools" BeforeTargets="Restore" Condition="'$(Configuration)' != 'Dev AI'">
 		<Message Text="Restoring dotnet tools" Importance="High" />
 		<Exec Command="dotnet tool restore" />
 	</Target>

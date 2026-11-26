@@ -19,6 +19,7 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
+		Dev AI|Any CPU = Dev AI|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{805B84D7-24B4-43F6-9086-A3773E1CD9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -74,6 +75,15 @@ Global
 		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|ARM64.Build.0 = Release|Any CPU
 		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|x64.ActiveCfg = Release|Any CPU
 		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Release|x64.Build.0 = Release|Any CPU
+		{805B84D7-24B4-43F6-9086-A3773E1CD9BD}.Dev AI|Any CPU.ActiveCfg = Dev AI|Any CPU
+		{805B84D7-24B4-43F6-9086-A3773E1CD9BD}.Dev AI|Any CPU.Build.0 = Dev AI|Any CPU
+		{805B84D7-24B4-43F6-9086-A3773E1CD9BD}.Dev AI|Any CPU.Deploy.0 = Dev AI|Any CPU
+		{77113F38-DD1C-42F6-B42D-567D21864CB3}.Dev AI|Any CPU.ActiveCfg = Dev AI|Any CPU
+		{77113F38-DD1C-42F6-B42D-567D21864CB3}.Dev AI|Any CPU.Build.0 = Dev AI|Any CPU
+		{C7452172-2FA7-4188-B34E-44FE0AABB72B}.Dev AI|Any CPU.ActiveCfg = Dev AI|Any CPU
+		{C7452172-2FA7-4188-B34E-44FE0AABB72B}.Dev AI|Any CPU.Build.0 = Dev AI|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Dev AI|Any CPU.ActiveCfg = Dev AI|Any CPU
+		{3F5A7573-C08C-4110-AEE0-F2D50047D690}.Dev AI|Any CPU.Build.0 = Dev AI|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

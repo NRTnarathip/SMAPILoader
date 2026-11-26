@@ -31,17 +31,25 @@
 
 ## 3. Build (ไม่มี hot reload)
 
-Debug แบบฝัง assemblies (APK ประมาณ 113 MB):
+**ใช้ config `Dev AI` สำหรับงาน dev ทุกงาน** — เร็วที่สุดและ APK รันได้จริงบนเครื่อง
+(arm64 เดียว, assembly store, ไม่ trim/AOT/analyzer, pdb ไม่ถูกยัดเข้า APK)
 
 ```powershell
-dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c Debug `
-  -p:EmbedAssembliesIntoApk=true `
+# ทางลัด (auto-detect SDK/JDK ให้)
+.\build-dev-ai.cmd
+
+# หรือเรียกตรง
+dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c "Dev AI" `
   -p:AndroidSdkDirectory="$env:LOCALAPPDATA\Android\Sdk" `
   -p:JavaSdkDirectory="C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot"
 ```
 
-**ทำไมต้อง `EmbedAssembliesIntoApk=true`**: csproj ตั้ง `false` ไว้ใน Debug (กลไก fast deploy)
-ถ้าไม่ใส่ APK จะไม่มี assemblies และแอปจะ crash ทันทีหลังติดตั้ง
+- ผลลัพธ์: `SMAPIGameLoader/bin/Dev AI/net9.0-android/abc.smapi.gameloader-Signed.apk` (~36 MB)
+- เวลาที่วัดได้บนเครื่องนี้: full build ~58 s, build หลังแก้ไฟล์ 1 ไฟล์ ~23 s
+- รองรับ **arm64 เท่านั้น** (ตรงกับข้อจำกัดของโปรเจกต์) — เครื่องทดสอบต้องเป็น arm64
+
+`Debug` เลิกใช้แล้ว (fast deploy ใช้กับ workflow scrcpy ไม่ได้) และ `Release` ใช้เฉพาะตอนปล่อย build
+โดยไม่ต้องแก้อะไรใน csproj
 
 Release (ค่า default ฝัง assemblies อยู่แล้ว):
 

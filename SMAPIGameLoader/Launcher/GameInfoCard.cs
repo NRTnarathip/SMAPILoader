@@ -17,9 +17,9 @@ public class GameInfoCard : InfoCard
         SetStatus(status, installed, InstalledStatusText, NotInstalledStatusText);
         AddDivider();
 
-        AddTextLine($"Game Version: {GameApkTool.CurrentGameVersion}", 15, emphasized: true);
-        AddTextLine($"Verify: {GetVerifyText(installed)}");
+        AddTextLine($"Your Game Version: {GameApkTool.CurrentGameVersion}", 15, emphasized: true);
         AddTextLine($"Support Minimum Version: {GameApkTool.SupportMinimumGameVersion}");
+        AddTextLine($"Verify: {GetVerifyText(installed)}");
         AddTextLine($"Launcher Version: {AppInfo.VersionString}");
         AddTextLine(GetLauncherBuildText());
     }

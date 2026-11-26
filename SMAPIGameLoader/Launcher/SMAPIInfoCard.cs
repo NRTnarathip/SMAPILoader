@@ -58,7 +58,7 @@ public class SMAPIInfoCard : InfoCard
         _buildDate.Text = FormatBuildDate(buildCode);
         SetStatus(_status, installed, "Installed", "Not installed");
 
-        _installButton.Text = installed ? "Update SMAPI" : "Install SMAPI";
+        _installButton.Text = installed ? "Reinstall" : "Install";
         _uninstallButton.Enabled = installed;
         _uninstallButton.Alpha = installed ? 1f : 0.4f;
     }

@@ -21,7 +21,7 @@ internal static class EntryGame
 
         try
         {
-            if (GameApkTool.IsGameVersionSupport == false)
+            if (GameApkTool.IsGameVersionSupport is false)
             {
                 ToastNotifyTool.Notify("Not support game version: " + GameApkTool.CurrentGameVersion + ", please update game");
                 return;
