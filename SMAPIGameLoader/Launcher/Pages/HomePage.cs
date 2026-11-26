@@ -62,9 +62,7 @@ public class HomePage : LinearLayout
             Ui.Dp(context, 20), Ui.Dp(context, 18));
 
         string headerTitle = "SMAPI Launcher";
-#if DEBUG
-        headerTitle += " (Debug)";
-#endif
+        if (ApkTool.IsDebugMode) headerTitle += " (Debug)";
         var header = new TextView(context) { Text = headerTitle };
         header.SetTextSize(ComplexUnitType.Sp, 22);
         header.SetTextColor(Color.White);

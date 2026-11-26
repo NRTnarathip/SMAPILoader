@@ -3,6 +3,7 @@ using Android.Content.PM;
 using Android.OS;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,12 @@ namespace SMAPIGameLoader;
 
 internal static class ApkTool
 {
+
+#if DEBUG
+    public const bool IsDebugMode = true;
+#else
+    public const bool IsDebugMode = false;
+#endif
     public static int LauncherBuildCode => int.Parse(AppInfo.BuildString);
     public static Version AppVersion => AppInfo.Version;
     public static string PackageName => AppInfo.PackageName;

@@ -6,11 +6,9 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using AndroidX.RecyclerView.Widget;
-using Google.Android.Material.FloatingActionButton;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -20,7 +18,6 @@ namespace SMAPIGameLoader.Launcher.Pages;
 internal sealed class ModManagerPage : LinearLayout
 {
     const string HeaderBackgroundColorHex = "#1A1D24";
-    const string SecondaryTextColorHex = "#9AA0A6";
     const string SortButtonBackgroundHex = "#262A33";
     const string SortModePrefKey = "mod_manager_sort_mode";
     const string SortDescendingPrefKey = "mod_manager_sort_descending";
@@ -40,13 +37,11 @@ internal sealed class ModManagerPage : LinearLayout
     private readonly List<ModInfo> _mods = new();
     private readonly ModAdapter _adapter;
     private readonly TextView _emptyText;
-    private readonly TextView _foundModsText;
     private readonly TextView _sortButton;
+    private readonly ImageButton _installButton;
     private readonly RecyclerView _list;
     private SortMode _sortMode = SortMode.Date;
     private bool _sortDescending = true;
-
-    public FloatingActionButton InstallFab { get; }
 
     public ModManagerPage(Context context) : base(context)
     {
@@ -62,7 +57,7 @@ internal sealed class ModManagerPage : LinearLayout
         var headerBox = new LinearLayout(context) { Orientation = Orientation.Vertical };
         headerBox.SetBackgroundColor(Color.ParseColor(HeaderBackgroundColorHex));
         headerBox.Elevation = Ui.Dp(context, 6);
-        headerBox.SetPadding(Ui.Dp(context, 20), Ui.Dp(context, 48), Ui.Dp(context, 20), Ui.Dp(context, 16));
+        headerBox.SetPadding(Ui.Dp(context, 16), Ui.Dp(context, 20), Ui.Dp(context, 16), Ui.Dp(context, 12));
 
         var titleRow = new LinearLayout(context) { Orientation = Orientation.Horizontal };
         titleRow.SetGravity(GravityFlags.CenterVertical);
@@ -71,33 +66,30 @@ internal sealed class ModManagerPage : LinearLayout
         header.SetTextSize(ComplexUnitType.Sp, 22);
         header.SetTextColor(Color.White);
         header.SetTypeface(null, TypefaceStyle.Bold);
+        header.SetSingleLine(true);
+        header.Ellipsize = TextUtils.TruncateAt.End;
 
+        _installButton = CreateInstallButton(context);
         _sortButton = CreateSortButton(context);
 
         titleRow.AddView(header, new LinearLayout.LayoutParams(
             0, ViewGroup.LayoutParams.WrapContent, 1f));
+        titleRow.AddView(_installButton);
         titleRow.AddView(_sortButton);
         headerBox.AddView(titleRow);
-
-        _foundModsText = new TextView(context) { Text = "...." };
-        _foundModsText.SetTextSize(ComplexUnitType.Sp, 14);
-        _foundModsText.SetTextColor(Color.ParseColor(SecondaryTextColorHex));
-        headerBox.AddView(_foundModsText, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent,
-            ViewGroup.LayoutParams.WrapContent)
-        { TopMargin = Ui.Dp(context, 4) });
 
         AddView(headerBox, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
 
-        // ---- Body: list + empty state + FAB ซ้อนกันใน FrameLayout ----
+        // ---- Body: list + empty state ซ้อนกันใน FrameLayout ----
         var body = new FrameLayout(context);
         AddView(body, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, 0, 1f));
 
         _adapter = new ModAdapter(context, _mods, OnClickedModItem);
         _list = new RecyclerView(context);
+        _list.SetPadding(0, Ui.Dp(context, 8), 0, Ui.Dp(context, 8));
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
 
@@ -118,21 +110,25 @@ internal sealed class ModManagerPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
 
-        InstallFab = new FloatingActionButton(context);
-        InstallFab.SetImageResource(Android.Resource.Drawable.IcInputAdd);
-        var fabLp = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WrapContent,
-            ViewGroup.LayoutParams.WrapContent)
-        {
-            Gravity = GravityFlags.End | GravityFlags.Bottom
-        };
-        InstallFab.Click += InstallFab_Click;
-        fabLp.SetMargins(
-            Ui.Dp(context, 16), Ui.Dp(context, 16),
-            Ui.Dp(context, 16), Ui.Dp(context, 16));
-        body.AddView(InstallFab, fabLp);
-
         RefreshMods();
+    }
+
+    private ImageButton CreateInstallButton(Context context)
+    {
+        var button = new ImageButton(context);
+        button.SetImageResource(Android.Resource.Drawable.IcInputAdd);
+        button.SetColorFilter(Color.White);
+        button.Background = Ui.CreateRippleDrawable(context, SortButtonBackgroundHex, 20);
+        button.ContentDescription = "Install mod";
+        button.SetPadding(
+            Ui.Dp(context, 10), Ui.Dp(context, 10),
+            Ui.Dp(context, 10), Ui.Dp(context, 10));
+
+        int size = Ui.Dp(context, 40);
+        button.LayoutParameters = new LinearLayout.LayoutParams(size, size)
+        { RightMargin = Ui.Dp(context, 8) };
+        button.Click += InstallButton_Click;
+        return button;
     }
 
     private TextView CreateSortButton(Context context)
@@ -259,8 +255,6 @@ internal sealed class ModManagerPage : LinearLayout
         bool empty = _mods.Count == 0;
         _emptyText.Visibility = empty ? ViewStates.Visible : ViewStates.Gone;
         _list.Visibility = empty ? ViewStates.Gone : ViewStates.Visible;
-
-        RefreshTitleHeader();
     }
 
     /// <summary>
@@ -281,21 +275,6 @@ internal sealed class ModManagerPage : LinearLayout
             MainThread.BeginInvokeOnMainThread(ApplySort);
         });
     }
-
-    void RefreshTitleHeader()
-    {
-        var sb = new SpannableStringBuilder();
-        sb.Append($"Total Mods: {_mods.Count}");
-        sb.Append("\n");
-        sb.Append($"Enabled Mods: {EnabledModsCount}");
-        sb.Append("\n");
-        sb.Append($"Disabled Mods: {DisabldModsCount}");
-        _foundModsText.SetText(sb, TextView.BufferType.Spannable);
-    }
-
-
-    int EnabledModsCount => _mods.Count(m => m.Enabled);
-    int DisabldModsCount => _mods.Count(m => !m.Enabled);
 
     private void OnClickedModItem(ModInfo mod, View anchor)
     {
@@ -326,8 +305,6 @@ internal sealed class ModManagerPage : LinearLayout
         int position = _mods.IndexOf(mod);
         if (position >= 0)
             _adapter.NotifyItemChanged(position);
-
-        RefreshTitleHeader();
     }
 
     private void ShowManifest(ModInfo mod)
@@ -391,7 +368,7 @@ internal sealed class ModManagerPage : LinearLayout
             .Show();
     }
 
-    private void InstallFab_Click(object sender, System.EventArgs e)
+    private void InstallButton_Click(object sender, System.EventArgs e)
     {
         ModInstaller.OnClickInstallMod(() =>
         {

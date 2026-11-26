@@ -363,3 +363,9 @@ MigrationBackup/
 FodyWeavers.xsd
 /AppTestCode
 /AndroidGame
+
+# Local ZCode agent state (MCP config เฉพาะเครื่อง, session plans)
+/.zcode
+
+# Local agent tooling / skills (ติดตั้งเองจาก upstream ไม่ใช่โค้ดโปรเจกต์)
+/.agents/

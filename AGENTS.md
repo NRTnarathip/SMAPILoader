@@ -124,7 +124,7 @@ namespace ที่ใช้จริง: `SMAPIGameLoader` (ส่วนให�
 
 ## 8. Per-project notes
 
-- Workflow เฉพาะแอป (build → deploy → ตรวจ UI ด้วย scrcpy-mcp, ห้ามใช้ VS debug/hot reload):
+- Workflow เฉพาะแอป (build → deploy → ตรวจ UI ด้วย mobile-mcp, ห้ามใช้ VS debug/hot reload):
   ดู `SMAPIGameLoader/AGENTS.md`
 - `AssemblyStore`: เปิด `Nullable` + `ImplicitUsings` — เขียนโค้ดให้ nullable-safe; namespace คือ
   `Xamarin.Android.AssemblyStore` (เลียนแบบ upstream) ไม่ใช่ `SMAPIGameLoader.*`
