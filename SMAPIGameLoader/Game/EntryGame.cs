@@ -21,9 +21,9 @@ internal static class EntryGame
 
         try
         {
-            if (StardewApkTool.IsGameVersionSupport == false)
+            if (GameApkTool.IsGameVersionSupport == false)
             {
-                ToastNotifyTool.Notify("Not support game version: " + StardewApkTool.CurrentGameVersion + ", please update game");
+                ToastNotifyTool.Notify("Not support game version: " + GameApkTool.CurrentGameVersion + ", please update game");
                 return;
             }
 

@@ -27,11 +27,11 @@ internal class GameAssemblyManager
         {
             Console.WriteLine("try clone stardew assemblies");
             //clone dlls Stardew Valley - try base APK first, then arm64 split APK for .NET 9+
-            var store = new AssemblyStoreExplorer(StardewApkTool.BaseApkPath, keepStoreInMemory: true);
-            if (store.Assemblies.Count == 0 && StardewApkTool.Arm64ApkPath != null)
+            var store = new AssemblyStoreExplorer(GameApkTool.BaseApkPath, keepStoreInMemory: true);
+            if (store.Assemblies.Count == 0 && GameApkTool.Arm64ApkPath != null)
             {
                 Console.WriteLine("No assemblies in base APK, trying arm64 split APK");
-                store = new AssemblyStoreExplorer(StardewApkTool.Arm64ApkPath, keepStoreInMemory: true);
+                store = new AssemblyStoreExplorer(GameApkTool.Arm64ApkPath, keepStoreInMemory: true);
             }
             foreach (var asm in store.Assemblies)
             {

@@ -37,7 +37,7 @@ internal static class GameCloner
         public void MarkCloenGameDone()
         {
             this.LastLauncherBuildCode = ApkTool.LauncherBuildCode;
-            this.LastGameVersionString = StardewApkTool.CurrentGameVersion.ToString();
+            this.LastGameVersionString = GameApkTool.CurrentGameVersion.ToString();
         }
         public bool IsNeedToCloneGame()
         {
@@ -47,7 +47,7 @@ internal static class GameCloner
                 return true;
 
             //check if has new update game
-            if (StardewApkTool.CurrentGameVersion != new Version(LastGameVersionString))
+            if (GameApkTool.CurrentGameVersion != new Version(LastGameVersionString))
                 return true;
 
             //don't clone game again

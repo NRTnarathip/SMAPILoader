@@ -1,24 +1,21 @@
 ﻿using Android.App;
 using Android.Content.PM;
-using Android.OS;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SMAPIGameLoader;
 
-internal static class StardewApkTool
+internal static class GameApkTool
 {
     public const string GamePlayStorePackageName = "com.chucklefish.stardewvalley";
     public const string GameGalaxyStorePackageName = "com.chucklefish.stardewvalleysamsung";
     static bool IsGameFromPlayStore = false;
     static bool IsGameFromGalaxyStore = false;
     static PackageInfo _currentPackageInfo;
+    public static string GameInstalledFromStoreName => IsGameFromPlayStore ? "Play Store" : IsGameFromGalaxyStore ? "Galaxy Store" : "Unknown";
 
     //init at first SDK
-    static StardewApkTool()
+    static GameApkTool()
     {
         Console.WriteLine("Initialize Stardew Apk Tool");
         var playStore = ApkTool.GetPackageInfo(GamePlayStorePackageName);
@@ -110,24 +107,14 @@ internal static class StardewApkTool
         }
     }
 
-    public static Version GameVersionSupport
+    public static Version SupportMinimumGameVersion
     {
         get
         {
-            if (CurrentPackageInfo == null)
-                return null;
-
-            switch (CurrentPackageInfo.PackageName)
-            {
-                case GamePlayStorePackageName:
-                    return new(1, 6, 15, 3);
-                case GameGalaxyStorePackageName:
-                    return new(1, 6, 15, 3);
-                default:
-                    return null;
-            }
+            return new(1, 16, 15, 3);
         }
     }
+
     public static Version CurrentGameVersion
     {
         get
@@ -142,5 +129,5 @@ internal static class StardewApkTool
             }
         }
     }
-    public static bool IsGameVersionSupport => CurrentGameVersion >= GameVersionSupport;
+    public static bool IsGameVersionSupport => CurrentGameVersion >= SupportMinimumGameVersion;
 }

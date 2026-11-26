@@ -60,7 +60,7 @@ static class GameAssetManager
     public static void VerifyAssets()
     {
         //check & update game content
-        var baseContentApk = StardewApkTool.ContentApkPath;
+        var baseContentApk = GameApkTool.ContentApkPath;
         using (FileStream apkFileStream = new FileStream(baseContentApk, FileMode.Open, FileAccess.Read))
         using (ZipArchive apkArchive = new ZipArchive(apkFileStream, ZipArchiveMode.Read))
         {
