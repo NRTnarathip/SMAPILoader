@@ -100,6 +100,10 @@ internal sealed class ModManagerPage : LinearLayout
         _list = new RecyclerView(context);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
+
+        // ปิด change animation เพื่อให้ NotifyItemChanged (toggle on/off) อัปเดตสีทันที
+        if (_list.GetItemAnimator() is SimpleItemAnimator animator)
+            animator.SupportsChangeAnimations = false;
         body.AddView(_list, new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));

@@ -14,6 +14,7 @@ internal class ModViewHolder : RecyclerView.ViewHolder
     const string CardBackgroundColorHex = "#1A1D24";
     const float DisabledAlpha = 0.45f;
 
+    private readonly View _content;
     private readonly TextView _name;
     private readonly TextView _version;
     private readonly TextView _size;
@@ -21,9 +22,10 @@ internal class ModViewHolder : RecyclerView.ViewHolder
     private readonly Action<ModInfo, View> _onClicked;
     private ModInfo? _mod;
 
-    private ModViewHolder(View root, TextView name, TextView version, TextView size,
+    private ModViewHolder(View root, View content, TextView name, TextView version, TextView size,
                           TextView date, Action<ModInfo, View> onClicked) : base(root)
     {
+        _content = content;
         _name = name;
         _version = version;
         _size = size;
@@ -91,7 +93,7 @@ internal class ModViewHolder : RecyclerView.ViewHolder
         column.AddView(version);
         column.AddView(metaRow);
 
-        return new ModViewHolder(card, name, version, size, date, onClicked);
+        return new ModViewHolder(card, column, name, version, size, date, onClicked);
     }
 
     static TextView CreateSecondaryText(Context context)
@@ -109,6 +111,9 @@ internal class ModViewHolder : RecyclerView.ViewHolder
         _version.Text = mod.VersionUIText;
         _size.Text = mod.SizeUIText;
         _date.Text = mod.DateUIText;
-        ItemView.Alpha = mod.Enabled ? 1f : DisabledAlpha;
+
+        // ต้อง dim ที่ content ข้างใน ไม่ใช่ ItemView เพราะ DefaultItemAnimator
+        // จะ cross-fade แล้วเซ็ต itemView.Alpha กลับเป็น 1 ตอน NotifyItemChanged
+        _content.Alpha = mod.Enabled ? 1f : DisabledAlpha;
     }
 }
