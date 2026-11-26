@@ -12,6 +12,14 @@ public class ModInfo
     public readonly string modName = "unknow";
     public readonly string modVersion = "unknow";
     public string ModFolderPath => modFolderPath;
+    public string ManifestPath => modManifestPath;
+
+    /// <summary>เวลาแก้ไขล่าสุดของ manifest.json ใช้สำหรับ sort by date</summary>
+    public DateTime LastModified { get; private set; } = DateTime.MinValue;
+
+    /// <summary>ขนาดรวมของโฟลเดอร์ mod (ไบต์) ใช้สำหรับ sort by size</summary>
+    public long SizeBytes { get; private set; }
+
     string modFolderPath;
     string modManifestPath;
     public bool Enabled
@@ -61,12 +69,28 @@ public class ModInfo
         return !string.IsNullOrEmpty(folderName) && !folderName.StartsWith('.');
     }
 
-    public ModInfo(string manifestFilePath, int modListIndex)
+    public void ComputeSize()
+    {
+        try
+        {
+            long total = 0;
+            foreach (var filePath in Directory.EnumerateFiles(modFolderPath, "*", SearchOption.AllDirectories))
+                total += new FileInfo(filePath).Length;
+            SizeBytes = total;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error try compute size of mod: {modFolderPath}\n{ex}");
+        }
+    }
+
+    public ModInfo(string manifestFilePath)
     {
         try
         {
             this.modManifestPath = manifestFilePath;
             this.modFolderPath = Path.GetDirectoryName(manifestFilePath);
+            this.LastModified = File.GetLastWriteTime(manifestFilePath);
 
             var manifestText = File.ReadAllText(manifestFilePath);
             var manifest = JObject.Parse(manifestText);
@@ -74,17 +98,15 @@ public class ModInfo
             this.modName = manifest["Name"]?.ToString();
             this.modVersion = manifest["Version"]?.ToString();
 
-            this.NameUIText = $"[{modListIndex + 1}]: {modName}";
+            this.NameUIText = modName;
             this.VersionUIText = $"Version: {modVersion}";
-
-            var relativeModDir = modFolderPath.Substring(modFolderPath.IndexOf("/Mods") + 5);
         }
         catch (Exception ex)
         {
             ErrorDialogTool.Show(ex, "Error try parser mod folder path: " + this.modFolderPath);
         }
 
-        this.NameUIText = $"[{modListIndex + 1}]: {modName}";
+        this.NameUIText = modName;
         this.VersionUIText = $"Version: {modVersion}";
     }
 
