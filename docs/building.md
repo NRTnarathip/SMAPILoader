@@ -137,6 +137,22 @@ dotnet build SMAPIGameLoader\SMAPIGameLoader.csproj `
     -p:JavaSdkDirectory="C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot"
 ```
 
+### Windows helper script
+
+On Windows, `tools.cmd` auto-detects the Android SDK and JDK and wraps the common commands:
+
+```bat
+tools.cmd build dev        :: fast dev build (arm64, assemblies embedded, DEBUG on)
+tools.cmd build release    :: publish build
+tools.cmd install dev      :: install the existing Dev APK
+tools.cmd install release  :: install the existing Release APK
+tools.cmd dev              :: build Dev, then install it
+tools.cmd release          :: build Release, then install it
+```
+
+Extra arguments are forwarded to `dotnet build` (for example `tools.cmd build dev -v:n`).
+Set `ANDROID_SERIAL` when more than one device is attached.
+
 ### Build output
 
 The signed APK will be at:
@@ -145,11 +161,15 @@ The signed APK will be at:
 SMAPIGameLoader/bin/Release/net9.0-android/abc.smapi.gameloader-Signed.apk
 ```
 
+(`Dev` builds land in `SMAPIGameLoader/bin/Dev/net9.0-android/` instead.)
+
 ## 6. Install on Device
 
 ```bash
 adb install -r SMAPIGameLoader/bin/Release/net9.0-android/abc.smapi.gameloader-Signed.apk
 ```
+
+Or, on Windows, `tools.cmd install release` (or `tools.cmd release` to build and install in one step).
 
 If upgrading over an existing install and the signing key differs:
 

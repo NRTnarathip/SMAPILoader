@@ -10,7 +10,11 @@ wrapped in `#if DEBUG`, and the `Dev` configuration defines `DEBUG`
 
 ## Requirements
 
-1. Build and install a `Dev` APK:
+1. Build and install a `Dev` APK (one command; auto-detects SDK/JDK/ADB):
+   ```powershell
+   .\tools.cmd dev
+   ```
+   Equivalently:
    ```bash
    .\build-dev.cmd
    adb install -r SMAPIGameLoader/bin/Dev/net9.0-android/abc.smapi.gameloader-Signed.apk

@@ -36,8 +36,14 @@
 `Dev` คือ debug mode หลัก (define `DEBUG`) แทน `Debug` เดิมที่เลิกใช้แล้ว
 
 ```powershell
-# ทางลัด (auto-detect SDK/JDK ให้)
-.\build-dev.cmd
+# ทางลัด (auto-detect SDK/JDK/ADB ให้)
+.\tools.cmd dev              # build Dev แล้วติดตั้งลงเครื่อง
+.\tools.cmd build dev        # build อย่างเดียว
+.\tools.cmd install dev      # ติดตั้ง APK ที่ build ไว้แล้ว
+.\tools.cmd release          # build Release แล้วติดตั้ง
+.\tools.cmd help             # ดูคำสั่งทั้งหมด
+
+.\build-dev.cmd              # เหมือน tools.cmd build dev (คงไว้เพื่อความเข้ากันได้)
 
 # หรือเรียกตรง
 dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c "Dev" `

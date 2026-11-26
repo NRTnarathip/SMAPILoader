@@ -26,10 +26,15 @@ game DLLs ที่ `../SMAPI-Android-1.6/src/DependenciesDll/`, และ custo
 (รายละเอียดใน `docs/building.md`)
 
 ```bash
-# Windows — งาน dev ใช้ config "Dev" (เร็วสุด: arm64 เดียว, assembly store, ไม่ trim/AOT)
-.\build-dev.cmd
+# Windows — helper ตัวเดียว (auto-detect SDK/JDK/ADB)
+.\tools.cmd dev               # build config "Dev" (เร็วสุด: arm64 เดียว, assembly store, ไม่ trim/AOT) แล้วติดตั้ง
+.\tools.cmd build dev         # build อย่างเดียว
+.\tools.cmd install dev       # ติดตั้ง APK ที่มีอยู่
+.\tools.cmd build release     # ปล่อย build
+.\tools.cmd release           # build + install Release
+.\tools.cmd help
 
-# ปล่อย build
+# ปล่อย build แบบเรียกตรง
 dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c Release ^
   -p:AndroidSdkDirectory="%LOCALAPPDATA%\Android\Sdk" ^
   -p:JavaSdkDirectory="C:\Program Files\Eclipse Adoptium\jdk-17.0.13.11-hotspot"
