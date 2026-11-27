@@ -74,8 +74,8 @@ public abstract class InfoCard : CardView
         Content.AddView(divider, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent, UI.Dp(Context, 1))
         {
-            TopMargin = UI.Dp(Context, 14),
-            BottomMargin = UI.Dp(Context, 8)
+            TopMargin = UI.Dp(Context, 8),
+            BottomMargin = UI.Dp(Context, 2)
         });
     }
 
@@ -83,9 +83,11 @@ public abstract class InfoCard : CardView
     {
         var row = new LinearLayout(Context) { Orientation = Orientation.Horizontal };
         row.SetGravity(GravityFlags.CenterVertical);
-        row.SetPadding(0, UI.Dp(Context, 7), 0, UI.Dp(Context, 7));
+        row.SetPadding(0, UI.Dp(Context, 3), 0, UI.Dp(Context, 3));
 
+        // ไม่เอา font padding ของ TextView ไม่งั้นแต่ละแถวจะดูลอยห่างกันเป็นช่อง
         var key = new TextView(Context) { Text = label };
+        key.SetIncludeFontPadding(false);
         key.SetTextSize(ComplexUnitType.Sp, 13);
         key.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         row.AddView(key, new LinearLayout.LayoutParams(
@@ -97,6 +99,7 @@ public abstract class InfoCard : CardView
         value.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         value.Gravity = GravityFlags.End | GravityFlags.CenterVertical;
         value.SetMaxLines(3);
+        value.SetIncludeFontPadding(false);
         value.SetLineSpacing(0, 1.15f);
         value.SetPadding(UI.Dp(Context, 16), 0, 0, 0);
         row.AddView(value);
@@ -119,7 +122,7 @@ public abstract class InfoCard : CardView
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent)
         {
-            TopMargin = UI.Dp(Context, emphasized ? 2 : 6)
+            TopMargin = UI.Dp(Context, emphasized ? 0 : 4)
         });
         return textView;
     }

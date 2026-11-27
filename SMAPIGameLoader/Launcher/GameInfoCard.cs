@@ -14,12 +14,12 @@ public class GameInfoCard : InfoCard
         SetStatus(status, installed, "Installed", "Missing");
         AddDivider();
 
-        AddRow("Your Game Version").Text = GameApkTool.CurrentGameVersion.ToString();
+        AddRow("Launcher Version").Text = AppInfo.VersionString;
+        AddRow("Launcher Build").Text = GetLauncherBuildText();
+        AddRow("Game Version").Text = GameApkTool.CurrentGameVersion.ToString();
         AddRow("Minimum Requirements Version").Text = GameApkTool.SupportMinimumGameVersion.ToString();
         AddRow("Is Game Support").Text = GameApkTool.IsGameVersionSupport.ToString();
         AddRow("Verify").Text = GetVerifyText(installed);
-        AddRow("Launcher Version").Text = AppInfo.VersionString;
-        AddRow("Build").Text = GetLauncherBuildText();
     }
 
     static string GetVerifyText(bool installed)
