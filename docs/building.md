@@ -153,6 +153,23 @@ tools.cmd release          :: build Release, then install it
 Extra arguments are forwarded to `dotnet build` (for example `tools.cmd build dev -v:n`).
 Set `ANDROID_SERIAL` when more than one device is attached.
 
+### Dev build behavior (intentional)
+
+**A Dev APK cannot start the game, and that is by design.** Tapping *Play Game* on a Dev build runs the
+cloner (game assets, assemblies, libs) and then stops with the toast *"Error can't start game on Debug
+Mode"*. The guard is the `#if DEBUG` block in `LauncherActivity.LaunchGameActivityInternal()`, placed
+right after `GameCloner.Setup()`. Use a **Release** build to test actual gameplay.
+
+### Dev build speed
+
+The Dev config sets `AndroidEnableAssemblyCompression=False` in the csproj: the assembly-store blob is
+then deflated once by APK packaging instead of being compressed internally first. The APK size is
+unchanged (~36 MB) and the store reader (`Xamarin.Android.AssemblyStore`, also used for the app's own
+APK) supports both compressed and uncompressed stores.
+
+Measured on this machine: full Dev build ~51 s, incremental Dev build after editing one file ~17 s
+(was ~22 s before this setting).
+
 ### Build output
 
 The signed APK will be at:

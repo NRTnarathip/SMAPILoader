@@ -29,7 +29,7 @@ internal sealed class ContactPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent);
 
-        AddView(new PageHeader(context, "Contact"), new LayoutParams(
+        AddView(new PageHeader(context, "Thanks"), new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
 
