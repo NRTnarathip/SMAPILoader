@@ -133,6 +133,7 @@ public class LauncherActivity : AppCompatActivity
     public const int HomeId = 1;
     public const int ModManagerId = 2;
     public const int LogPageId = 3;
+    public const int ContactPageId = 4;
 
     /// <summary>ชื่อหน้าปัจจุบัน (ใช้โดย McpDebugReceiver/GetState)</summary>
     public string CurrentPageName { get; private set; } = "home";
@@ -141,6 +142,7 @@ public class LauncherActivity : AppCompatActivity
     private View _homePage = null!;
     private ModManagerPage _modPage = null!;
     private LogPage _logPage = null!;
+    private ContactPage _contactPage = null!;
     private LinearLayout _nav = null!;
     private readonly List<(int Id, ImageView Icon, TextView Label)> _navItems = new();
     private int _selectedNavId = HomeId;
@@ -154,9 +156,11 @@ public class LauncherActivity : AppCompatActivity
         _homePage = new HomePage(this);
         _modPage = new ModManagerPage(this);
         _logPage = new LogPage(this);
+        _contactPage = new ContactPage(this);
         _container.AddView(_homePage);
         _container.AddView(_modPage);
         _container.AddView(_logPage);
+        _container.AddView(_contactPage);
 
         // Bottom navigation ทำเองแบบ compact (M3 BottomNavigationView ล็อก minHeight 80dp
         // และเหลือแถบว่างใต้ label ที่ปรับไม่ได้)
@@ -166,6 +170,7 @@ public class LauncherActivity : AppCompatActivity
         AddNavItem(HomeId, Resource.Drawable.ic_nav_home, "Home");
         AddNavItem(ModManagerId, Resource.Drawable.ic_nav_mods, "Mods");
         AddNavItem(LogPageId, Resource.Drawable.ic_nav_log, "Log");
+        AddNavItem(ContactPageId, Resource.Drawable.ic_nav_network, "Contact");
 
         // เส้นคั่นบาง ๆ ระหว่าง content กับ bottom nav
         var navDivider = new View(this);
@@ -244,6 +249,7 @@ public class LauncherActivity : AppCompatActivity
         _homePage.Visibility = itemId == HomeId ? ViewStates.Visible : ViewStates.Gone;
         _modPage.Visibility = itemId == ModManagerId ? ViewStates.Visible : ViewStates.Gone;
         _logPage.Visibility = itemId == LogPageId ? ViewStates.Visible : ViewStates.Gone;
+        _contactPage.Visibility = itemId == ContactPageId ? ViewStates.Visible : ViewStates.Gone;
 
         if (itemId == LogPageId)
             _logPage.Reload();
@@ -252,6 +258,7 @@ public class LauncherActivity : AppCompatActivity
         {
             ModManagerId => "mods",
             LogPageId => "log",
+            ContactPageId => "contact",
             _ => "home",
         };
     }

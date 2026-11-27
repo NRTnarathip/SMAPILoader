@@ -374,8 +374,8 @@ internal sealed class ModManagerPage : LinearLayout
         popup.Elevation = UI.Dp(_context, 8);
         popup.OutsideTouchable = true;
 
-        AddActionRow(content, popup, Resource.Drawable.ic_power,
-            mod.Enabled ? "Toggle Off" : "Toggle On", null, () => ToggleMod(mod));
+        //AddActionRow(content, popup, Resource.Drawable.ic_power,
+        //    mod.Enabled ? "Toggle Off" : "Toggle On", null, () => ToggleMod(mod));
         AddActionRow(content, popup, Resource.Drawable.ic_folder,
             "Open Folder", null, () => OpenModFolder(mod));
         AddActionRow(content, popup, Resource.Drawable.ic_code,

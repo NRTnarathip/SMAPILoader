@@ -45,7 +45,8 @@ The real package name is `abc.smapi.gameloader` (from `AndroidManifest.xml`), no
 | Go to Home | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoHomePage` | `"home"` |
 | Go to Mod Manager | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoModManagerPage` | `"mods"` |
 | Go to Log | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoLogPage` | `"log"` |
-| Get current page | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GetState` | `"home"`, `"mods"` or `"log"` |
+| Go to Contact | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoToContact` | `"contact"` |
+| Get current page | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GetState` | `"home"`, `"mods"`, `"log"` or `"contact"` |
 | Start the game (same as Play Game; Dev builds stop before the game — see below) | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_PlayGame` | `"starting_game"` |
 | Unknown command | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_Whatever` | `"error:unknown_cmd"` |
 
@@ -61,7 +62,7 @@ Broadcast completed: result=0, data="mods"
 
 ## Result semantics
 
-- Success: the real current page name — `"home"`, `"mods"` or `"log"`.
+- Success: the real current page name — `"home"`, `"mods"`, `"log"` or `"contact"`.
 - `MCP_PlayGame`: `"starting_game"` means the launch was kicked off; it returns immediately because
   the game start itself runs in the background (watch logcat or the resumed activity to see it land).
 - Unknown or missing `cmd`: `"error:unknown_cmd"`.
