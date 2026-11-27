@@ -303,15 +303,18 @@ public class LauncherActivity : AppCompatActivity
 
         try
         {
+            TaskTool.NewLine("Checking game version");
             if (GameApkTool.IsGameVersionSupport is false)
             {
-                ToastNotifyTool.Notify("Not support game version: " + GameApkTool.CurrentGameVersion + ", please update game");
+                TaskTool.Fail("Game version " + GameApkTool.CurrentGameVersion
+                    + " is not supported. Please update Stardew Valley.");
                 return;
             }
 
+            TaskTool.NewLine("Checking SMAPI installation");
             if (SMAPIInstaller.IsInstalled is false)
             {
-                ToastNotifyTool.Notify("Please install SMAPI!!");
+                TaskTool.Fail("SMAPI is not installed. Install SMAPI from the SMAPI card first.");
                 return;
             }
 
@@ -319,15 +322,16 @@ public class LauncherActivity : AppCompatActivity
 
             // Dev เป็น debug build (define DEBUG) จึงไม่ควรเข้าเกมได้
 #if DEBUG
-            ToastNotifyTool.Notify("Error can't start game on Debug Mode");
+            TaskTool.Fail("The game can't start in a Debug build. Use a Release build to play.");
             return;
 #endif
 
+            TaskTool.NewLine("Launching game...");
             StartSMAPIActivity(launcherActivity);
         }
         catch (Exception ex)
         {
-            ToastNotifyTool.Notify("Error:LaunchGameActivity: " + ex.ToString());
+            TaskTool.Fail(ex.Message);
         }
     }
     //prevent Load Game Assembly in scope function LaunchGameActivityInternal()

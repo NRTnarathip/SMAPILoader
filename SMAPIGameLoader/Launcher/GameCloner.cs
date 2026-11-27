@@ -72,22 +72,21 @@ internal static class GameCloner
     public static void Setup()
     {
         ClonerState clonerState = GetClonerState();
-        TaskTool.NewLine("Try to assert game clone");
-
         bool isNeedCloenGame = clonerState.IsNeedToCloneGame();
 
-        //clone each section
+        TaskTool.NewLine(isNeedCloenGame
+            ? "Game files need an update, this may take a minute"
+            : "Game files are up to date");
 
+        //clone each section
         if (isNeedCloenGame)
         {
-            TaskTool.NewLine("Starting cloner game assets");
-            //clone game assets
+            TaskTool.NewLine("Copying game assets");
             GameAssetManager.VerifyAssets();
-            TaskTool.NewLine("Done verify asset");
+            TaskTool.NewLine("Copying game assemblies");
             GameAssemblyManager.VerifyAssemblies();
-            TaskTool.NewLine("Done verify assemblies");
+            TaskTool.NewLine("Copying native libraries");
             GameAssemblyManager.VerifyLibs();
-            TaskTool.NewLine("Done verify libs");
         }
 
         //Load MonoGame.Framework.dll into reference
@@ -96,19 +95,16 @@ internal static class GameCloner
         //Rewrite StardewValley.dll
         if (isNeedCloenGame)
         {
-            TaskTool.NewLine("Try rewriter StardewValley.dll");
+            TaskTool.NewLine("Patching StardewValley.dll");
             using (var stardewAssemblyStream = File.Open(GameAssemblyManager.StardewValleyFilePath,
                 FileMode.Open, FileAccess.ReadWrite))
             {
-
-                TaskTool.NewLine("Starting StardewValley Rewriter...");
                 var stardewAssemblyDef = StardewGameRewriter.ReadAssembly(stardewAssemblyStream);
                 StardewGameRewriter.Rewrite(stardewAssemblyDef);
                 StardewAudioRewriter.Rewrite(stardewAssemblyDef);
 
-                TaskTool.NewLine("Try save StardewValley rewriter to file..");
+                TaskTool.NewLine("Saving patched assembly");
                 stardewAssemblyDef.Write();
-                TaskTool.NewLine("Successfully Rewrite StardewValley.dll");
             }
 
             //Don't load StardewValley assembly here
@@ -119,12 +115,9 @@ internal static class GameCloner
         //Finally
         if (isNeedCloenGame)
         {
-            //mark
             clonerState.MarkCloenGameDone();
             clonerState.SaveToFile();
-            TaskTool.NewLine("Done save cloner state to file");
+            TaskTool.NewLine("Game files ready");
         }
-
-        TaskTool.NewLine("Done assert game clone");
     }
 }

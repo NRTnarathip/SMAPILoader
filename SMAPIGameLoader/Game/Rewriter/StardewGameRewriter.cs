@@ -35,7 +35,7 @@ internal static class StardewGameRewriter
                 var instance_FieldDef = mainActivityTypeDef.Fields.First(f => f.Name == "instance");
                 //change FieldType MainActivity to SMAPIActivity;
                 instance_FieldDef.FieldType = stardewModule.ImportReference(typeof(SMAPIActivity));
-                TaskTool.NewLine("changed field type MainActivity to SMAPIActivity");
+                TaskTool.NewLine("Redirected MainActivity to SMAPIActivity");
             }
         
             Console.WriteLine("done Rewrite assembly: " + assemblyDefinition.FullName);
