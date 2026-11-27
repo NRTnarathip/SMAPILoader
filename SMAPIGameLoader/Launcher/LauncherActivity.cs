@@ -45,6 +45,7 @@ public class LauncherActivity : AppCompatActivity
         AssertRequirement();
 
         //ready
+        LauncherTheme.Load();
         SetupLauncherPage();
         SetDarkMode();
 
@@ -134,6 +135,7 @@ public class LauncherActivity : AppCompatActivity
     public const int ModManagerId = 2;
     public const int LogPageId = 3;
     public const int ContactPageId = 4;
+    public const int SettingsPageId = 5;
 
     /// <summary>ชื่อหน้าปัจจุบัน (ใช้โดย McpDebugReceiver/GetState)</summary>
     public string CurrentPageName { get; private set; } = "home";
@@ -143,9 +145,11 @@ public class LauncherActivity : AppCompatActivity
     private ModManagerPage _modPage = null!;
     private LogPage _logPage = null!;
     private ContactPage _contactPage = null!;
+    private SettingsPage _settingsPage = null!;
     private LinearLayout _nav = null!;
     private readonly List<(int Id, ImageView Icon, TextView Label)> _navItems = new();
-    private int _selectedNavId = HomeId;
+    // static เพื่อคงแท็บเดิมหลัง Recreate ตอนสลับธีม
+    private static int _selectedNavId = HomeId;
 
     private void SetupLauncherPage()
     {
@@ -157,10 +161,12 @@ public class LauncherActivity : AppCompatActivity
         _modPage = new ModManagerPage(this);
         _logPage = new LogPage(this);
         _contactPage = new ContactPage(this);
+        _settingsPage = new SettingsPage(this);
         _container.AddView(_homePage);
         _container.AddView(_modPage);
         _container.AddView(_logPage);
         _container.AddView(_contactPage);
+        _container.AddView(_settingsPage);
 
         // Bottom navigation ทำเองแบบ compact (M3 BottomNavigationView ล็อก minHeight 80dp
         // และเหลือแถบว่างใต้ label ที่ปรับไม่ได้)
@@ -171,6 +177,7 @@ public class LauncherActivity : AppCompatActivity
         AddNavItem(ModManagerId, Resource.Drawable.ic_nav_mods, "Mods");
         AddNavItem(LogPageId, Resource.Drawable.ic_nav_log, "Log");
         AddNavItem(ContactPageId, Resource.Drawable.ic_nav_network, "Thanks");
+        AddNavItem(SettingsPageId, Resource.Drawable.ic_nav_settings, "Settings");
 
         // เส้นคั่นบาง ๆ ระหว่าง content กับ bottom nav
         var navDivider = new View(this);
@@ -192,7 +199,7 @@ public class LauncherActivity : AppCompatActivity
         SetContentView(root);
 
         // run first page
-        SelectNavItem(HomeId);
+        SelectNavItem(_selectedNavId);
     }
 
     void AddNavItem(int id, int iconRes, string label)
@@ -250,6 +257,7 @@ public class LauncherActivity : AppCompatActivity
         _modPage.Visibility = itemId == ModManagerId ? ViewStates.Visible : ViewStates.Gone;
         _logPage.Visibility = itemId == LogPageId ? ViewStates.Visible : ViewStates.Gone;
         _contactPage.Visibility = itemId == ContactPageId ? ViewStates.Visible : ViewStates.Gone;
+        _settingsPage.Visibility = itemId == SettingsPageId ? ViewStates.Visible : ViewStates.Gone;
 
         if (itemId == LogPageId)
             _logPage.Reload();
@@ -259,6 +267,7 @@ public class LauncherActivity : AppCompatActivity
             ModManagerId => "mods",
             LogPageId => "log",
             ContactPageId => "contact",
+            SettingsPageId => "settings",
             _ => "home",
         };
     }

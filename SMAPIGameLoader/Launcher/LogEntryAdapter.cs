@@ -11,11 +11,12 @@ namespace SMAPIGameLoader.Launcher;
 /// <summary>แถว log หนึ่งบรรทัด ใช้ RecyclerView เพื่อไม่ให้ต้องสร้าง TextView หลายพันตัวพร้อมกัน</summary>
 internal sealed class LogEntryAdapter : RecyclerView.Adapter
 {
-    static readonly Color ColorError = LauncherTheme.Parse(LauncherTheme.StatusErrorTextHex);
-    static readonly Color ColorWarn = LauncherTheme.Parse(LauncherTheme.WarningTextHex);
-    static readonly Color ColorInfo = LauncherTheme.Parse(LauncherTheme.TextPrimaryHex);
-    static readonly Color ColorMuted = LauncherTheme.Parse(LauncherTheme.TextSecondaryHex);
-    static readonly Color ColorOther = LauncherTheme.Parse(LauncherTheme.LogContinuationHex);
+    // property ไม่ใช่ field เพราะสีต้องตามธีมที่เปลี่ยนได้ตอนรัน
+    static Color ColorError => LauncherTheme.Parse(LauncherTheme.StatusErrorTextHex);
+    static Color ColorWarn => LauncherTheme.Parse(LauncherTheme.WarningTextHex);
+    static Color ColorInfo => LauncherTheme.Parse(LauncherTheme.TextPrimaryHex);
+    static Color ColorMuted => LauncherTheme.Parse(LauncherTheme.TextSecondaryHex);
+    static Color ColorOther => LauncherTheme.Parse(LauncherTheme.LogContinuationHex);
 
     readonly List<LogEntry> _entries = new();
 
