@@ -6,15 +6,12 @@ namespace SMAPIGameLoader.Launcher;
 
 public class GameInfoCard : InfoCard
 {
-    const string InstalledStatusText = "Installed";
-    const string NotInstalledStatusText = "Not Installed";
-
     public GameInfoCard(Context context) : base(context)
     {
         var installed = GameApkTool.IsInstalled;
 
         var status = AddHeader("Launcher & Game");
-        SetStatus(status, installed, InstalledStatusText, NotInstalledStatusText);
+        SetStatus(status, installed, "Installed", "Missing");
         AddDivider();
 
         AddRow("Your Game Version").Text = GameApkTool.CurrentGameVersion.ToString();

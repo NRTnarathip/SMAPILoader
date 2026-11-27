@@ -53,7 +53,7 @@ public class SMAPIInfoCard : InfoCard
         _version.Text = SMAPIInstaller.GetCurrentVersion().ToString();
         _buildCode.Text = buildCode.ToString();
         _buildDate.Text = FormatBuildDate(buildCode);
-        SetStatus(_status, installed, "Installed", "Not installed");
+        SetStatus(_status, installed, "Installed", "Missing");
 
         _installButton.Text = installed ? "Reinstall" : "Install";
         _uninstallButton.Enabled = installed;
