@@ -26,8 +26,8 @@ public class HomePage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent);
 
-        string headerTitle = "SMAPI Launcher";
-        if (ApkTool.IsDebugMode) headerTitle += " (Debug)";
+        string headerTitle = "Home";
+        if (ApkTool.IsDebugMode) headerTitle += " (Debug Mode)";
         AddView(new PageHeader(context, headerTitle), new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));

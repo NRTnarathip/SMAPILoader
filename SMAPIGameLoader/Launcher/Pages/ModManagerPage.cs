@@ -166,9 +166,9 @@ internal sealed class ModManagerPage : LinearLayout
     {
         var button = new ImageButton(context);
         button.SetImageResource(Android.Resource.Drawable.IcInputAdd);
-        button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.AccentHex));
+        button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.HeaderTextHex));
         button.Background = UI.CreateRippleDrawable(
-            context, LauncherTheme.SurfaceVariantHex, 20);
+            context, LauncherTheme.HeaderPillHex, 20);
         button.ContentDescription = "Install mod";
         button.SetPadding(
             UI.Dp(context, 10), UI.Dp(context, 10),
@@ -190,13 +190,13 @@ internal sealed class ModManagerPage : LinearLayout
             Focusable = true
         };
         button.SetTextSize(ComplexUnitType.Sp, 12);
-        button.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        button.SetTextColor(LauncherTheme.Parse(LauncherTheme.HeaderTextHex));
         button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         button.SetPadding(
             UI.Dp(context, 12), UI.Dp(context, 9),
             UI.Dp(context, 12), UI.Dp(context, 9));
         button.Background = UI.CreateRippleDrawable(
-            context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
+            context, LauncherTheme.HeaderPillHex, LauncherTheme.ChipRadiusDp);
         button.Click += SortButton_Click;
         return button;
     }

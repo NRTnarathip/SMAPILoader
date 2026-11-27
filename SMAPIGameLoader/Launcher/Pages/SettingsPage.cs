@@ -1,4 +1,4 @@
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Graphics;
 using Android.Util;
@@ -59,7 +59,7 @@ internal sealed class SettingsPage : LinearLayout
 
         var title = new TextView(context) { Text = "Theme" };
         title.SetTextSize(ComplexUnitType.Sp, 17);
-        title.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        title.SetTextColor(LauncherTheme.Parse(LauncherTheme.CardTitleHex));
         title.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         title.SetPadding(UI.Dp(context, 16), 0, UI.Dp(context, 16), UI.Dp(context, 6));
         content.AddView(title);
@@ -67,7 +67,7 @@ internal sealed class SettingsPage : LinearLayout
         content.AddView(CreateThemeRow(context, LauncherTheme.DarkName, "Dark",
             "Stardew green on dark surfaces"));
         content.AddView(CreateThemeRow(context, LauncherTheme.ChristmasName, "Christmas",
-            "Pine green with gold accent"));
+            "Festive red, green and gold"));
 
         card.AddView(content);
         return card;

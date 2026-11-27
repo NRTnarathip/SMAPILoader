@@ -1,4 +1,4 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Util;
@@ -40,7 +40,7 @@ public abstract class InfoCard : CardView
 
         var title = new TextView(Context) { Text = titleText };
         title.SetTextSize(ComplexUnitType.Sp, titleSizeSp);
-        title.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        title.SetTextColor(LauncherTheme.Parse(LauncherTheme.CardTitleHex));
         title.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         title.LetterSpacing = 0.01f;
         header.AddView(title, new LinearLayout.LayoutParams(

@@ -1,4 +1,4 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Xamarin.Essentials;
 
@@ -16,12 +16,27 @@ internal static class LauncherTheme
 
     public static string CurrentName { get; private set; } = DarkName;
 
+    /// <summary>ไอคอน status bar เป็นสีเข้ม (พื้นสว่าง) หรือสีขาว (พื้นเข้ม)</summary>
+    public static bool StatusBarDarkIcons { get; private set; }
+
+    /// <summary>ไอคอน system navigation bar เป็นสีเข้ม (พื้นสว่าง)</summary>
+    public static bool NavBarDarkIcons { get; private set; }
+
     // พื้นผิว
     public static string BackgroundHex { get; private set; } = "#0D1116";
     public static string HeaderBackgroundHex { get; private set; } = "#141A21";
     public static string CardBackgroundHex { get; private set; } = "#191F29";
     public static string SurfaceVariantHex { get; private set; } = "#232B37";
     public static string NavBarBackgroundHex { get; private set; } = "#12171E";
+
+    /// <summary>สีข้อความ/ไอคอนบน header (ต้องอ่านออกบน HeaderBackgroundHex)</summary>
+    public static string HeaderTextHex { get; private set; } = "#E9EDF2";
+
+    /// <summary>พื้นปุ่มใน header (เช่น install/sort/reload)</summary>
+    public static string HeaderPillHex { get; private set; } = "#232B37";
+
+    /// <summary>สีหัวข้อการ์ด</summary>
+    public static string CardTitleHex { get; private set; } = "#E9EDF2";
 
     // การ์ดที่กำลังถูกเลือก/เปิด action อยู่
     public static string SelectedCardBackgroundHex { get; private set; } = "#1F3A26";
@@ -54,6 +69,9 @@ internal static class LauncherTheme
     /// <summary>สีไอคอน/ข้อความของ bottom nav: selected = accent, ปกติ = เทากลาง</summary>
     public static string NavInactiveHex { get; private set; } = "#7D8797";
 
+    /// <summary>สี ripple ของการแตะ (สว่างบนพื้นเข้ม, เข้มบนพื้นสว่าง)</summary>
+    public static string RippleHex { get; private set; } = "#33FFFFFF";
+
     // รัศมีมุม
     public const float CardRadiusDp = 18;
     public const float ButtonRadiusDp = 16;
@@ -75,26 +93,34 @@ internal static class LauncherTheme
         var christmas = name == ChristmasName;
         CurrentName = christmas ? ChristmasName : DarkName;
 
-        BackgroundHex = christmas ? "#0B1410" : "#0D1116";
-        HeaderBackgroundHex = christmas ? "#122019" : "#141A21";
-        CardBackgroundHex = christmas ? "#172A1F" : "#191F29";
-        SurfaceVariantHex = christmas ? "#22372A" : "#232B37";
-        NavBarBackgroundHex = christmas ? "#0E1A14" : "#12171E";
-        SelectedCardBackgroundHex = christmas ? "#3A2220" : "#1F3A26";
+        BackgroundHex = christmas ? "#FAF6EF" : "#0D1116";
+        HeaderBackgroundHex = christmas ? "#1B7A3E" : "#141A21";
+        HeaderTextHex = christmas ? "#FFFFFF" : "#E9EDF2";
+        HeaderPillHex = christmas ? "#26FFFFFF" : "#232B37";
+        CardBackgroundHex = christmas ? "#FFFFFF" : "#191F29";
+        CardTitleHex = christmas ? "#1B7A3E" : "#E9EDF2";
+        SurfaceVariantHex = christmas ? "#EDF4EC" : "#232B37";
+        NavBarBackgroundHex = christmas ? "#EDF4EC" : "#12171E";
+        SelectedCardBackgroundHex = christmas ? "#FFF3D1" : "#1F3A26";
         PrimaryHex = christmas ? "#B3261E" : "#2E7D32";
-        AccentHex = christmas ? "#E8C07D" : "#8AD49A";
-        TextPrimaryHex = christmas ? "#F2F5F1" : "#E9EDF2";
-        TextSecondaryHex = christmas ? "#9FAFA4" : "#94A0B0";
+        AccentHex = christmas ? "#1B7A3E" : "#8AD49A";
+        TextPrimaryHex = christmas ? "#1C1B18" : "#E9EDF2";
+        TextSecondaryHex = christmas ? "#666B62" : "#94A0B0";
         TextOnPrimaryHex = "#FFFFFF";
-        DividerHex = "#1AFFFFFF";
-        StatusOkTextHex = christmas ? "#A8E6B4" : "#8CE0A0";
-        StatusOkBackgroundHex = christmas ? "#1E3A2A" : "#1F3A26";
-        StatusErrorTextHex = christmas ? "#F3A9A9" : "#F1A0A6";
-        StatusErrorBackgroundHex = christmas ? "#3A1F22" : "#3A1F22";
-        WarningTextHex = christmas ? "#F0A98C" : "#E8C07D";
-        LogContinuationHex = christmas ? "#C8D3CA" : "#C3CBD6";
-        ScrollThumbHex = christmas ? "#6C8074" : "#66707E";
-        NavInactiveHex = christmas ? "#7E9083" : "#7D8797";
+        DividerHex = christmas ? "#1A000000" : "#1AFFFFFF";
+        StatusOkTextHex = christmas ? "#1B7A3E" : "#8CE0A0";
+        StatusOkBackgroundHex = christmas ? "#E3F3E6" : "#1F3A26";
+        StatusErrorTextHex = christmas ? "#B3261E" : "#F1A0A6";
+        StatusErrorBackgroundHex = christmas ? "#FBE6E3" : "#3A1F22";
+        WarningTextHex = christmas ? "#8A6100" : "#E8C07D";
+        LogContinuationHex = christmas ? "#3A3933" : "#C3CBD6";
+        ScrollThumbHex = christmas ? "#9A968C" : "#66707E";
+        NavInactiveHex = christmas ? "#6F7A6C" : "#7D8797";
+        RippleHex = christmas ? "#1A000000" : "#33FFFFFF";
+
+        // status bar = สี header (christmas เป็นเขียวเข้ม จึงต้องใช้ไอคอนขาว)
+        StatusBarDarkIcons = false;
+        NavBarDarkIcons = christmas;
     }
 
     public static Color Parse(string hex) => Color.ParseColor(hex);

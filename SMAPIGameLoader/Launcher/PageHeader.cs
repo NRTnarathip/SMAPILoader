@@ -1,4 +1,4 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Text;
 using Android.Util;
@@ -34,7 +34,7 @@ internal sealed class PageHeader : LinearLayout
 
         Title = new TextView(context) { Text = titleText };
         Title.SetTextSize(ComplexUnitType.Sp, 22);
-        Title.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        Title.SetTextColor(LauncherTheme.Parse(LauncherTheme.HeaderTextHex));
         Title.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         Title.LetterSpacing = 0.01f;
         Title.SetSingleLine(true);

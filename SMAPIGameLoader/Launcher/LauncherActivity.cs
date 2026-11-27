@@ -93,6 +93,21 @@ public class LauncherActivity : AppCompatActivity
         AppCompatDelegate.DefaultNightMode = AppCompatDelegate.ModeNightYes;
         Window?.SetStatusBarColor(LauncherTheme.Parse(LauncherTheme.HeaderBackgroundHex));
         Window?.SetNavigationBarColor(LauncherTheme.Parse(LauncherTheme.NavBarBackgroundHex));
+
+        // ไอคอน status/nav bar ต้องตรงกับความสว่างของพื้นหลัง
+        if (Window?.DecorView is null)
+            return;
+
+        const SystemUiFlags statusBar = SystemUiFlags.LightStatusBar;
+        const SystemUiFlags navBar = SystemUiFlags.LightNavigationBar;
+        var flags = Window.DecorView.SystemUiVisibility;
+        flags = LauncherTheme.StatusBarDarkIcons
+            ? flags | (StatusBarVisibility)statusBar
+            : flags & ~(StatusBarVisibility)statusBar;
+        flags = LauncherTheme.NavBarDarkIcons
+            ? flags | (StatusBarVisibility)navBar
+            : flags & ~(StatusBarVisibility)navBar;
+        Window.DecorView.SystemUiVisibility = flags;
     }
 
     /// <summary>

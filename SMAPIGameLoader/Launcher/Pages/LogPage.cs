@@ -1,4 +1,4 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Text;
@@ -71,12 +71,12 @@ internal sealed class LogPage : LinearLayout
         var header = new PageHeader(context, "SMAPI Log");
 
         var reloadButton = CreateHeaderButton(context, Resource.Drawable.ic_refresh,
-            LauncherTheme.TextPrimaryHex, "Reload log");
+            LauncherTheme.HeaderTextHex, "Reload log");
         reloadButton.Click += (s, e) => Reload();
         header.Actions.AddView(reloadButton);
 
         var shareButton = CreateHeaderButton(context, Resource.Drawable.ic_share,
-            LauncherTheme.AccentHex, "Share log");
+            LauncherTheme.HeaderTextHex, "Share log");
         shareButton.Click += (s, e) => SmapiLogTool.ShareLog();
         header.Actions.AddView(shareButton);
 
@@ -320,7 +320,7 @@ internal sealed class LogPage : LinearLayout
         button.SetImageResource(iconResId);
         button.SetColorFilter(LauncherTheme.Parse(tintHex));
         button.Background = UI.CreateRippleDrawable(
-            context, LauncherTheme.SurfaceVariantHex, 20);
+            context, LauncherTheme.HeaderPillHex, 20);
         button.ContentDescription = description;
         button.SetPadding(
             UI.Dp(context, 10), UI.Dp(context, 10),

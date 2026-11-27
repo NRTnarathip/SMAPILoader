@@ -8,8 +8,6 @@ namespace SMAPIGameLoader.Launcher;
 
 public static class UI
 {
-    const string RippleColorHex = "#33FFFFFF";
-
     public static int Dp(Context context, float dp) =>
         (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, dp, context.Resources!.DisplayMetrics!);
 
@@ -23,7 +21,7 @@ public static class UI
         var fill = CreateRoundedDrawable(context, fillColorHex, cornerRadiusDp, strokeColorHex);
         var mask = CreateRoundedDrawable(context, "#FFFFFF", cornerRadiusDp, null);
         return new RippleDrawable(
-            ColorStateList.ValueOf(Color.ParseColor(RippleColorHex)), fill, mask);
+            ColorStateList.ValueOf(Color.ParseColor(LauncherTheme.RippleHex)), fill, mask);
     }
 
     static GradientDrawable CreateRoundedDrawable(
