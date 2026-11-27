@@ -47,8 +47,10 @@ internal sealed class LogPage : LinearLayout
     readonly TextView _emptyTitle;
     readonly TextView _emptyHint;
     readonly TextView _emptyDetail;
+    readonly ImageButton _firstPageButton;
     readonly ImageButton _prevButton;
     readonly ImageButton _nextButton;
+    readonly ImageButton _lastPageButton;
 
     int _filterMask;
     int _page;
@@ -147,12 +149,16 @@ internal sealed class LogPage : LinearLayout
         pager.SetGravity(GravityFlags.CenterVertical);
         pager.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.NavBarBackgroundHex));
         pager.SetPadding(
-            UI.Dp(context, 12), UI.Dp(context, 6),
-            UI.Dp(context, 12), UI.Dp(context, 6));
+            UI.Dp(context, 8), UI.Dp(context, 6),
+            UI.Dp(context, 8), UI.Dp(context, 6));
+
+        _firstPageButton = CreatePagerButton(context, Resource.Drawable.ic_first_page, "First page");
+        _firstPageButton.Click += (s, e) => GoToPage(0);
+        pager.AddView(_firstPageButton);
 
         _prevButton = CreatePagerButton(context, Resource.Drawable.ic_chevron_left, "Previous page");
         _prevButton.Click += (s, e) => GoToPage(_page - 1);
-        pager.AddView(_prevButton);
+        pager.AddView(_prevButton, PagerGap());
 
         _pageText = new TextView(context) { Gravity = GravityFlags.Center };
         _pageText.SetTextSize(ComplexUnitType.Sp, 12);
@@ -162,36 +168,35 @@ internal sealed class LogPage : LinearLayout
         pager.AddView(_pageText, new LinearLayout.LayoutParams(
             0, ViewGroup.LayoutParams.WrapContent, 1f)
         {
-            LeftMargin = UI.Dp(context, 8),
-            RightMargin = UI.Dp(context, 8)
+            LeftMargin = UI.Dp(context, 6),
+            RightMargin = UI.Dp(context, 6)
         });
 
         _nextButton = CreatePagerButton(context, Resource.Drawable.ic_chevron_right, "Next page");
         _nextButton.Click += (s, e) => GoToPage(_page + 1);
-        pager.AddView(_nextButton);
+        pager.AddView(_nextButton, PagerGap());
+
+        _lastPageButton = CreatePagerButton(context, Resource.Drawable.ic_last_page, "Last page");
+        _lastPageButton.Click += (s, e) => GoToLastLine(); // หน้าสุดท้าย + เลื่อนถึงบรรทัดสุดท้ายเลย
+        pager.AddView(_lastPageButton, PagerGap());
 
         var pagerSeparator = new View(context);
         pagerSeparator.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
         pager.AddView(pagerSeparator, new LinearLayout.LayoutParams(
             UI.Dp(context, 1), UI.Dp(context, 20))
         {
-            LeftMargin = UI.Dp(context, 8),
-            RightMargin = UI.Dp(context, 8)
+            LeftMargin = UI.Dp(context, 6),
+            RightMargin = UI.Dp(context, 6)
         });
 
-        var topButton = CreatePagerButton(context, Resource.Drawable.ic_to_top, "Scroll to top");
-        topButton.Click += (s, e) => _list.ScrollToPosition(0);
+        // กระโดดไปบรรทัดแรก/สุดท้ายของ log ทั้งไฟล์ (ข้ามหน้าให้เอง)
+        var topButton = CreatePagerButton(context, Resource.Drawable.ic_to_top, "Jump to first line");
+        topButton.Click += (s, e) => GoToFirstLine();
         pager.AddView(topButton);
 
-        var bottomButton = CreatePagerButton(context, Resource.Drawable.ic_to_bottom, "Scroll to bottom");
-        bottomButton.Click += (s, e) =>
-        {
-            if (_adapter.ItemCount > 0)
-                _list.ScrollToPosition(_adapter.ItemCount - 1);
-        };
-        pager.AddView(bottomButton, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
-        { LeftMargin = UI.Dp(context, 8) });
+        var bottomButton = CreatePagerButton(context, Resource.Drawable.ic_to_bottom, "Jump to last line");
+        bottomButton.Click += (s, e) => GoToLastLine();
+        pager.AddView(bottomButton, PagerGap());
 
         AddView(pager, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
@@ -277,6 +282,29 @@ internal sealed class LogPage : LinearLayout
 
     int PageCount => Math.Max(1, (int)Math.Ceiling(_filtered.Count / (double)PageSize));
 
+    /// <summary>ไปที่บรรทัดแรกของ log (คนละเรื่องกับ scroll ในหน้าปัจจุบัน)</summary>
+    void GoToFirstLine()
+    {
+        if (_page != 0)
+            GoToPage(0);
+        else
+            _list.ScrollToPosition(0);
+    }
+
+    /// <summary>ไปที่บรรทัดสุดท้ายของ log: สลับไปหน้าสุดท้ายแล้วเลื่อนลงล่างสุด</summary>
+    void GoToLastLine()
+    {
+        int lastPage = PageCount - 1;
+        if (_page != lastPage)
+        {
+            _page = lastPage;
+            RefreshView(scrollToTop: false);
+        }
+
+        if (_adapter.ItemCount > 0)
+            _list.ScrollToPosition(_adapter.ItemCount - 1);
+    }
+
     // ===== UI helpers =====
 
     static ImageButton CreateHeaderButton(
@@ -298,6 +326,10 @@ internal sealed class LogPage : LinearLayout
         return button;
     }
 
+    LinearLayout.LayoutParams PagerGap() => new(
+        ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+    { LeftMargin = UI.Dp(Context, 2) };
+
     static ImageButton CreatePagerButton(Context context, int iconResId, string description)
     {
         var button = new ImageButton(context);
@@ -307,10 +339,10 @@ internal sealed class LogPage : LinearLayout
             context, LauncherTheme.SurfaceVariantHex, 20);
         button.ContentDescription = description;
         button.SetPadding(
-            UI.Dp(context, 8), UI.Dp(context, 8),
-            UI.Dp(context, 8), UI.Dp(context, 8));
+            UI.Dp(context, 6), UI.Dp(context, 6),
+            UI.Dp(context, 6), UI.Dp(context, 6));
 
-        int size = UI.Dp(context, 40);
+        int size = UI.Dp(context, 36);
         button.LayoutParameters = new LinearLayout.LayoutParams(size, size);
         return button;
     }
@@ -436,7 +468,7 @@ internal sealed class LogPage : LinearLayout
 
         if (hasLines)
         {
-            _pageText.Text = $"{_page + 1}/{pageCount} · {start + 1}-{start + count} of {_filtered.Count}";
+            _pageText.Text = $"{_page + 1}/{pageCount} · {start + 1}-{start + count}";
         }
         else
         {
@@ -444,8 +476,12 @@ internal sealed class LogPage : LinearLayout
             SetEmptyState();
         }
 
-        SetPagerButtonEnabled(_prevButton, _page > 0);
-        SetPagerButtonEnabled(_nextButton, _page < pageCount - 1);
+        bool hasPrev = _page > 0;
+        bool hasNext = _page < pageCount - 1;
+        SetPagerButtonEnabled(_firstPageButton, hasPrev);
+        SetPagerButtonEnabled(_prevButton, hasPrev);
+        SetPagerButtonEnabled(_nextButton, hasNext);
+        SetPagerButtonEnabled(_lastPageButton, hasNext);
 
         if (scrollToTop)
             _list.ScrollToPosition(0);
