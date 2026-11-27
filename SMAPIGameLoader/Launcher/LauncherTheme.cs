@@ -16,6 +16,9 @@ internal static class LauncherTheme
 
     public static string CurrentName { get; private set; } = DarkName;
 
+    /// <summary>ธีมพื้นสว่าง — ใช้เลือกไอคอนแบบสีเข้ม (ไอคอนขาวจะมองไม่เห็น)</summary>
+    public static bool IsLightTheme => CurrentName == ChristmasName;
+
     /// <summary>ไอคอน status bar เป็นสีเข้ม (พื้นสว่าง) หรือสีขาว (พื้นเข้ม)</summary>
     public static bool StatusBarDarkIcons { get; private set; }
 

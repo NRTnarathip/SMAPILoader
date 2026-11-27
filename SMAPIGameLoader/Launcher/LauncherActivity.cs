@@ -191,7 +191,7 @@ public class LauncherActivity : AppCompatActivity
         AddNavItem(HomeId, Resource.Drawable.ic_nav_home, "Home");
         AddNavItem(ModManagerId, Resource.Drawable.ic_nav_mods, "Mods");
         AddNavItem(LogPageId, Resource.Drawable.ic_nav_log, "Log");
-        AddNavItem(ContactPageId, Resource.Drawable.ic_nav_network, "Thanks");
+        AddNavItem(ContactPageId, Resource.Drawable.ic_nav_network, "Social");
         AddNavItem(SettingsPageId, Resource.Drawable.ic_nav_settings, "Settings");
 
         // เส้นคั่นบาง ๆ ระหว่าง content กับ bottom nav

@@ -1,4 +1,4 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Net;
 using Android.Util;
@@ -29,7 +29,7 @@ internal sealed class ContactPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent);
 
-        AddView(new PageHeader(context, "Thanks"), new LayoutParams(
+        AddView(new PageHeader(context, "Social"), new LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
 
@@ -75,6 +75,11 @@ internal sealed class ContactPage : LinearLayout
         return card;
     }
 
+    /// <summary>ไอคอน GitHub เป็นสีขาว/ดำตามความสว่างของธีม</summary>
+    static int GithubIcon => LauncherTheme.IsLightTheme
+        ? Resource.Drawable.ic_contact_github_ink
+        : Resource.Drawable.ic_contact_github;
+
     static CardView CreateLinksCard(Context context)
     {
         var card = CreateCard(context);
@@ -85,10 +90,10 @@ internal sealed class ContactPage : LinearLayout
         {
             (Resource.Drawable.ic_contact_discord, "SMAPI Thailand & Global", "discord.gg/cHPWYe2RYb",
                 "https://discord.gg/cHPWYe2RYb"),
-            (Resource.Drawable.ic_contact_github, "GitHub SMAPI Launcher",
+            (GithubIcon, "GitHub SMAPI Launcher",
                 "github.com/NRTnarathip/SMAPILoader",
                 "https://github.com/NRTnarathip/SMAPILoader"),
-            (Resource.Drawable.ic_contact_github, "GitHub SMAPI Zip",
+            (GithubIcon, "GitHub SMAPI Zip",
                 "github.com/NRTnarathip/SMAPI-Android-1.6",
                 "https://github.com/NRTnarathip/SMAPI-Android-1.6"),
             (Resource.Drawable.ic_contact_nexus, "Nexus SMAPI Zip",
