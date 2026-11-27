@@ -41,6 +41,9 @@ internal static class LauncherTheme
     public const string WarningTextHex = "#E8C07D";
     public const string LogContinuationHex = "#C3CBD6";
 
+    // scrollbar
+    public const string ScrollThumbHex = "#66707E";
+
     // รัศมีมุม
     public const float CardRadiusDp = 18;
     public const float ButtonRadiusDp = 16;

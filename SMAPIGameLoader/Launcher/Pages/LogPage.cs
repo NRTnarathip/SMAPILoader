@@ -51,6 +51,7 @@ internal sealed class LogPage : LinearLayout
     readonly ImageButton _prevButton;
     readonly ImageButton _nextButton;
     readonly ImageButton _lastPageButton;
+    readonly RecyclerScrollBar _scrollBar;
 
     int _filterMask;
     int _page;
@@ -139,6 +140,16 @@ internal sealed class LogPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
 
+        // scrollbar ลากได้ ทับขอบขวาของ list (เว้นระยะจากขอบจอ กันชนโซน gesture ของระบบ)
+        _scrollBar = new RecyclerScrollBar(context, _list);
+        body.AddView(_scrollBar, new FrameLayout.LayoutParams(
+            UI.Dp(context, 24), ViewGroup.LayoutParams.MatchParent)
+        {
+            Gravity = GravityFlags.Right,
+            RightMargin = UI.Dp(context, 16)
+        });
+        _list.AddOnScrollListener(new ScrollBarInvalidator(_scrollBar));
+
         // ===== Pager bar =====
         var pagerDivider = new View(context);
         pagerDivider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
@@ -189,13 +200,17 @@ internal sealed class LogPage : LinearLayout
             RightMargin = UI.Dp(context, 6)
         });
 
-        // กระโดดไปบรรทัดแรก/สุดท้ายของ log ทั้งไฟล์ (ข้ามหน้าให้เอง)
-        var topButton = CreatePagerButton(context, Resource.Drawable.ic_to_top, "Jump to first line");
-        topButton.Click += (s, e) => GoToFirstLine();
+        // เลื่อนบนสุด/ล่างสุดของหน้าที่กำลังดูอยู่เท่านั้น (ไม่ข้ามหน้า)
+        var topButton = CreatePagerButton(context, Resource.Drawable.ic_to_top, "Scroll to top of page");
+        topButton.Click += (s, e) => _list.ScrollToPosition(0);
         pager.AddView(topButton);
 
-        var bottomButton = CreatePagerButton(context, Resource.Drawable.ic_to_bottom, "Jump to last line");
-        bottomButton.Click += (s, e) => GoToLastLine();
+        var bottomButton = CreatePagerButton(context, Resource.Drawable.ic_to_bottom, "Scroll to bottom of page");
+        bottomButton.Click += (s, e) =>
+        {
+            if (_adapter.ItemCount > 0)
+                _list.ScrollToPosition(_adapter.ItemCount - 1);
+        };
         pager.AddView(bottomButton, PagerGap());
 
         AddView(pager, new LayoutParams(
@@ -281,15 +296,6 @@ internal sealed class LogPage : LinearLayout
     }
 
     int PageCount => Math.Max(1, (int)Math.Ceiling(_filtered.Count / (double)PageSize));
-
-    /// <summary>ไปที่บรรทัดแรกของ log (คนละเรื่องกับ scroll ในหน้าปัจจุบัน)</summary>
-    void GoToFirstLine()
-    {
-        if (_page != 0)
-            GoToPage(0);
-        else
-            _list.ScrollToPosition(0);
-    }
 
     /// <summary>ไปที่บรรทัดสุดท้ายของ log: สลับไปหน้าสุดท้ายแล้วเลื่อนลงล่างสุด</summary>
     void GoToLastLine()
@@ -461,6 +467,7 @@ internal sealed class LogPage : LinearLayout
         for (int i = 0; i < count; i++)
             pageLines.Add(_filtered[start + i]);
         _adapter.Submit(pageLines);
+        _scrollBar.ResetThumb();
 
         bool hasLines = _filtered.Count > 0;
         _list.Visibility = hasLines ? ViewStates.Visible : ViewStates.Gone;
@@ -508,5 +515,16 @@ internal sealed class LogPage : LinearLayout
     {
         button.Enabled = enabled;
         button.Alpha = enabled ? 1f : 0.35f;
+    }
+
+    /// <summary>บอกให้ scrollbar วาดใหม่ทุกครั้งที่ list เลื่อน</summary>
+    sealed class ScrollBarInvalidator : RecyclerView.OnScrollListener
+    {
+        readonly View _bar;
+
+        public ScrollBarInvalidator(View bar) => _bar = bar;
+
+        public override void OnScrolled(RecyclerView recyclerView, int dx, int dy) =>
+            _bar.Invalidate();
     }
 }
