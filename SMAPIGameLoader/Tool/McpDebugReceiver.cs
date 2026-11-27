@@ -22,6 +22,7 @@ public class McpDebugReceiver : BroadcastReceiver
         ["MCP_GoModManagerPage"] = _ => Navigate(LauncherActivity.ModManagerId),
         ["MCP_GoLogPage"] = _ => Navigate(LauncherActivity.LogPageId),
         ["MCP_GetState"] = _ => LauncherActivity.Instance.CurrentPageName,
+        ["MCP_PlayGame"] = _ => PlayGame(),
     };
 
     public override void OnReceive(Context context, Intent intent)
@@ -51,6 +52,13 @@ public class McpDebugReceiver : BroadcastReceiver
         var activity = LauncherActivity.Instance;
         activity.NavigateTo(itemId);
         return activity.CurrentPageName;
+    }
+
+    /// <summary>เริ่มเกมเหมือนกดปุ่ม Play Game (ตัว launch ทำงานเบื้องหลังจึงคืนผลทันที)</summary>
+    static string PlayGame()
+    {
+        LauncherActivity.Instance.OnClickStartGame();
+        return "starting_game";
     }
 }
 #endif
