@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Graphics;
+using Android.Text;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
@@ -28,11 +29,16 @@ internal sealed class ModManagerPage : LinearLayout
 
     private readonly Context _context;
     private readonly List<ModInfo> _mods = new();
+    private readonly List<ModInfo> _visibleMods = new(); // ผลหลังกรองด้วยคำค้น (ตัวที่ list แสดง)
     private readonly ModAdapter _adapter;
     private readonly LinearLayout _emptyView;
+    private readonly TextView _emptyText;
+    private readonly TextView _emptyHint;
     private readonly TextView _sortButton;
     private readonly ImageButton _installButton;
     private readonly RecyclerView _list;
+    private readonly EditText _searchInput;
+    private readonly ImageView _searchClear;
     private SortMode _sortMode = SortMode.Date;
     private bool _sortDescending = true;
 
@@ -58,16 +64,69 @@ internal sealed class ModManagerPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.WrapContent));
 
+        // ---- ช่องค้นหา อยู่ติดใต้ header ----
+        var searchBar = new LinearLayout(context) { Orientation = Orientation.Horizontal };
+        searchBar.SetGravity(GravityFlags.CenterVertical);
+        searchBar.SetMinimumHeight(UI.Dp(context, 44));
+        searchBar.SetPadding(
+            UI.Dp(context, 12), 0, UI.Dp(context, 4), 0);
+        searchBar.Background = LauncherTheme.CreateSurfaceDrawable(
+            context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
+        AddView(searchBar, new LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+        {
+            LeftMargin = UI.Dp(context, 16),
+            RightMargin = UI.Dp(context, 16),
+            TopMargin = UI.Dp(context, 10),
+            BottomMargin = UI.Dp(context, 2)
+        });
+
+        var searchIcon = new ImageView(context);
+        searchIcon.SetImageResource(Resource.Drawable.ic_search);
+        searchIcon.SetColorFilter(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        searchIcon.LayoutParameters = new LinearLayout.LayoutParams(
+            UI.Dp(context, 18), UI.Dp(context, 18));
+        searchBar.AddView(searchIcon);
+
+        _searchInput = new EditText(context)
+        {
+            Hint = "Search mods",
+            Background = null,
+            ImeOptions = Android.Views.InputMethods.ImeAction.Search,
+            InputType = InputTypes.ClassText
+        };
+        _searchInput.SetSingleLine(true);
+        _searchInput.SetTextSize(ComplexUnitType.Sp, 14);
+        _searchInput.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        _searchInput.SetHintTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        _searchInput.SetPadding(UI.Dp(context, 10), 0, 0, 0);
+        _searchInput.LayoutParameters = new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 1f);
+        _searchInput.TextChanged += OnSearchTextChanged;
+        searchBar.AddView(_searchInput);
+
+        _searchClear = new ImageView(context);
+        _searchClear.SetImageResource(Resource.Drawable.ic_close);
+        _searchClear.SetColorFilter(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        _searchClear.SetPadding(
+            UI.Dp(context, 10), UI.Dp(context, 10),
+            UI.Dp(context, 10), UI.Dp(context, 10));
+        _searchClear.Visibility = ViewStates.Gone;
+        _searchClear.ContentDescription = "Clear search";
+        _searchClear.Click += (s, e) => _searchInput.Text = "";
+        searchBar.AddView(_searchClear, new LinearLayout.LayoutParams(
+            UI.Dp(context, 38), UI.Dp(context, 38)));
+
         // ---- Body: list + empty state ซ้อนกันใน FrameLayout ----
         var body = new FrameLayout(context);
         AddView(body, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, 0, 1f));
 
-        _adapter = new ModAdapter(context, _mods, OnClickedModItem);
+        _adapter = new ModAdapter(context, _visibleMods, OnClickedModItem);
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
         _list.SetPadding(0, UI.Dp(context, 12), 0, UI.Dp(context, 16));
-        _list.SetClipToPadding(false);
+        _list.SetClipToPadding(true);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
 
@@ -82,19 +141,19 @@ internal sealed class ModManagerPage : LinearLayout
         emptyView.SetGravity(GravityFlags.Center);
         _emptyView = emptyView;
 
-        var emptyText = new TextView(context) { Text = "No mods found." };
-        emptyText.SetTextSize(ComplexUnitType.Sp, 16);
-        emptyText.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
-        emptyText.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
-        emptyText.Gravity = GravityFlags.Center;
-        emptyView.AddView(emptyText);
+        _emptyText = new TextView(context) { Text = "No mods found." };
+        _emptyText.SetTextSize(ComplexUnitType.Sp, 16);
+        _emptyText.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        _emptyText.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        _emptyText.Gravity = GravityFlags.Center;
+        emptyView.AddView(_emptyText);
 
-        var emptyHint = new TextView(context) { Text = "Tap + to install your first mod." };
-        emptyHint.SetTextSize(ComplexUnitType.Sp, 13);
-        emptyHint.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
-        emptyHint.Gravity = GravityFlags.Center;
-        emptyHint.SetPadding(0, UI.Dp(context, 6), 0, 0);
-        emptyView.AddView(emptyHint);
+        _emptyHint = new TextView(context) { Text = "Tap + to install your first mod." };
+        _emptyHint.SetTextSize(ComplexUnitType.Sp, 13);
+        _emptyHint.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        _emptyHint.Gravity = GravityFlags.Center;
+        _emptyHint.SetPadding(0, UI.Dp(context, 6), 0, 0);
+        emptyView.AddView(_emptyHint);
 
         body.AddView(emptyView, new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
@@ -205,6 +264,37 @@ internal sealed class ModManagerPage : LinearLayout
         _ => MenuSortDate,
     };
 
+    void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        _searchClear.Visibility = string.IsNullOrEmpty(e.Text?.ToString())
+            ? ViewStates.Gone
+            : ViewStates.Visible;
+        ApplyList();
+    }
+
+    /// <summary>กรองตามคำค้น → sort → อัปเดต list/empty state</summary>
+    void ApplyList()
+    {
+        string query = (_searchInput.Text ?? "").Trim();
+
+        _visibleMods.Clear();
+        foreach (var mod in _mods)
+        {
+            if (query.Length == 0 ||
+                mod.NameUIText.Contains(query, StringComparison.OrdinalIgnoreCase))
+                _visibleMods.Add(mod);
+        }
+
+        ApplySort();
+
+        bool hasMods = _mods.Count > 0;
+        bool hasVisible = _visibleMods.Count > 0;
+        _list.Visibility = hasVisible ? ViewStates.Visible : ViewStates.Gone;
+        _emptyView.Visibility = hasVisible ? ViewStates.Gone : ViewStates.Visible;
+        _emptyText.Text = hasMods ? $"No mods match \"{query}\"" : "No mods found.";
+        _emptyHint.Text = hasMods ? "Try a different name." : "Tap + to install your first mod.";
+    }
+
     void ApplySort()
     {
         Comparison<ModInfo> ascending = _sortMode switch
@@ -215,7 +305,7 @@ internal sealed class ModManagerPage : LinearLayout
             _ => (a, b) => a.LastModified.CompareTo(b.LastModified),
         };
 
-        _mods.Sort((a, b) => _sortDescending ? ascending(b, a) : ascending(a, b));
+        _visibleMods.Sort((a, b) => _sortDescending ? ascending(b, a) : ascending(a, b));
         _adapter.NotifyDataSetChanged();
         _sortButton.Text = $"Sort: {_sortMode} {(_sortDescending ? "↓" : "↑")}";
     }
@@ -242,12 +332,8 @@ internal sealed class ModManagerPage : LinearLayout
         }
 
         //refresh
-        ApplySort();
+        ApplyList();
         RecomputeModSizes();
-
-        bool empty = _mods.Count == 0;
-        _emptyView.Visibility = empty ? ViewStates.Visible : ViewStates.Gone;
-        _list.Visibility = empty ? ViewStates.Gone : ViewStates.Visible;
     }
 
     /// <summary>
@@ -392,7 +478,7 @@ internal sealed class ModManagerPage : LinearLayout
     {
         mod.Enabled = !mod.Enabled;
 
-        int position = _mods.IndexOf(mod);
+        int position = _visibleMods.IndexOf(mod);
         if (position >= 0)
             _adapter.NotifyItemChanged(position);
     }
