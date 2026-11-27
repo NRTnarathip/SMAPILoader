@@ -1,12 +1,15 @@
-﻿using Android.Content;
+using Android.Content;
+using Android.Content.Res;
 using Android.Graphics;
 using Android.Text;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
 using AndroidX.CardView.Widget;
 using AndroidX.RecyclerView.Widget;
 using System;
+using Orientation = Android.Widget.Orientation;
 
 namespace SMAPIGameLoader.Launcher;
 
@@ -17,24 +20,37 @@ internal class ModViewHolder : RecyclerView.ViewHolder
     private readonly View _content;
     private readonly TextView _name;
     private readonly TextView _detail;
+    private readonly SwitchCompat _toggle;
     private readonly Action<ModInfo, View> _onClicked;
+    private readonly Action<ModInfo> _onToggled;
     private ModInfo? _mod;
 
     private ModViewHolder(View root, View content, TextView name, TextView detail,
-                          Action<ModInfo, View> onClicked) : base(root)
+                          SwitchCompat toggle, Action<ModInfo, View> onClicked,
+                          Action<ModInfo> onToggled) : base(root)
     {
         _content = content;
         _name = name;
         _detail = detail;
+        _toggle = toggle;
         _onClicked = onClicked;
+        _onToggled = onToggled;
 
         root.Click += (s, e) =>
         {
             if (_mod != null) _onClicked(_mod, root);
         };
+
+        // Bind ตั้ง Checked ให้ตรงกับ state จริงอยู่แล้ว ค่าที่ต่างจึงเป็นการกดของผู้ใช้เท่านั้น
+        toggle.CheckedChange += (s, e) =>
+        {
+            if (_mod != null && e.IsChecked != _mod.Enabled)
+                _onToggled(_mod);
+        };
     }
 
-    public static ModViewHolder Create(Context context, Action<ModInfo, View> onClicked)
+    public static ModViewHolder Create(Context context, Action<ModInfo, View> onClicked,
+                                       Action<ModInfo> onToggled)
     {
         var card = new CardView(context)
         {
@@ -52,11 +68,16 @@ internal class ModViewHolder : RecyclerView.ViewHolder
             RightMargin = sideMargin
         };
 
-        // สองบรรทัดต่อการ์ด (ชื่อ / version · size · date) เพื่อให้ list ยาว ๆ ดูแน่นและอ่านง่าย
+        // สองบรรทัดต่อการ์ด (ชื่อ / version · size · date) + switch เปิด/ปิด mod ที่ขวาสุด
+        var row = new LinearLayout(context) { Orientation = Orientation.Horizontal };
+        row.SetGravity(GravityFlags.CenterVertical);
+        row.SetPadding(UI.Dp(context, 16), UI.Dp(context, 6),
+                       UI.Dp(context, 12), UI.Dp(context, 6));
+        card.AddView(row);
+
         var column = new LinearLayout(context) { Orientation = Orientation.Vertical };
-        column.SetPadding(UI.Dp(context, 16), UI.Dp(context, 10),
-                          UI.Dp(context, 16), UI.Dp(context, 10));
-        card.AddView(column);
+        row.AddView(column, new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 1f));
 
         var name = new TextView(context);
         name.SetTextSize(ComplexUnitType.Sp, 15);
@@ -78,17 +99,38 @@ internal class ModViewHolder : RecyclerView.ViewHolder
         column.AddView(name);
         column.AddView(detail);
 
-        return new ModViewHolder(card, column, name, detail, onClicked);
+        var toggle = new SwitchCompat(context);
+        toggle.ThumbTintList = TintStates(LauncherTheme.AccentHex, LauncherTheme.TextSecondaryHex);
+        toggle.TrackTintList = TintStates(LauncherTheme.StatusOkBackgroundHex,
+                                          LauncherTheme.SurfaceVariantHex);
+        toggle.LayoutParameters = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WrapContent,
+            ViewGroup.LayoutParams.WrapContent)
+        { LeftMargin = UI.Dp(context, 8) };
+        row.AddView(toggle);
+
+        return new ModViewHolder(card, column, name, detail, toggle, onClicked, onToggled);
     }
+
+    static ColorStateList TintStates(string checkedHex, string normalHex) =>
+        new(
+            new[] { new[] { Android.Resource.Attribute.StateChecked }, new int[0] },
+            new[]
+            {
+                LauncherTheme.Parse(checkedHex).ToArgb(),
+                LauncherTheme.Parse(normalHex).ToArgb(),
+            });
 
     public void Bind(ModInfo mod)
     {
         _mod = mod;
         _name.Text = mod.NameUIText;
         _detail.Text = $"{mod.VersionUIText} · {mod.SizeUIText} · {mod.DateUIText}";
+        _toggle.ContentDescription = $"Toggle {mod.NameUIText}";
 
         // ต้อง dim ที่ content ข้างใน ไม่ใช่ ItemView เพราะ DefaultItemAnimator
         // จะ cross-fade แล้วเซ็ต itemView.Alpha กลับเป็น 1 ตอน NotifyItemChanged
         _content.Alpha = mod.Enabled ? 1f : DisabledAlpha;
+        _toggle.Checked = mod.Enabled;
     }
 }

@@ -122,7 +122,7 @@ internal sealed class ModManagerPage : LinearLayout
         AddView(body, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, 0, 1f));
 
-        _adapter = new ModAdapter(context, _visibleMods, OnClickedModItem);
+        _adapter = new ModAdapter(context, _visibleMods, OnClickedModItem, ToggleMod);
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
         _list.SetPadding(0, UI.Dp(context, 12), 0, UI.Dp(context, 16));
