@@ -2,14 +2,16 @@ using _Microsoft.Android.Resource.Designer;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Graphics;
 using Android.OS;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.App;
-using Google.Android.Material.BottomNavigation;
 using SMAPIGameLoader.Launcher.Pages;
 using SMAPIGameLoader.Tool;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Xamarin.Essentials;
 using static Android.Provider.DocumentsContract;
@@ -139,7 +141,9 @@ public class LauncherActivity : AppCompatActivity
     private View _homePage = null!;
     private ModManagerPage _modPage = null!;
     private LogPage _logPage = null!;
-    private BottomNavigationView _nav = null!;
+    private LinearLayout _nav = null!;
+    private readonly List<(int Id, ImageView Icon, TextView Label)> _navItems = new();
+    private int _selectedNavId = HomeId;
 
     private void SetupLauncherPage()
     {
@@ -154,25 +158,14 @@ public class LauncherActivity : AppCompatActivity
         _container.AddView(_modPage);
         _container.AddView(_logPage);
 
-        // Bottom navigation อยู่ล่างสุด
-        _nav = new BottomNavigationView(this)
-        {
-            ItemActiveIndicatorEnabled = false
-        };
+        // Bottom navigation ทำเองแบบ compact (M3 BottomNavigationView ล็อก minHeight 80dp
+        // และเหลือแถบว่างใต้ label ที่ปรับไม่ได้)
+        _nav = new LinearLayout(this) { Orientation = Orientation.Horizontal };
         _nav.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.NavBarBackgroundHex));
-        _nav.Elevation = 0;
-        _nav.ItemIconTintList = LauncherTheme.BottomNavItemColors();
-        _nav.ItemTextColor = LauncherTheme.BottomNavItemColors();
-        _nav.ItemIconSize = UI.Dp(this, 22);
-        _nav.SelectedItemId = HomeId;
-        _nav.Menu.Add(0, HomeId, 0, "Home").SetIcon(Resource.Drawable.ic_nav_home);
-        _nav.Menu.Add(0, ModManagerId, 1, "Mods").SetIcon(Resource.Drawable.ic_nav_mods);
-        _nav.Menu.Add(0, LogPageId, 2, "Log").SetIcon(Resource.Drawable.ic_nav_log);
-        _nav.ItemSelected += (s, e) =>
-        {
-            ShowPage(e.Item!.ItemId);
-            e.Handled = true;
-        };
+        _nav.SetPadding(0, UI.Dp(this, 4), 0, UI.Dp(this, 4));
+        AddNavItem(HomeId, Resource.Drawable.ic_nav_home, "Home");
+        AddNavItem(ModManagerId, Resource.Drawable.ic_nav_mods, "Mods");
+        AddNavItem(LogPageId, Resource.Drawable.ic_nav_log, "Log");
 
         // เส้นคั่นบาง ๆ ระหว่าง content กับ bottom nav
         var navDivider = new View(this);
@@ -194,7 +187,56 @@ public class LauncherActivity : AppCompatActivity
         SetContentView(root);
 
         // run first page
-        ShowPage(HomeId);
+        SelectNavItem(HomeId);
+    }
+
+    void AddNavItem(int id, int iconRes, string label)
+    {
+        var item = new LinearLayout(this)
+        {
+            Orientation = Orientation.Vertical,
+            Clickable = true,
+            Focusable = true
+        };
+        item.SetGravity(GravityFlags.Center);
+        item.SetPadding(0, UI.Dp(this, 4), 0, UI.Dp(this, 4));
+        item.LayoutParameters = new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 1f);
+        item.Background = UI.CreateRippleDrawable(this, null, LauncherTheme.ChipRadiusDp);
+
+        var icon = new ImageView(this);
+        icon.SetImageResource(iconRes);
+        icon.LayoutParameters = new LinearLayout.LayoutParams(
+            UI.Dp(this, 22), UI.Dp(this, 22));
+        item.AddView(icon);
+
+        var text = new TextView(this) { Text = label, Gravity = GravityFlags.Center };
+        text.SetTextSize(ComplexUnitType.Sp, 12);
+        text.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        text.SetPadding(0, UI.Dp(this, 2), 0, 0);
+        item.AddView(text);
+
+        item.Click += (s, e) => SelectNavItem(id);
+
+        _nav.AddView(item);
+        _navItems.Add((id, icon, text));
+    }
+
+    /// <summary>ไฮไลต์ tab ที่เลือก + สลับหน้า</summary>
+    void SelectNavItem(int id)
+    {
+        _selectedNavId = id;
+        var selected = LauncherTheme.Parse(LauncherTheme.AccentHex);
+        var normal = LauncherTheme.Parse(LauncherTheme.NavInactiveHex);
+
+        foreach (var (itemId, icon, label) in _navItems)
+        {
+            var color = itemId == id ? selected : normal;
+            icon.SetColorFilter(color);
+            label.SetTextColor(color);
+        }
+
+        ShowPage(id);
     }
 
     private void ShowPage(int itemId)
@@ -217,10 +259,10 @@ public class LauncherActivity : AppCompatActivity
     /// <summary>นำทางไปหน้าที่กำหนด (ใช้โดย McpDebugReceiver) — ต้องเรียกบน main thread</summary>
     public void NavigateTo(int itemId)
     {
-        if (_nav.SelectedItemId == itemId)
+        if (_selectedNavId == itemId)
             ShowPage(itemId);
         else
-            _nav.SelectedItemId = itemId; // ItemSelected handler -> ShowPage
+            SelectNavItem(itemId);
     }
 
     public void OnClickStartGame()

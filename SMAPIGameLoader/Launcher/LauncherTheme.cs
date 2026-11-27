@@ -1,5 +1,4 @@
 using Android.Content;
-using Android.Content.Res;
 using Android.Graphics;
 
 namespace SMAPIGameLoader.Launcher;
@@ -54,20 +53,7 @@ internal static class LauncherTheme
     public static Typeface BodyTypeface => Typeface.Create("sans-serif", TypefaceStyle.Normal);
 
     /// <summary>สีไอคอน/ข้อความของ bottom nav: selected = accent, ปกติ = เทากลาง</summary>
-    public static ColorStateList BottomNavItemColors()
-    {
-        return new ColorStateList(
-            new[]
-            {
-                new[] { Android.Resource.Attribute.StateChecked },
-                new int[0]
-            },
-            new[]
-            {
-                Parse(AccentHex).ToArgb(),
-                Parse("#7D8797").ToArgb()
-            });
-    }
+    public const string NavInactiveHex = "#7D8797";
 
     /// <summary>พื้นหลังกลมมีขอบจาง ใช้กับการ์ด/ชิปที่ต้องการเส้นแบ่งชัดขึ้น</summary>
     public static Android.Graphics.Drawables.GradientDrawable CreateSurfaceDrawable(
