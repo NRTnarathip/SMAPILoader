@@ -370,3 +370,6 @@ FodyWeavers.xsd
 # Local agent tooling / skills (ติดตั้งเองจาก upstream ไม่ใช่โค้ดโปรเจกต์)
 /.agents/
 /tests
+
+# Named release APKs produced by build-release.cmd (binaries, not source)
+/Artifacts/

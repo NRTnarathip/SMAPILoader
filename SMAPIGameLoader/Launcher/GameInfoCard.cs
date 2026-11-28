@@ -14,12 +14,13 @@ public class GameInfoCard : InfoCard
         SetStatus(status, installed, "Installed", "Missing");
         AddDivider();
 
-        AddRow("Launcher Version").Text = AppInfo.VersionString;
-        AddRow("Launcher Build").Text = GetLauncherBuildText();
-        AddRow("Game Version").Text = GameApkTool.CurrentGameVersion.ToString();
-        AddRow("Minimum Requirements Version").Text = GameApkTool.SupportMinimumGameVersion.ToString();
-        AddRow("Is Game Support").Text = GameApkTool.IsGameVersionSupport.ToString();
-        AddRow("Verify").Text = GetVerifyText(installed);
+        AddRow("Launcher Version", AppInfo.VersionString);
+        AddRow("Launcher Build Code", AppInfo.BuildString);
+        AddRow("Launcher Build Date", GetLauncherBuildDateText());
+        AddRow("Game Version", GameApkTool.CurrentGameVersion.ToString());
+        AddRow("Minimum Requirements Version", GameApkTool.SupportMinimumGameVersion.ToString());
+        AddRow("Is Game Support", GameApkTool.IsGameVersionSupport.ToString());
+        AddRow("Verify", GetVerifyText(installed));
     }
 
     static string GetVerifyText(bool installed)
@@ -33,7 +34,7 @@ public class GameInfoCard : InfoCard
         return "Please Download Game Official From Play Store Or Galaxy Store";
     }
 
-    static string GetLauncherBuildText()
+    static string GetLauncherBuildDateText()
     {
         var buildTime = DateTimeOffset
             .FromUnixTimeSeconds(long.Parse(AppInfo.BuildString))

@@ -125,6 +125,13 @@ public abstract class InfoCard : CardView
         return value;
     }
 
+    protected TextView AddRow(string label, string text)
+    {
+        var row = AddRow(label);
+        row.Text = text;
+        return row;
+    }
+
     protected TextView AddTextLine(string text, int textSizeSp = 13, bool emphasized = false)
     {
         var textView = new TextView(Context) { Text = text };
