@@ -162,14 +162,14 @@ internal static class SMAPIInstaller
         try
         {
 
-            var pick = await FilePickerTool.PickZipFile(title: "Please Pick File SMAPI-4.x.x.xxxx.zip Android");
+            var pick = await FilePickerTool.PickZipFile(title: "Please Pick File SMAPI-Android-4.x.x.xxxx.zip Android");
             if (pick == null)
                 return;
 
             //assert SMAPI it's android
             if (IsSMAPIZipFromPickFile(pick) is false)
             {
-                DialogTool.Show("SMAPI Installer Error", "Please select file SMAPI-4.x.x.xxxx.zip for Android");
+                DialogTool.Show("SMAPI Installer Error", "Please select file SMAPI-Android-4.x.x.xxxx.zip for Android");
                 return;
             }
 

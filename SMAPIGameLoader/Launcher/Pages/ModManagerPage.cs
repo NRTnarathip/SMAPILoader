@@ -303,6 +303,9 @@ internal sealed class ModManagerPage : LinearLayout
         bool hasMods = _mods.Count > 0;
         bool hasVisible = _visibleMods.Count > 0;
         _list.Visibility = hasVisible ? ViewStates.Visible : ViewStates.Gone;
+        _scrollBar.Visibility = _list.Visibility;
+        // invalidate หลัง layout รอบนี้ ไม่งั้น thumb ที่วาดไว้ตอน list ยังมีของเก่าจะค้าง
+        _scrollBar.Post(_scrollBar.ResetThumb);
         _emptyView.Visibility = hasVisible ? ViewStates.Gone : ViewStates.Visible;
         _emptyText.Text = hasMods ? $"No mods match \"{query}\"" : "No mods found.";
         _emptyHint.Text = hasMods ? "Try a different name." : "Tap + to install your first mod.";
@@ -326,6 +329,7 @@ internal sealed class ModManagerPage : LinearLayout
 
     void RefreshMods()
     {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
         //clear first
         _mods.Clear();
 
@@ -347,6 +351,7 @@ internal sealed class ModManagerPage : LinearLayout
 
         //refresh
         ApplyList();
+        Console.WriteLine($"Refresh Mods done: {_mods.Count} mods in {sw.ElapsedMilliseconds} ms");
         RecomputeModSizes();
     }
 
