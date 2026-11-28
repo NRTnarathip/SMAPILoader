@@ -36,6 +36,7 @@ internal sealed class ModManagerPage : LinearLayout
     private readonly TextView _sortButton;
     private readonly ImageButton _installButton;
     private readonly RecyclerView _list;
+    private readonly RecyclerScrollBar _scrollBar;
     private readonly EditText _searchInput;
     private readonly ImageView _searchClear;
     private SortMode _sortMode = SortMode.Date;
@@ -124,7 +125,8 @@ internal sealed class ModManagerPage : LinearLayout
         _adapter = new ModAdapter(context, _visibleMods, OnClickedModItem, ToggleMod);
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
-        _list.SetPadding(0, UI.Dp(context, 12), 0, UI.Dp(context, 16));
+        // padding ขวาเว้นที่ให้ scrollbar ไม่ให้ทับสวิตช์เปิด/ปิดของ mod
+        _list.SetPadding(0, UI.Dp(context, 12), UI.Dp(context, 16), UI.Dp(context, 16));
         _list.SetClipToPadding(true);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
@@ -157,6 +159,16 @@ internal sealed class ModManagerPage : LinearLayout
         body.AddView(emptyView, new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
+
+        // scrollbar ลากได้แบบเดียวกับหน้า Log
+        _scrollBar = new RecyclerScrollBar(context, _list);
+        body.AddView(_scrollBar, new FrameLayout.LayoutParams(
+            UI.Dp(context, 24), ViewGroup.LayoutParams.MatchParent)
+        {
+            Gravity = GravityFlags.Right,
+            RightMargin = UI.Dp(context, 16)
+        });
+        _list.AddOnScrollListener(new RecyclerScrollBar.Invalidator(_scrollBar));
 
         RefreshMods();
     }
@@ -308,6 +320,7 @@ internal sealed class ModManagerPage : LinearLayout
 
         _visibleMods.Sort((a, b) => _sortDescending ? ascending(b, a) : ascending(a, b));
         _adapter.NotifyDataSetChanged();
+        _scrollBar.ResetThumb();
         _sortButton.Text = $"Sort: {_sortMode} {(_sortDescending ? "↓" : "↑")}";
     }
 

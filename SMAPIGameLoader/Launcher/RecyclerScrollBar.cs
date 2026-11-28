@@ -135,6 +135,17 @@ internal sealed class RecyclerScrollBar : View
         return false;
     }
 
+    /// <summary>บอกให้ scrollbar วาดใหม่ทุกครั้งที่ list เลื่อน</summary>
+    internal sealed class Invalidator : RecyclerView.OnScrollListener
+    {
+        readonly View _bar;
+
+        public Invalidator(View bar) => _bar = bar;
+
+        public override void OnScrolled(RecyclerView recyclerView, int dx, int dy) =>
+            _bar.Invalidate();
+    }
+
     void Drag(float y)
     {
         float maxTravel = Height - _thumbHeight;

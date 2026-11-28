@@ -148,7 +148,7 @@ internal sealed class LogPage : LinearLayout
             Gravity = GravityFlags.Right,
             RightMargin = UI.Dp(context, 16)
         });
-        _list.AddOnScrollListener(new ScrollBarInvalidator(_scrollBar));
+        _list.AddOnScrollListener(new RecyclerScrollBar.Invalidator(_scrollBar));
 
         // ===== Pager bar =====
         var pagerDivider = new View(context);
@@ -515,16 +515,5 @@ internal sealed class LogPage : LinearLayout
     {
         button.Enabled = enabled;
         button.Alpha = enabled ? 1f : 0.35f;
-    }
-
-    /// <summary>บอกให้ scrollbar วาดใหม่ทุกครั้งที่ list เลื่อน</summary>
-    sealed class ScrollBarInvalidator : RecyclerView.OnScrollListener
-    {
-        readonly View _bar;
-
-        public ScrollBarInvalidator(View bar) => _bar = bar;
-
-        public override void OnScrolled(RecyclerView recyclerView, int dx, int dy) =>
-            _bar.Invalidate();
     }
 }
