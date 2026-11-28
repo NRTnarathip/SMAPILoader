@@ -7,20 +7,26 @@ using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.Widget;
 using Google.Android.Material.Dialog;
+using Google.Android.Material.Snackbar;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Orientation = Android.Widget.Orientation;
 
 namespace SMAPIGameLoader.Launcher;
 
 /// <summary>
-/// ฟอร์มแก้ JSON แบบไม่ต้องเขียนโค้ด (object/array ซ้อนได้, เพิ่ม/ลบ field ได้)
-/// ค่าถูกเขียนกลับเข้า JToken ทันทีที่ผู้ใช้แก้ — เปลี่ยนชื่อ key ยังไม่รองรับ
+/// ฟอร์มแก้ JSON แบบ compact: แถวเดียวต่อ field (label 40% / value 60%),
+/// section ซ้อนพับได้, ลบด้วย long-press + Undo — ค่าถูกเขียนกลับเข้า JToken ทันที
 /// </summary>
 internal sealed class JsonTreeEditor : LinearLayout
 {
+    private const float RowHeightDp = 40;
+    private const int AutoCollapseThreshold = 5;
+
     private enum ValueKind { Text, Number, Bool, Object, Array }
 
     private static readonly string[] KindNames = { "Text", "Number", "True / False", "Object", "Array" };
@@ -30,11 +36,34 @@ internal sealed class JsonTreeEditor : LinearLayout
         public EditText Input;
         public JValue Value;
         public string Path;
+        public bool IsInteger;
+    }
+
+    /// <summary>กันพิมพ์/วางค่าที่ไม่ใช่ตัวเลข (ปล่อย partial อย่าง "-" หรือ "1." ไว้ให้ validate ตอน save)</summary>
+    private sealed class NumberInputFilter : Java.Lang.Object, IInputFilter
+    {
+        private readonly Regex _pattern;
+
+        public NumberInputFilter(bool allowDecimal) =>
+            _pattern = new Regex(allowDecimal ? @"^-?\d*\.?\d*$" : @"^-?\d*$");
+
+        public Java.Lang.ICharSequence FilterFormatted(Java.Lang.ICharSequence source, int start, int end,
+            ISpanned dest, int dstart, int dend)
+        {
+            string current = dest?.ToString() ?? "";
+            if (dstart < 0 || dend > current.Length || dstart > dend)
+                return null;
+
+            string inserted = source?.SubSequenceFormatted(start, end)?.ToString() ?? "";
+            string result = current.Substring(0, dstart) + inserted + current.Substring(dend);
+            return _pattern.IsMatch(result) ? null : new Java.Lang.String("");
+        }
     }
 
     private readonly Context _context;
     private readonly JToken _root;
     private readonly List<NumberField> _numbers = new();
+    private readonly Dictionary<string, bool> _collapsed = new();
 
     /// <summary>ยิงเมื่อผู้ใช้เปลี่ยนค่าหรือโครงสร้าง (ใช้ทำ dirty flag)</summary>
     public event Action Changed;
@@ -52,7 +81,7 @@ internal sealed class JsonTreeEditor : LinearLayout
     {
         foreach (var field in _numbers)
         {
-            if (!TryParseNumber(field.Input.Text, out _))
+            if (!TryParseNumber(field.Input.Text, field.IsInteger, out _))
             {
                 error = $"Invalid number for \"{field.Path}\"";
                 return false;
@@ -71,10 +100,10 @@ internal sealed class JsonTreeEditor : LinearLayout
         switch (_root)
         {
             case JObject obj:
-                AddObjectChildren(this, obj);
+                AddObjectChildren(this, obj, "");
                 break;
             case JArray array:
-                AddArrayChildren(this, array);
+                AddArrayChildren(this, array, "");
                 break;
             default:
                 AddInfo("Root value is not an object or array. Switch to Raw mode to edit it.");
@@ -82,25 +111,28 @@ internal sealed class JsonTreeEditor : LinearLayout
         }
     }
 
-    void AddObjectChildren(LinearLayout parent, JObject obj)
+    // ===== object / array =====
+
+    void AddObjectChildren(LinearLayout parent, JObject obj, string path)
     {
-        foreach (var property in obj.Properties())
+        foreach (var property in obj.Properties().ToList())
         {
-            string name = property.Name;
-            AddNode(parent, property.Value, name, name,
-                () => { obj.Remove(name); OnStructureChanged(); });
+            string key = property.Name;
+            AddNode(parent, property.Value, key, ChildPath(path, key),
+                () => DeleteProperty(obj, key));
         }
 
-        AddAddButton(parent, "+ Add field", () => ShowAddDialog(obj, false));
+        AddAddButton(parent, "+ Add key", () => ShowAddDialog(obj, false));
     }
 
-    void AddArrayChildren(LinearLayout parent, JArray array)
+    void AddArrayChildren(LinearLayout parent, JArray array, string path)
     {
         for (int i = 0; i < array.Count; i++)
         {
             int index = i;
-            AddNode(parent, array[index], $"[{index}]", $"[{index}]",
-                () => { array.RemoveAt(index); OnStructureChanged(); });
+            string itemPath = $"{path}[{index}]";
+            AddNode(parent, array[index], $"[{index}]", itemPath,
+                () => DeleteArrayItem(array, index));
         }
 
         AddAddButton(parent, "+ Add item", () => ShowAddDialog(array, true));
@@ -111,10 +143,12 @@ internal sealed class JsonTreeEditor : LinearLayout
         switch (token)
         {
             case JObject obj:
-                AddObjectChildren(AddSection(parent, label, delete), obj);
+                AddSection(parent, label, obj.Count, path, delete,
+                    content => AddObjectChildren(content, obj, path));
                 break;
             case JArray array:
-                AddArrayChildren(AddSection(parent, label, delete), array);
+                AddSection(parent, label, array.Count, path, delete,
+                    content => AddArrayChildren(content, array, path));
                 break;
             default:
                 AddScalarRow(parent, token, label, path, delete);
@@ -122,56 +156,107 @@ internal sealed class JsonTreeEditor : LinearLayout
         }
     }
 
-    LinearLayout AddSection(LinearLayout parent, string label, Action delete)
+    static string ChildPath(string path, string key) =>
+        string.IsNullOrEmpty(path) ? key : $"{path}.{key}";
+
+    // ===== collapsible section =====
+
+    void AddSection(LinearLayout parent, string label, int count, string path,
+                    Action delete, Action<LinearLayout> fill)
     {
+        bool collapsed = _collapsed.TryGetValue(path, out bool stored)
+            ? stored
+            : count > AutoCollapseThreshold;
+
         var section = new LinearLayout(_context) { Orientation = Orientation.Vertical };
-        section.SetPadding(UI.Dp(_context, 12), 0, 0, 0);
         parent.AddView(section, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
 
-        var row = new LinearLayout(_context) { Orientation = Orientation.Horizontal };
-        row.SetGravity(GravityFlags.CenterVertical);
-        row.SetPadding(0, UI.Dp(_context, 6), 0, 0);
+        var header = new LinearLayout(_context)
+        {
+            Orientation = Orientation.Horizontal,
+            Clickable = true,
+            Focusable = true
+        };
+        header.SetGravity(GravityFlags.CenterVertical);
+        header.SetMinimumHeight(UI.Dp(_context, RowHeightDp));
+        header.SetPadding(UI.Dp(_context, 4), 0, UI.Dp(_context, 4), 0);
+        header.Background = UI.CreateRippleDrawable(_context, null, LauncherTheme.ChipRadiusDp);
 
-        var title = new TextView(_context) { Text = label };
-        title.SetTextSize(ComplexUnitType.Sp, 14);
+        var chevron = new ImageView(_context);
+        chevron.SetImageResource(Resource.Drawable.ic_chevron_right);
+        chevron.SetColorFilter(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        chevron.Rotation = collapsed ? 0 : 90;
+        header.AddView(chevron, new LinearLayout.LayoutParams(
+            UI.Dp(_context, 16), UI.Dp(_context, 16))
+        { RightMargin = UI.Dp(_context, 6) });
+
+        var title = new TextView(_context) { Text = $"{label} {{{count}}}" };
+        title.SetTextSize(ComplexUnitType.Sp, 13);
         title.SetTextColor(LauncherTheme.Parse(LauncherTheme.CardTitleHex));
         title.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
         title.SetSingleLine(true);
         title.Ellipsize = TextUtils.TruncateAt.End;
-        title.LayoutParameters = new LinearLayout.LayoutParams(
-            0, ViewGroup.LayoutParams.WrapContent, 1f);
-        row.AddView(title);
-        row.AddView(CreateDeleteButton(delete));
+        title.SetIncludeFontPadding(false);
+        header.AddView(title, new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 1f));
 
-        section.AddView(row, new LinearLayout.LayoutParams(
+        section.AddView(header, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-        return section;
+        AttachDeleteMenu(header, delete);
+
+        var body = new LinearLayout(_context) { Orientation = Orientation.Horizontal };
+        body.Visibility = collapsed ? ViewStates.Gone : ViewStates.Visible;
+
+        var indentLine = new View(_context);
+        indentLine.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
+        body.AddView(indentLine, new LinearLayout.LayoutParams(
+            UI.Dp(_context, 1), ViewGroup.LayoutParams.MatchParent)
+        {
+            LeftMargin = UI.Dp(_context, 12),
+            RightMargin = UI.Dp(_context, 8)
+        });
+
+        var content = new LinearLayout(_context) { Orientation = Orientation.Vertical };
+        body.AddView(content, new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 1f));
+
+        section.AddView(body, new LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+        fill(content);
+
+        header.Click += (s, e) =>
+        {
+            collapsed = !collapsed;
+            _collapsed[path] = collapsed;
+            body.Visibility = collapsed ? ViewStates.Gone : ViewStates.Visible;
+            chevron.Rotation = collapsed ? 0 : 90;
+        };
     }
+
+    // ===== scalar row (label 40% / value 60%) =====
 
     void AddScalarRow(LinearLayout parent, JToken token, string label, string path, Action delete)
     {
-        var cell = new LinearLayout(_context) { Orientation = Orientation.Vertical };
-        parent.AddView(cell, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-        { BottomMargin = UI.Dp(_context, 10) });
-
-        var labelRow = new LinearLayout(_context) { Orientation = Orientation.Horizontal };
-        labelRow.SetGravity(GravityFlags.CenterVertical);
+        var row = new LinearLayout(_context) { Orientation = Orientation.Horizontal };
+        row.SetGravity(GravityFlags.CenterVertical);
+        row.SetMinimumHeight(UI.Dp(_context, RowHeightDp));
+        row.SetPadding(0, UI.Dp(_context, 2), 0, UI.Dp(_context, 2));
+        parent.AddView(row, new LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+        AttachDeleteMenu(row, delete);
 
         var labelView = new TextView(_context) { Text = label };
-        labelView.SetTextSize(ComplexUnitType.Sp, 12);
-        labelView.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
+        labelView.SetTextSize(ComplexUnitType.Sp, 13);
+        labelView.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
         labelView.SetTypeface(LauncherTheme.BodyTypeface, TypefaceStyle.Normal);
         labelView.SetSingleLine(true);
         labelView.Ellipsize = TextUtils.TruncateAt.End;
-        labelView.LayoutParameters = new LinearLayout.LayoutParams(
-            0, ViewGroup.LayoutParams.WrapContent, 1f);
-        labelRow.AddView(labelView);
-        labelRow.AddView(CreateDeleteButton(delete));
-
-        cell.AddView(labelRow, new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+        labelView.SetIncludeFontPadding(false);
+        row.AddView(labelView, new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 0.4f)
+        { RightMargin = UI.Dp(_context, 8) });
 
         View editor;
         switch (token.Type)
@@ -195,22 +280,26 @@ internal sealed class JsonTreeEditor : LinearLayout
             case JTokenType.Integer:
             case JTokenType.Float:
             {
-                var input = CreateInput(InputTypes.ClassNumber
-                    | InputTypes.NumberFlagDecimal | InputTypes.NumberFlagSigned);
+                bool isInteger = token.Type == JTokenType.Integer;
+                var input = CreateEntry(isInteger
+                    ? InputTypes.ClassNumber | InputTypes.NumberFlagSigned
+                    : InputTypes.ClassNumber | InputTypes.NumberFlagSigned | InputTypes.NumberFlagDecimal);
                 input.Text = token.ToString();
-                var field = new NumberField { Input = input, Value = (JValue)token, Path = path };
+                input.SetFilters(new IInputFilter[] { new NumberInputFilter(!isInteger) });
+
+                var field = new NumberField
+                {
+                    Input = input,
+                    Value = (JValue)token,
+                    Path = path,
+                    IsInteger = isInteger
+                };
                 _numbers.Add(field);
+
                 input.TextChanged += (s, e) =>
                 {
-                    if (TryParseNumber(e.Text?.ToString(), out var parsed))
-                    {
+                    if (TryParseNumber(e.Text?.ToString(), field.IsInteger, out var parsed))
                         field.Value.Value = parsed;
-                        input.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
-                    }
-                    else
-                    {
-                        input.SetTextColor(LauncherTheme.Parse(LauncherTheme.StatusErrorTextHex));
-                    }
 
                     RaiseChanged();
                 };
@@ -219,7 +308,7 @@ internal sealed class JsonTreeEditor : LinearLayout
             }
             case JTokenType.String:
             {
-                var input = CreateInput(InputTypes.ClassText);
+                var input = CreateEntry(InputTypes.ClassText);
                 input.Text = token.Value<string>();
                 input.TextChanged += (s, e) =>
                 {
@@ -237,37 +326,43 @@ internal sealed class JsonTreeEditor : LinearLayout
                 break;
         }
 
-        editor.LayoutParameters = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-        { TopMargin = UI.Dp(_context, 2) };
-        cell.AddView(editor);
+        row.AddView(editor, new LinearLayout.LayoutParams(
+            0, ViewGroup.LayoutParams.WrapContent, 0.6f));
     }
 
-    EditText CreateInput(InputTypes inputType)
+    EditText CreateEntry(InputTypes inputType)
     {
-        var input = new EditText(_context)
-        {
-            Background = LauncherTheme.CreateSurfaceDrawable(
-                _context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp)
-        };
-        input.SetTextSize(ComplexUnitType.Sp, 14);
+        var input = new EditText(_context) { Background = CreateFieldDrawable() };
+        input.SetTextSize(ComplexUnitType.Sp, 13);
         input.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
         input.SetPadding(
-            UI.Dp(_context, 12), UI.Dp(_context, 10),
-            UI.Dp(_context, 12), UI.Dp(_context, 10));
+            UI.Dp(_context, 8), UI.Dp(_context, 4),
+            UI.Dp(_context, 8), UI.Dp(_context, 4));
+        input.SetIncludeFontPadding(false);
+        input.SetMinimumHeight(UI.Dp(_context, 32));
         input.SetSingleLine(true);
         input.InputType = inputType;
         return input;
     }
 
+    /// <summary>พื้นกลมขอบบาง 1px (ไดอะล็อก 1dp จะหนาเกินไปในธีมมืด)</summary>
+    Android.Graphics.Drawables.Drawable CreateFieldDrawable()
+    {
+        var drawable = LauncherTheme.CreateSurfaceDrawable(
+            _context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);
+        drawable.SetStroke(1, LauncherTheme.Parse(LauncherTheme.DividerHex));
+        return drawable;
+    }
+
     TextView CreateReadOnlyValue(string text)
     {
         var view = new TextView(_context) { Text = text };
-        view.SetTextSize(ComplexUnitType.Sp, 14);
+        view.SetTextSize(ComplexUnitType.Sp, 13);
         view.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextSecondaryHex));
         view.SetTypeface(Typeface.Monospace, TypefaceStyle.Normal);
         view.SetSingleLine(true);
         view.Ellipsize = TextUtils.TruncateAt.End;
+        view.SetIncludeFontPadding(false);
         return view;
     }
 
@@ -291,36 +386,78 @@ internal sealed class JsonTreeEditor : LinearLayout
         button.SetTextSize(ComplexUnitType.Sp, 13);
         button.SetTextColor(LauncherTheme.Parse(LauncherTheme.AccentHex));
         button.SetTypeface(LauncherTheme.TitleTypeface, TypefaceStyle.Normal);
+        button.SetIncludeFontPadding(false);
         button.SetPadding(
-            UI.Dp(_context, 8), UI.Dp(_context, 10),
-            UI.Dp(_context, 8), UI.Dp(_context, 10));
+            UI.Dp(_context, 4), UI.Dp(_context, 10),
+            UI.Dp(_context, 4), UI.Dp(_context, 10));
         button.Background = UI.CreateRippleDrawable(_context, null, LauncherTheme.ChipRadiusDp);
         button.Click += (s, e) => action();
 
         parent.AddView(button, new LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+        { TopMargin = UI.Dp(_context, 2), BottomMargin = UI.Dp(_context, 2) });
+    }
+
+    // ===== delete + undo =====
+
+    void AttachDeleteMenu(View anchor, Action delete)
+    {
+        anchor.LongClickable = true;
+        anchor.LongClick += (s, e) =>
         {
-            TopMargin = UI.Dp(_context, 2),
-            BottomMargin = UI.Dp(_context, 6)
+            var menu = new Android.Widget.PopupMenu(_context, anchor);
+            menu.Menu?.Add(0, 1, 0, "Delete");
+            menu.MenuItemClick += (ms, args) =>
+            {
+                if (args.Item?.ItemId == 1)
+                    delete();
+            };
+            menu.Show();
+            e.Handled = true;
+        };
+    }
+
+    void DeleteProperty(JObject obj, string key)
+    {
+        var token = obj[key];
+        obj.Remove(key);
+        OnStructureChanged();
+        ShowUndo($"Deleted \"{key}\"", () =>
+        {
+            if (!obj.ContainsKey(key))
+                obj.Add(key, token);
+            OnStructureChanged();
         });
     }
 
-    ImageButton CreateDeleteButton(Action delete)
+    void DeleteArrayItem(JArray array, int index)
     {
-        var button = new ImageButton(_context);
-        button.SetImageResource(Resource.Drawable.ic_delete);
-        button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.StatusErrorTextHex));
-        button.Background = UI.CreateRippleDrawable(_context, null, LauncherTheme.ChipRadiusDp);
-        button.ContentDescription = "Delete";
-        button.SetPadding(
-            UI.Dp(_context, 12), UI.Dp(_context, 12),
-            UI.Dp(_context, 12), UI.Dp(_context, 12));
-        button.Click += (s, e) => delete();
-
-        int size = UI.Dp(_context, 48);
-        button.LayoutParameters = new LinearLayout.LayoutParams(size, size);
-        return button;
+        var token = array[index];
+        array.RemoveAt(index);
+        OnStructureChanged();
+        ShowUndo($"Deleted \"[{index}]\"", () =>
+        {
+            if (index <= array.Count)
+                array.Insert(index, token);
+            else
+                array.Add(token);
+            OnStructureChanged();
+        });
     }
+
+    void ShowUndo(string message, Action undo)
+    {
+        var snackbar = Snackbar.Make(this, message, Snackbar.LengthLong);
+        snackbar.SetBackgroundTint(
+            LauncherTheme.Parse(LauncherTheme.SurfaceVariantHex).ToArgb());
+        snackbar.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        snackbar.SetActionTextColor(
+            LauncherTheme.Parse(LauncherTheme.AccentHex).ToArgb());
+        snackbar.SetAction("Undo", v => undo());
+        snackbar.Show();
+    }
+
+    // ===== add key / item =====
 
     void ShowAddDialog(JContainer container, bool isArray)
     {
@@ -350,7 +487,7 @@ internal sealed class JsonTreeEditor : LinearLayout
         { TopMargin = UI.Dp(_context, 8) });
 
         new MaterialAlertDialogBuilder(_context)
-            .SetTitle(isArray ? "Add item" : "Add field")
+            .SetTitle(isArray ? "Add item" : "Add key")
             .SetView(box)
             .SetPositiveButton("Add", (s, e) =>
             {
@@ -393,16 +530,19 @@ internal sealed class JsonTreeEditor : LinearLayout
         _ => new JArray(),
     };
 
-    static bool TryParseNumber(string text, out object value)
+    static bool TryParseNumber(string text, bool isInteger, out object value)
     {
         text = (text ?? "").Trim();
-        if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out long integer))
-        {
-            value = integer;
-            return true;
-        }
 
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
+        if (isInteger)
+        {
+            if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out long integer))
+            {
+                value = integer;
+                return true;
+            }
+        }
+        else if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
         {
             value = number;
             return true;
