@@ -1,6 +1,7 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Views;
+using Android.Widget;
 using AndroidX.RecyclerView.Widget;
 using System;
 
@@ -13,9 +14,8 @@ namespace SMAPIGameLoader.Launcher;
 /// </summary>
 internal sealed class RecyclerScrollBar : View
 {
-    const float ThumbWidthDp = 6;
-    const float MinThumbDp = 24;
-    const float TouchSlopDp = 12;
+    /// <summary>ความกว้างของ view ที่รับ touch (thumb อยู่ในนี้ ชิดขวา)</summary>
+    const float BarWidthDp = 16;
 
     readonly RecyclerView _list;
     readonly Paint _paint = new() { AntiAlias = true };
@@ -29,9 +29,25 @@ internal sealed class RecyclerScrollBar : View
     int _dragExtent;
     int _lastTrackHeight;
 
-    public RecyclerScrollBar(Context context, RecyclerView list) : base(context)
+    RecyclerScrollBar(Context context, RecyclerView list) : base(context)
     {
         _list = list;
+    }
+
+    /// <summary>
+    /// แนบ scrollbar ให้ list: ชิดขอบขวาของ container (ใช้ร่วมกันทุกหน้า)
+    /// แล้วผูกให้วาดใหม่ทุกครั้งที่ list เลื่อน
+    /// </summary>
+    public static RecyclerScrollBar Attach(FrameLayout container, RecyclerView list)
+    {
+        var bar = new RecyclerScrollBar(container.Context!, list);
+        container.AddView(bar, new FrameLayout.LayoutParams(
+            UI.Dp(container.Context!, BarWidthDp), ViewGroup.LayoutParams.MatchParent)
+        {
+            Gravity = GravityFlags.Right
+        });
+        list.AddOnScrollListener(new Invalidator(bar));
+        return bar;
     }
 
     /// <summary>เรียกเมื่อเนื้อหา list เปลี่ยน — ให้คำนวณความสูง thumb ใหม่ครั้งเดียว</summary>
@@ -64,7 +80,7 @@ internal sealed class RecyclerScrollBar : View
         if (_thumbSizeValid)
             return;
 
-        _thumbHeight = Math.Max(UI.Dp(Context, MinThumbDp), Height * extent / (float)range);
+        _thumbHeight = Math.Max(UI.Dp(Context, LauncherTheme.ScrollThumbMinHeightDp), Height * extent / (float)range);
         _thumbSizeValid = true;
     }
 
@@ -77,8 +93,9 @@ internal sealed class RecyclerScrollBar : View
         EnsureThumbHeight(range, extent);
         _thumbTop = (Height - _thumbHeight) * offset / Math.Max(1, range - extent);
 
-        float thumbWidth = UI.Dp(Context, ThumbWidthDp);
-        float left = (Width - thumbWidth) / 2f;
+        float thumbWidth = UI.Dp(Context, LauncherTheme.ScrollThumbWidthDp);
+        // ชิดขวาของ view เพื่อให้ bar อยู่ติดขอบจอ (เว้น 1dp ไม่ให้ชนมุมโค้ง)
+        float left = Width - thumbWidth - UI.Dp(Context, LauncherTheme.ScrollThumbInsetDp);
 
         _paint.Color = LauncherTheme.Parse(_dragging
             ? LauncherTheme.AccentHex
@@ -103,7 +120,7 @@ internal sealed class RecyclerScrollBar : View
         switch (e.ActionMasked)
         {
             case MotionEventActions.Down:
-                float slop = UI.Dp(Context, TouchSlopDp);
+                float slop = UI.Dp(Context, LauncherTheme.ScrollBarTouchSlopDp);
                 float y = e.GetY();
                 if (y < _thumbTop - slop || y > _thumbTop + _thumbHeight + slop)
                     return false;

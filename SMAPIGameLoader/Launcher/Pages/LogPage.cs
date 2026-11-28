@@ -140,15 +140,8 @@ internal sealed class LogPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
 
-        // scrollbar ลากได้ ทับขอบขวาของ list (เว้นระยะจากขอบจอ กันชนโซน gesture ของระบบ)
-        _scrollBar = new RecyclerScrollBar(context, _list);
-        body.AddView(_scrollBar, new FrameLayout.LayoutParams(
-            UI.Dp(context, 24), ViewGroup.LayoutParams.MatchParent)
-        {
-            Gravity = GravityFlags.Right,
-            RightMargin = UI.Dp(context, 16)
-        });
-        _list.AddOnScrollListener(new RecyclerScrollBar.Invalidator(_scrollBar));
+        // scrollbar ลากได้ ชิดขอบขวาจอ (geometry/size มาจาก RecyclerScrollBar ร่วมกันทุกหน้า)
+        _scrollBar = RecyclerScrollBar.Attach(body, _list);
 
         // ===== Pager bar =====
         var pagerDivider = new View(context);

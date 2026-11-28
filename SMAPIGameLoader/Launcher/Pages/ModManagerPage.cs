@@ -125,8 +125,8 @@ internal sealed class ModManagerPage : LinearLayout
         _adapter = new ModAdapter(context, _visibleMods, OnClickedModItem, ToggleMod);
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
-        // padding ขวาเว้นที่ให้ scrollbar ไม่ให้ทับสวิตช์เปิด/ปิดของ mod
-        _list.SetPadding(0, UI.Dp(context, 12), UI.Dp(context, 16), UI.Dp(context, 16));
+        // ไม่เว้น padding ขวา: ให้การ์ดห่างขอบจอเท่าขอบซ้าย (8dp จาก margin ของการ์ด)
+        _list.SetPadding(0, UI.Dp(context, 12), 0, UI.Dp(context, 16));
         _list.SetClipToPadding(true);
         _list.SetLayoutManager(new LinearLayoutManager(context));
         _list.SetAdapter(_adapter);
@@ -160,15 +160,8 @@ internal sealed class ModManagerPage : LinearLayout
             ViewGroup.LayoutParams.MatchParent,
             ViewGroup.LayoutParams.MatchParent));
 
-        // scrollbar ลากได้แบบเดียวกับหน้า Log
-        _scrollBar = new RecyclerScrollBar(context, _list);
-        body.AddView(_scrollBar, new FrameLayout.LayoutParams(
-            UI.Dp(context, 24), ViewGroup.LayoutParams.MatchParent)
-        {
-            Gravity = GravityFlags.Right,
-            RightMargin = UI.Dp(context, 16)
-        });
-        _list.AddOnScrollListener(new RecyclerScrollBar.Invalidator(_scrollBar));
+        // scrollbar อยู่ชิดขอบขวาจอ (thumb อยู่ในช่องว่าง 8dp ของการ์ดพอดี ไม่ทับสวิตช์)
+        _scrollBar = RecyclerScrollBar.Attach(body, _list);
 
         RefreshMods();
     }

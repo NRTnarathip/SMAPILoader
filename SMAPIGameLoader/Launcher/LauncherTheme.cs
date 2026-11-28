@@ -80,6 +80,12 @@ internal static class LauncherTheme
     public const float ButtonRadiusDp = 16;
     public const float ChipRadiusDp = 12;
 
+    // scrollbar — ใช้ร่วมกันทุกหน้าผ่าน RecyclerScrollBar (สี = ScrollThumbHex, ตอนลาก = AccentHex)
+    public const float ScrollThumbWidthDp = 12;
+    public const float ScrollThumbMinHeightDp = 24;
+    public const float ScrollBarTouchSlopDp = 12;
+    public const float ScrollThumbInsetDp = 1;
+
     /// <summary>โหลดธีมที่บันทึกไว้ — ต้องเรียกก่อนสร้าง UI</summary>
     public static void Load() => Apply(Preferences.Get(PrefKey, DarkName));
 

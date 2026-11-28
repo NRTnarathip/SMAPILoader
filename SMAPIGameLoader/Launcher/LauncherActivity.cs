@@ -390,10 +390,10 @@ public class LauncherActivity : AppCompatActivity
             GameCloner.Setup();
 
             // Dev เป็น debug build (define DEBUG) จึงไม่ควรเข้าเกมได้
-#if DEBUG
-            TaskTool.Fail("The game can't start in a Debug build. Use a Release build to play.");
-            return;
-#endif
+            //#if DEBUG
+            //            TaskTool.Fail("The game can't start in a Debug build. Use a Release build to play.");
+            //            return;
+            //#endif
 
             TaskTool.NewLine("Launching game...");
             StartSMAPIActivity(launcherActivity);
