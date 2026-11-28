@@ -4,6 +4,7 @@ using Android.Text;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using System;
 
 namespace SMAPIGameLoader.Launcher;
 
@@ -20,7 +21,7 @@ internal sealed class PageHeader : LinearLayout
     /// <summary>ช่องวางปุ่มฝั่งขวา (ถ้าไม่ใช้จะไม่กินที่)</summary>
     public LinearLayout Actions { get; }
 
-    public PageHeader(Context context, string titleText) : base(context)
+    public PageHeader(Context context, string titleText, Action onBack = null) : base(context)
     {
         Orientation = Orientation.Horizontal;
         SetGravity(GravityFlags.CenterVertical);
@@ -31,6 +32,9 @@ internal sealed class PageHeader : LinearLayout
         SetPadding(
             UI.Dp(context, 16), UI.Dp(context, 18),
             UI.Dp(context, 16), UI.Dp(context, 14));
+
+        if (onBack is not null)
+            AddView(CreateBackButton(context, onBack));
 
         Title = new TextView(context) { Text = titleText };
         Title.SetTextSize(ComplexUnitType.Sp, 22);
@@ -51,5 +55,24 @@ internal sealed class PageHeader : LinearLayout
         });
         AddView(Actions, new LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
+    }
+
+    static ImageButton CreateBackButton(Context context, Action onBack)
+    {
+        var button = new ImageButton(context);
+        button.SetImageResource(Resource.Drawable.ic_chevron_left);
+        button.SetColorFilter(LauncherTheme.Parse(LauncherTheme.HeaderTextHex));
+        button.Background = UI.CreateRippleDrawable(
+            context, LauncherTheme.HeaderPillHex, LauncherTheme.ChipRadiusDp);
+        button.ContentDescription = "Back";
+        button.SetPadding(
+            UI.Dp(context, 10), UI.Dp(context, 10),
+            UI.Dp(context, 10), UI.Dp(context, 10));
+        button.Click += (s, e) => onBack();
+
+        int size = UI.Dp(context, 40);
+        button.LayoutParameters = new LayoutParams(size, size)
+        { RightMargin = UI.Dp(context, 8) };
+        return button;
     }
 }

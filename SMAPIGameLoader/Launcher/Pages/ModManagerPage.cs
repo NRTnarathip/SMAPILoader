@@ -380,6 +380,8 @@ internal sealed class ModManagerPage : LinearLayout
             "Open Folder", null, () => OpenModFolder(mod));
         AddActionRow(content, popup, Resource.Drawable.ic_code,
             "Show manifest.json", null, () => ShowManifest(mod));
+        AddActionRow(content, popup, Resource.Drawable.ic_config,
+            "Edit Config", null, () => (_context as LauncherActivity)?.ShowModConfig(mod));
 
         var divider = new View(_context);
         divider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));

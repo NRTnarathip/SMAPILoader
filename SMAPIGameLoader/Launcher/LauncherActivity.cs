@@ -161,7 +161,9 @@ public class LauncherActivity : AppCompatActivity
     private LogPage _logPage = null!;
     private ContactPage _contactPage = null!;
     private SettingsPage _settingsPage = null!;
+    private ModConfigPage _configPage = null!;
     private LinearLayout _nav = null!;
+    private LinearLayout _navContainer = null!;
     private readonly List<(int Id, ImageView Icon, TextView Label)> _navItems = new();
     // static เพื่อคงแท็บเดิมหลัง Recreate ตอนสลับธีม
     private static int _selectedNavId = HomeId;
@@ -183,6 +185,10 @@ public class LauncherActivity : AppCompatActivity
         _container.AddView(_contactPage);
         _container.AddView(_settingsPage);
 
+        // sub-page: เพิ่มเป็นตัวสุดท้ายเพื่อให้วาดทับหน้าที่ถูกซ่อนอยู่
+        _configPage = new ModConfigPage(this) { Visibility = ViewStates.Gone };
+        _container.AddView(_configPage);
+
         // Bottom navigation ทำเองแบบ compact (M3 BottomNavigationView ล็อก minHeight 80dp
         // และเหลือแถบว่างใต้ label ที่ปรับไม่ได้)
         _nav = new LinearLayout(this) { Orientation = Orientation.Horizontal };
@@ -197,10 +203,10 @@ public class LauncherActivity : AppCompatActivity
         // เส้นคั่นบาง ๆ ระหว่าง content กับ bottom nav
         var navDivider = new View(this);
         navDivider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
-        var navContainer = new LinearLayout(this) { Orientation = Orientation.Vertical };
-        navContainer.AddView(navDivider, new LinearLayout.LayoutParams(
+        _navContainer = new LinearLayout(this) { Orientation = Orientation.Vertical };
+        _navContainer.AddView(navDivider, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MatchParent, UI.Dp(this, 1)));
-        navContainer.AddView(_nav);
+        _navContainer.AddView(_nav);
 
         // Root: แนวตั้ง ใช้เต็มจอ
         var root = new LinearLayout(this) { Orientation = Orientation.Vertical };
@@ -210,7 +216,7 @@ public class LauncherActivity : AppCompatActivity
             ViewGroup.LayoutParams.MatchParent);
 
         root.AddView(_container);
-        root.AddView(navContainer);
+        root.AddView(_navContainer);
         SetContentView(root);
 
         // run first page
@@ -268,6 +274,9 @@ public class LauncherActivity : AppCompatActivity
 
     private void ShowPage(int itemId)
     {
+        _configPage.Visibility = ViewStates.Gone;
+        _navContainer.Visibility = ViewStates.Visible;
+
         _homePage.Visibility = itemId == HomeId ? ViewStates.Visible : ViewStates.Gone;
         _modPage.Visibility = itemId == ModManagerId ? ViewStates.Visible : ViewStates.Gone;
         _logPage.Visibility = itemId == LogPageId ? ViewStates.Visible : ViewStates.Gone;
@@ -294,6 +303,32 @@ public class LauncherActivity : AppCompatActivity
             ShowPage(itemId);
         else
             SelectNavItem(itemId);
+    }
+
+    /// <summary>เปิดหน้าแก้ JSON ของ mod (sub-page ของแท็บ Mods)</summary>
+    public void ShowModConfig(ModInfo mod)
+    {
+        SelectNavItem(ModManagerId);
+        _modPage.Visibility = ViewStates.Gone;
+        _configPage.Open(mod);
+        _configPage.Visibility = ViewStates.Visible;
+        _navContainer.Visibility = ViewStates.Gone;
+        CurrentPageName = "mod-config";
+    }
+
+    public override void OnBackPressed()
+    {
+        if (_configPage.Visibility == ViewStates.Visible)
+        {
+            if (_configPage.HandleBack())
+                return;
+
+            // อยู่โหมด list แล้ว → กลับแท็บ Mods
+            SelectNavItem(_selectedNavId);
+            return;
+        }
+
+        base.OnBackPressed();
     }
 
     public void OnClickStartGame()
