@@ -51,9 +51,8 @@ dotnet build SMAPIGameLoader/SMAPIGameLoader.csproj -c "Dev" `
 - เวลาที่วัดได้บนเครื่องนี้: full build ~51 s, build หลังแก้ไฟล์ 1 ไฟล์ ~17 s
   (Dev ตั้ง `AndroidEnableAssemblyCompression=False` เพื่อลดเวลาซิป APK — APK size เท่าเดิม อย่าเปิดกลับ)
 - รองรับ **arm64 เท่านั้น** (ตรงกับข้อจำกัดของโปรเจกต์) — เครื่องทดสอบต้องเป็น arm64
-- **กด Play บน Dev build จะไม่เข้าเกม และเป็นพฤติกรรมที่ตั้งใจ** — cloner ทำงานจนจบแล้วขึ้น toast
-  "Error can't start game on Debug Mode" (guard `#if DEBUG` ใน `LauncherActivity.LaunchGameActivityInternal()`
-  ซึ่งอยู่หลัง `GameCloner.Setup()`); ทดสอบ gameplay ต้องใช้ `Release`
+- **Dev build รันเกมได้จริง** เหมือน Release (clone + Harmony patch + SMAPI ครบ) — `DEBUG`
+  ใช้แค่เปิด adb command bridge (`McpDebugReceiver`) ไม่มีการบล็อกการเข้าเกม
 - `tools.cmd` auto-detect SDK/JDK/ADB; override ด้วย `ANDROID_HOME`/`ANDROID_SDK_ROOT`, `JAVA_HOME`, `ANDROID_SERIAL`
 - `RestoreDotnetTools` (target ใน csproj) รัน `dotnet tool restore` เมื่อ config ไม่ใช่ Dev —
   ถ้าล้มเหลวและไม่เกี่ยวกับงาน ให้รายงาน ไม่ต้องแก้ถาวร

@@ -48,7 +48,7 @@ The real package name is `abc.smapi.gameloader` (from `AndroidManifest.xml`), no
 | Go to Contact | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoToContact` | `"contact"` |
 | Get current page | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GetState` | `"home"`, `"mods"`, `"log"`, `"contact"`, `"settings"` or `"mod-config"` |
 | Open a JSON file in the config editor by absolute path (`--es arg <path>`) | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_OpenConfigFile --es arg /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/<Mod>/config.json` | `"mod-config"` |
-| Start the game (same as Play Game; Dev builds stop before the game — see below) | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_PlayGame` | `"starting_game"` |
+| Start the game (same as Play Game) | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_PlayGame` | `"starting_game"` |
 | Unknown command | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_Whatever` | `"error:unknown_cmd"` |
 
 Example output:
@@ -94,16 +94,14 @@ on the form view (Raw is still available in the header); Back/Discard returns to
 there is no file list to go back to. The UI is built on the main thread, so take a screenshot after
 the broadcast to confirm the page rendered.
 
-### `MCP_PlayGame` on Dev builds
+### `MCP_PlayGame`
 
-On purpose, **the game will not actually start from a Dev build.** `LaunchGameActivityInternal`
-runs `GameCloner.Setup()` and then hits a `#if DEBUG` guard that shows the toast
-"Error can't start game on Debug Mode" and returns before `StartSMAPIActivity`. Debug builds cannot
-run the Harmony patcher the game needs. So a Dev build returns `"starting_game"` and stops after the
-clone/verify/rewrite stage — that is the expected result, not a broken command.
-
-Release builds can launch the game, but they are compiled without `DEBUG`, so `McpDebugReceiver` is
-not present at all. To launch for real, install a Release build and press Play Game in the UI.
+`MCP_PlayGame` goes through the same path as the Play Game button (`OnClickStartGame` →
+`LauncherActivity.LaunchGameActivityInternal`): it checks the game version and the SMAPI install, runs
+`GameCloner.Setup()` and starts `SMAPIActivity`. A Dev build launches the game for real, so the command
+is useful for smoke-testing gameplay; the launch runs in the background, hence the immediate
+`"starting_game"` reply. Release builds work the same way but are compiled without `DEBUG`, so
+`McpDebugReceiver` is not present there at all.
 
 The optional `--es arg <value>` extra is used by `MCP_OpenConfigFile` (absolute JSON path); other
 tools ignore it.
@@ -140,7 +138,7 @@ Rules of thumb:
 |---|---|
 | `Broadcast completed: result=0, data=""` (empty) | No receiver registered — the app is not running, is a `Release` build, or the launcher activity is not alive. Launch the `Dev` APK and keep the launcher open. |
 | `data="error:unknown_cmd"` | Typo in the `cmd` value; it is case-sensitive. |
-| `MCP_PlayGame` returns `"starting_game"` but the game never opens | Expected on a Dev build — the `#if DEBUG` guard stops the launch right after `GameCloner.Setup()`; see "`MCP_PlayGame` on Dev builds". |
+| `MCP_PlayGame` returns `"starting_game"` but the game never opens | The launch failed after the reply — check logcat and the on-device task log for a game-version or missing-SMAPI failure. |
 | Broadcast delivered but UI does not change | Confirm the activity is actually in the foreground (see check above); background receivers may be registered but the UI is not visible. |
 | Bridge missing after update | You installed a `Release` APK or a build without `DEBUG`; rebuild with `build-dev.cmd`. |
 | `java.lang.SecurityException` on API 33+ | The receiver is registered with `ReceiverFlags.Exported`; reinstall the current `Dev` build if you see this. |

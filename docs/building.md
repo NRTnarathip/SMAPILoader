@@ -153,12 +153,11 @@ tools.cmd release          :: build Release, then install it
 Extra arguments are forwarded to `dotnet build` (for example `tools.cmd build dev -v:n`).
 Set `ANDROID_SERIAL` when more than one device is attached.
 
-### Dev build behavior (intentional)
+### Dev build behavior
 
-**A Dev APK cannot start the game, and that is by design.** Tapping *Play Game* on a Dev build runs the
-cloner (game assets, assemblies, libs) and then stops with the toast *"Error can't start game on Debug
-Mode"*. The guard is the `#if DEBUG` block in `LauncherActivity.LaunchGameActivityInternal()`, placed
-right after `GameCloner.Setup()`. Use a **Release** build to test actual gameplay.
+A Dev APK runs the game normally: *Play Game* clones the game files, applies the Harmony patches and
+launches SMAPI exactly like a Release build. `DEBUG` only adds the debug-only adb command bridge
+(`McpDebugReceiver`), so gameplay can be tested on a Dev build without a separate Release install.
 
 ### Dev build speed
 
