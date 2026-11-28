@@ -9,7 +9,6 @@ using AndroidX.RecyclerView.Widget;
 using Google.Android.Material.Dialog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -161,6 +160,8 @@ internal sealed class ModManagerPage : LinearLayout
 
         RefreshMods();
     }
+
+    public void Refresh() => RefreshMods();
 
     private ImageButton CreateInstallButton(Context context)
     {
@@ -379,9 +380,10 @@ internal sealed class ModManagerPage : LinearLayout
         AddActionRow(content, popup, Resource.Drawable.ic_folder,
             "Open Folder", null, () => OpenModFolder(mod));
         AddActionRow(content, popup, Resource.Drawable.ic_code,
-            "Show manifest.json", null, () => ShowManifest(mod));
+            "Edit manifest.json", null,
+            () => (_context as LauncherActivity)?.ShowConfigFile(mod.ManifestPath));
         AddActionRow(content, popup, Resource.Drawable.ic_config,
-            "Edit Config", null, () => (_context as LauncherActivity)?.ShowModConfig(mod));
+            "Mod Config", null, () => (_context as LauncherActivity)?.ShowModConfig(mod));
 
         var divider = new View(_context);
         divider.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.DividerHex));
@@ -483,39 +485,6 @@ internal sealed class ModManagerPage : LinearLayout
         int position = _visibleMods.IndexOf(mod);
         if (position >= 0)
             _adapter.NotifyItemChanged(position);
-    }
-
-    private void ShowManifest(ModInfo mod)
-    {
-        string manifestText;
-        try
-        {
-            manifestText = File.ReadAllText(mod.ManifestPath);
-        }
-        catch (Exception ex)
-        {
-            ErrorDialogTool.Show(ex, "Failed to read manifest.json");
-            return;
-        }
-
-        var textView = new TextView(_context);
-        textView.SetTextSize(ComplexUnitType.Sp, 12);
-        textView.SetTextColor(Color.White);
-        textView.SetTypeface(Typeface.Monospace, TypefaceStyle.Normal);
-        textView.SetTextIsSelectable(true);
-        textView.Text = manifestText;
-
-        int padding = UI.Dp(_context, 16);
-        textView.SetPadding(padding, padding, padding, padding);
-
-        var scroll = new ScrollView(_context);
-        scroll.AddView(textView);
-
-        new MaterialAlertDialogBuilder(_context)
-            .SetTitle("manifest.json")
-            .SetView(scroll)
-            .SetPositiveButton("Close", (s, e) => { })
-            .Show();
     }
 
     private void OpenModFolder(ModInfo mod)

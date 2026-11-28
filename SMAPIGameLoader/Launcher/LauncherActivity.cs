@@ -286,6 +286,10 @@ public class LauncherActivity : AppCompatActivity
         if (itemId == LogPageId)
             _logPage.Reload();
 
+        // manifest.json แก้ได้จาก Edit manifest.json — ต้องอ่านชื่อ/version ใหม่ทุกครั้งที่กลับมาแท็บ Mods
+        if (itemId == ModManagerId)
+            _modPage.Refresh();
+
         CurrentPageName = itemId switch
         {
             ModManagerId => "mods",
