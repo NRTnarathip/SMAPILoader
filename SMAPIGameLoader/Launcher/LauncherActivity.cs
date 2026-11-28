@@ -308,9 +308,24 @@ public class LauncherActivity : AppCompatActivity
     /// <summary>เปิดหน้าแก้ JSON ของ mod (sub-page ของแท็บ Mods)</summary>
     public void ShowModConfig(ModInfo mod)
     {
+        ShowConfigPage();
+        _configPage.Open(mod);
+    }
+
+    /// <summary>เปิด editor ของไฟล์ JSON ตาม path ตรง ๆ (ใช้โดย McpDebugReceiver)</summary>
+    public bool ShowConfigFile(string filePath)
+    {
+        if (!_configPage.OpenFile(filePath))
+            return false;
+
+        ShowConfigPage();
+        return true;
+    }
+
+    void ShowConfigPage()
+    {
         SelectNavItem(ModManagerId);
         _modPage.Visibility = ViewStates.Gone;
-        _configPage.Open(mod);
         _configPage.Visibility = ViewStates.Visible;
         _navContainer.Visibility = ViewStates.Gone;
         CurrentPageName = "mod-config";

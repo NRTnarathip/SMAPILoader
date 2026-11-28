@@ -26,6 +26,7 @@ internal sealed class ModConfigPage : LinearLayout
     private readonly FrameLayout _content;
 
     private ModInfo _mod;
+    private string _modFolder;
     private string _filePath;
     private JToken _root;
     private JsonTreeEditor _tree;
@@ -33,6 +34,8 @@ internal sealed class ModConfigPage : LinearLayout
     private bool _rawMode;
     private bool _editorOpen;
     private bool _dirty;
+    // เปิดไฟล์ตรง ๆ ด้วย path (ไม่ผ่าน list) — ใช้โดย McpDebugReceiver
+    private bool _direct;
 
     public ModConfigPage(Context context) : base(context)
     {
@@ -55,7 +58,23 @@ internal sealed class ModConfigPage : LinearLayout
     public void Open(ModInfo mod)
     {
         _mod = mod;
+        _modFolder = mod.ModFolderPath;
+        _direct = false;
         ShowList();
+    }
+
+    /// <summary>
+    /// เปิด editor ของไฟล์ JSON ตาม absolute path ตรง ๆ (ข้าม list)
+    /// คืน false ถ้าอ่าน/parse ไม่ได้ (มี dialog แจ้งแล้ว)
+    /// </summary>
+    public bool OpenFile(string filePath)
+    {
+        _mod = null;
+        _modFolder = Path.GetDirectoryName(filePath);
+        _direct = true;
+        _editorOpen = false;
+        _dirty = false;
+        return OpenEditor(filePath);
     }
 
     /// <summary>true = จบในหน้านี้แล้ว, false = อยู่ในโหมด list (ให้ activity กลับไปแท็บ Mods)</summary>
@@ -66,12 +85,20 @@ internal sealed class ModConfigPage : LinearLayout
 
         if (_dirty)
         {
-            ConfirmDiscard(ShowList);
+            ConfirmDiscard(ExitEditor);
             return true;
         }
 
-        ShowList();
+        ExitEditor();
         return true;
+    }
+
+    void ExitEditor()
+    {
+        if (_direct)
+            ExitToMods();
+        else
+            ShowList();
     }
 
     void OnHeaderBack()
@@ -129,7 +156,7 @@ internal sealed class ModConfigPage : LinearLayout
     {
         try
         {
-            return Directory.EnumerateFiles(_mod.ModFolderPath, "*", SearchOption.AllDirectories)
+            return Directory.EnumerateFiles(_modFolder, "*", SearchOption.AllDirectories)
                 .Where(path => path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                 .OrderBy(Rank)
                 .ThenBy(RelativePath, StringComparer.OrdinalIgnoreCase)
@@ -153,7 +180,7 @@ internal sealed class ModConfigPage : LinearLayout
     }
 
     string RelativePath(string path) =>
-        Path.GetRelativePath(_mod.ModFolderPath, path).Replace('\\', '/');
+        Path.GetRelativePath(_modFolder, path).Replace('\\', '/');
 
     View CreateFileRow(string path)
     {
@@ -228,7 +255,7 @@ internal sealed class ModConfigPage : LinearLayout
 
     // ===== โหมด editor =====
 
-    void OpenEditor(string path)
+    bool OpenEditor(string path)
     {
         string text;
         try
@@ -238,7 +265,7 @@ internal sealed class ModConfigPage : LinearLayout
         catch (Exception ex)
         {
             ErrorDialogTool.Show(ex, "Failed to read " + Path.GetFileName(path));
-            return;
+            return false;
         }
 
         JToken root;
@@ -249,7 +276,7 @@ internal sealed class ModConfigPage : LinearLayout
         catch (Exception ex)
         {
             ShowError("Invalid JSON", ex.Message);
-            return;
+            return false;
         }
 
         _filePath = path;
@@ -258,6 +285,7 @@ internal sealed class ModConfigPage : LinearLayout
         _rawMode = false;
         _dirty = false;
         BuildEditor();
+        return true;
     }
 
     void BuildEditor()

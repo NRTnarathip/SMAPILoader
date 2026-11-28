@@ -46,7 +46,8 @@ The real package name is `abc.smapi.gameloader` (from `AndroidManifest.xml`), no
 | Go to Mod Manager | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoModManagerPage` | `"mods"` |
 | Go to Log | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoLogPage` | `"log"` |
 | Go to Contact | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GoToContact` | `"contact"` |
-| Get current page | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GetState` | `"home"`, `"mods"`, `"log"` or `"contact"` |
+| Get current page | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_GetState` | `"home"`, `"mods"`, `"log"`, `"contact"`, `"settings"` or `"mod-config"` |
+| Open a JSON file in the config editor by absolute path (`--es arg <path>`) | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_OpenConfigFile --es arg /storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/<Mod>/config.json` | `"mod-config"` |
 | Start the game (same as Play Game; Dev builds stop before the game — see below) | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_PlayGame` | `"starting_game"` |
 | Unknown command | `adb shell am broadcast -a app.mcp.CMD --es cmd MCP_Whatever` | `"error:unknown_cmd"` |
 
@@ -62,11 +63,36 @@ Broadcast completed: result=0, data="mods"
 
 ## Result semantics
 
-- Success: the real current page name — `"home"`, `"mods"`, `"log"` or `"contact"`.
+- Success: the real current page name — `"home"`, `"mods"`, `"log"`, `"contact"`, `"settings"` or
+  `"mod-config"`.
 - `MCP_PlayGame`: `"starting_game"` means the launch was kicked off; it returns immediately because
   the game start itself runs in the background (watch logcat or the resumed activity to see it land).
+- `MCP_OpenConfigFile`: `"mod-config"` means the editor page opened for the given file;
+  `"error:missing_path"` means `--es arg` was empty, `"error:file_not_found"` means the path does not
+  exist, `"error:invalid_json"` means the file was read but is not valid JSON (an error dialog is
+  shown on the device).
 - Unknown or missing `cmd`: `"error:unknown_cmd"`.
 - Handler threw an exception: `"error:<exception message>"`.
+
+### `MCP_OpenConfigFile` examples
+
+```bash
+# Git Bash on Windows mangles /storage/... paths — disable conversion first
+MSYS_NO_PATHCONV=1 adb shell am broadcast -a app.mcp.CMD \
+  --es cmd MCP_OpenConfigFile \
+  --es arg "/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/Virtual Keyboard/config.json"
+```
+
+```text
+Broadcasting: Intent { act=app.mcp.CMD flg=0x400000 (has extras) }
+Broadcast completed: result=0, data="mod-config"
+```
+
+The path must be an absolute path on the device and readable by the app (mod folders under
+`/storage/emulated/0/Android/data/abc.smapi.gameloader/files/Mods/` are). The editor opens directly
+on the form view (Raw is still available in the header); Back/Discard returns to the Mods tab because
+there is no file list to go back to. The UI is built on the main thread, so take a screenshot after
+the broadcast to confirm the page rendered.
 
 ### `MCP_PlayGame` on Dev builds
 
@@ -79,8 +105,8 @@ clone/verify/rewrite stage — that is the expected result, not a broken command
 Release builds can launch the game, but they are compiled without `DEBUG`, so `McpDebugReceiver` is
 not present at all. To launch for real, install a Release build and press Play Game in the UI.
 
-The optional `--es arg <value>` extra is accepted by the protocol but none of the current tools
-use it.
+The optional `--es arg <value>` extra is used by `MCP_OpenConfigFile` (absolute JSON path); other
+tools ignore it.
 
 ## Adding a new tool
 
@@ -123,5 +149,7 @@ Rules of thumb:
 
 - `SMAPIGameLoader/Tool/McpDebugReceiver.cs` — receiver + command dictionary.
 - `SMAPIGameLoader/Launcher/LauncherActivity.cs` — `RegisterMcpReceiver()` / `UnregisterMcpReceiver()`,
-  `NavigateTo(int)`, and `CurrentPageName`.
+  `NavigateTo(int)`, `ShowModConfig(ModInfo)`, `ShowConfigFile(string)` and `CurrentPageName`.
+- `SMAPIGameLoader/Launcher/Pages/ModConfigPage.cs` — config editor page (`OpenFile(path)` opens the
+  editor directly, bypassing the JSON file list).
 - `docs/building.md` — full build prerequisites.

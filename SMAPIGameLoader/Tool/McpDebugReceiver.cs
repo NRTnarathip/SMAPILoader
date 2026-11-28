@@ -3,6 +3,7 @@ using Android.Content;
 using SMAPIGameLoader.Launcher;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SMAPIGameLoader.Tool;
 
@@ -24,6 +25,7 @@ public class McpDebugReceiver : BroadcastReceiver
         ["MCP_GoToContact"] = _ => Navigate(LauncherActivity.ContactPageId),
         ["MCP_GoToSettings"] = _ => Navigate(LauncherActivity.SettingsPageId),
         ["MCP_GetState"] = _ => LauncherActivity.Instance.CurrentPageName,
+        ["MCP_OpenConfigFile"] = OpenConfigFile,
         ["MCP_PlayGame"] = _ => PlayGame(),
     };
 
@@ -54,6 +56,20 @@ public class McpDebugReceiver : BroadcastReceiver
         var activity = LauncherActivity.Instance;
         activity.NavigateTo(itemId);
         return activity.CurrentPageName;
+    }
+
+    /// <summary>เปิด config editor ตรง ๆ ตาม absolute path ที่ส่งมาใน arg (ข้ามหน้า list)</summary>
+    static string OpenConfigFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return "error:missing_path";
+
+        if (!File.Exists(path))
+            return "error:file_not_found";
+
+        return LauncherActivity.Instance.ShowConfigFile(path)
+            ? LauncherActivity.Instance.CurrentPageName
+            : "error:invalid_json";
     }
 
     /// <summary>เริ่มเกมเหมือนกดปุ่ม Play Game (ตัว launch ทำงานเบื้องหลังจึงคืนผลทันที)</summary>
