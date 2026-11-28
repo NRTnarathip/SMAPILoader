@@ -119,7 +119,8 @@ internal sealed class JsonTreeEditor : LinearLayout
         {
             string key = property.Name;
             AddNode(parent, property.Value, key, ChildPath(path, key),
-                () => DeleteProperty(obj, key));
+                () => DeleteProperty(obj, key),
+                () => ShowRenameDialog(obj, key));
         }
 
         AddAddButton(parent, "+ Add key", () => ShowAddDialog(obj, false));
@@ -132,26 +133,27 @@ internal sealed class JsonTreeEditor : LinearLayout
             int index = i;
             string itemPath = $"{path}[{index}]";
             AddNode(parent, array[index], $"[{index}]", itemPath,
-                () => DeleteArrayItem(array, index));
+                () => DeleteArrayItem(array, index), null);   // array item ไม่มี key ให้ rename
         }
 
         AddAddButton(parent, "+ Add item", () => ShowAddDialog(array, true));
     }
 
-    void AddNode(LinearLayout parent, JToken token, string label, string path, Action delete)
+    void AddNode(LinearLayout parent, JToken token, string label, string path,
+                 Action delete, Action rename)
     {
         switch (token)
         {
             case JObject obj:
-                AddSection(parent, label, obj.Count, path, delete,
+                AddSection(parent, label, obj.Count, path, delete, rename,
                     content => AddObjectChildren(content, obj, path));
                 break;
             case JArray array:
-                AddSection(parent, label, array.Count, path, delete,
+                AddSection(parent, label, array.Count, path, delete, null,
                     content => AddArrayChildren(content, array, path));
                 break;
             default:
-                AddScalarRow(parent, token, label, path, delete);
+                AddScalarRow(parent, token, label, path, delete, rename);
                 break;
         }
     }
@@ -162,7 +164,7 @@ internal sealed class JsonTreeEditor : LinearLayout
     // ===== collapsible section =====
 
     void AddSection(LinearLayout parent, string label, int count, string path,
-                    Action delete, Action<LinearLayout> fill)
+                    Action delete, Action rename, Action<LinearLayout> fill)
     {
         bool collapsed = _collapsed.TryGetValue(path, out bool stored)
             ? stored
@@ -203,7 +205,7 @@ internal sealed class JsonTreeEditor : LinearLayout
 
         section.AddView(header, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-        AttachDeleteMenu(header, delete);
+        AttachRowMenu(header, delete, rename);
 
         var body = new LinearLayout(_context) { Orientation = Orientation.Horizontal };
         body.Visibility = collapsed ? ViewStates.Gone : ViewStates.Visible;
@@ -237,7 +239,8 @@ internal sealed class JsonTreeEditor : LinearLayout
 
     // ===== scalar row (label 40% / value 60%) =====
 
-    void AddScalarRow(LinearLayout parent, JToken token, string label, string path, Action delete)
+    void AddScalarRow(LinearLayout parent, JToken token, string label, string path,
+                      Action delete, Action rename)
     {
         var row = new LinearLayout(_context) { Orientation = Orientation.Horizontal };
         row.SetGravity(GravityFlags.CenterVertical);
@@ -245,7 +248,7 @@ internal sealed class JsonTreeEditor : LinearLayout
         row.SetPadding(0, UI.Dp(_context, 2), 0, UI.Dp(_context, 2));
         parent.AddView(row, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-        AttachDeleteMenu(row, delete);
+        AttachRowMenu(row, delete, rename);
 
         var labelView = new TextView(_context) { Text = label };
         labelView.SetTextSize(ComplexUnitType.Sp, 13);
@@ -398,23 +401,85 @@ internal sealed class JsonTreeEditor : LinearLayout
         { TopMargin = UI.Dp(_context, 2), BottomMargin = UI.Dp(_context, 2) });
     }
 
-    // ===== delete + undo =====
+    // ===== row menu (rename / delete) + undo =====
 
-    void AttachDeleteMenu(View anchor, Action delete)
+    /// <summary>กดค้างที่แถว/หัว section: ไฮไลต์แถวระหว่างเปิด popup แล้วโชว์เมนู anchored</summary>
+    void AttachRowMenu(View anchor, Action delete, Action rename)
     {
         anchor.LongClickable = true;
         anchor.LongClick += (s, e) =>
         {
-            var menu = new Android.Widget.PopupMenu(_context, anchor);
-            menu.Menu?.Add(0, 1, 0, "Delete");
-            menu.MenuItemClick += (ms, args) =>
+            var previousBackground = anchor.Background;
+            anchor.Background = UI.CreateRippleDrawable(
+                _context, LauncherTheme.SelectedCardBackgroundHex, LauncherTheme.ChipRadiusDp);
+
+            var menu = new AnchoredMenu(_context);
+            if (rename is not null)
             {
-                if (args.Item?.ItemId == 1)
-                    delete();
-            };
-            menu.Show();
+                menu.AddItem(Resource.Drawable.ic_edit, "Rename", null, rename);
+                menu.AddDivider();
+            }
+
+            menu.AddItem(Resource.Drawable.ic_delete, "Delete",
+                    LauncherTheme.StatusErrorTextHex, delete)
+                .OnDismiss(() => anchor.Background = previousBackground)
+                .Show(anchor);
+
             e.Handled = true;
         };
+    }
+
+    void ShowRenameDialog(JObject owner, string key)
+    {
+        var box = new LinearLayout(_context) { Orientation = Orientation.Vertical };
+        box.SetPadding(
+            UI.Dp(_context, 20), UI.Dp(_context, 4),
+            UI.Dp(_context, 20), 0);
+
+        var input = new EditText(_context) { Text = key };
+        input.SetSingleLine(true);
+        input.SetTextSize(ComplexUnitType.Sp, 14);
+        input.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
+        input.SetSelection(key.Length);
+        box.AddView(input, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
+
+        new MaterialAlertDialogBuilder(_context)
+            .SetTitle("Rename key")
+            .SetView(box)
+            .SetPositiveButton("Rename", (s, e) =>
+            {
+                string newKey = (input.Text ?? "").Trim();
+                if (newKey.Length == 0)
+                {
+                    Toast.MakeText(_context, "Key cannot be empty", ToastLength.Short).Show();
+                    return;
+                }
+
+                if (newKey == key)
+                    return;
+
+                if (owner.ContainsKey(newKey))
+                {
+                    Toast.MakeText(_context, "Key already exists", ToastLength.Short).Show();
+                    return;
+                }
+
+                RenameProperty(owner, key, newKey);
+            })
+            .SetNegativeButton("Cancel", (s, e) => { })
+            .Show();
+    }
+
+    /// <summary>เปลี่ยนชื่อ key โดยคงลำดับ field เดิมของ object</summary>
+    void RenameProperty(JObject owner, string oldKey, string newKey)
+    {
+        var items = owner.Properties().Select(p => (p.Name, p.Value)).ToList();
+        owner.RemoveAll();
+        foreach (var (name, value) in items)
+            owner.Add(name == oldKey ? newKey : name, value);
+
+        OnStructureChanged();
     }
 
     void DeleteProperty(JObject obj, string key)
