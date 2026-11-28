@@ -17,6 +17,7 @@ namespace SMAPIGameLoader.Launcher.Pages;
 
 internal sealed class ModManagerPage : LinearLayout
 {
+    const int PageSize = 30;
     const string SortModePrefKey = "mod_manager_sort_mode";
     const string SortDescendingPrefKey = "mod_manager_sort_descending";
 
@@ -28,7 +29,8 @@ internal sealed class ModManagerPage : LinearLayout
 
     private readonly Context _context;
     private readonly List<ModInfo> _mods = new();
-    private readonly List<ModInfo> _visibleMods = new(); // ผลหลังกรองด้วยคำค้น (ตัวที่ list แสดง)
+    private readonly List<ModInfo> _visibleMods = new(); // ผลหลังกรองด้วยคำค้น (ยังไม่แบ่งหน้า)
+    private readonly List<ModInfo> _pageMods = new();    // เฉพาะ mod ของหน้าที่กำลังดูอยู่ (ตัวที่ list แสดง)
     private readonly ModAdapter _adapter;
     private readonly LinearLayout _emptyView;
     private readonly TextView _emptyText;
@@ -37,10 +39,12 @@ internal sealed class ModManagerPage : LinearLayout
     private readonly ImageButton _installButton;
     private readonly RecyclerView _list;
     private readonly RecyclerScrollBar _scrollBar;
+    private readonly PagerBar _pager;
     private readonly EditText _searchInput;
     private readonly ImageView _searchClear;
     private SortMode _sortMode = SortMode.Date;
     private bool _sortDescending = true;
+    private int _page;
 
     public ModManagerPage(Context context) : base(context)
     {
@@ -122,7 +126,7 @@ internal sealed class ModManagerPage : LinearLayout
         AddView(body, new LayoutParams(
             ViewGroup.LayoutParams.MatchParent, 0, 1f));
 
-        _adapter = new ModAdapter(context, _visibleMods, OnClickedModItem, ToggleMod);
+        _adapter = new ModAdapter(context, _pageMods, OnClickedModItem, ToggleMod);
         _list = new RecyclerView(context);
         _list.SetBackgroundColor(LauncherTheme.Parse(LauncherTheme.BackgroundHex));
         // ไม่เว้น padding ขวา: ให้การ์ดห่างขอบจอเท่าขอบซ้าย (8dp จาก margin ของการ์ด)
@@ -162,6 +166,18 @@ internal sealed class ModManagerPage : LinearLayout
 
         // scrollbar อยู่ชิดขอบขวาจอ (thumb อยู่ในช่องว่าง 8dp ของการ์ดพอดี ไม่ทับสวิตช์)
         _scrollBar = RecyclerScrollBar.Attach(body, _list);
+
+        // ===== Pager bar (แบบเดียวกับหน้า Log) =====
+        AddView(PagerBar.CreateDivider(context));
+
+        _pager = new PagerBar(context, _list,
+            onFirst: () => GoToPage(0),
+            onPrev: () => GoToPage(_page - 1),
+            onNext: () => GoToPage(_page + 1),
+            onLast: GoToLastMod);
+        AddView(_pager, new LayoutParams(
+            ViewGroup.LayoutParams.MatchParent,
+            ViewGroup.LayoutParams.WrapContent));
 
         RefreshMods();
     }
@@ -278,7 +294,7 @@ internal sealed class ModManagerPage : LinearLayout
         ApplyList();
     }
 
-    /// <summary>กรองตามคำค้น → sort → อัปเดต list/empty state</summary>
+    /// <summary>กรองตามคำค้น → เรียง → กลับไปหน้าแรก</summary>
     void ApplyList()
     {
         string query = (_searchInput.Text ?? "").Trim();
@@ -291,20 +307,31 @@ internal sealed class ModManagerPage : LinearLayout
                 _visibleMods.Add(mod);
         }
 
-        ApplySort();
+        SortVisible();
+        _page = 0;
+        RefreshView(scrollToTop: true);
 
         bool hasMods = _mods.Count > 0;
-        bool hasVisible = _visibleMods.Count > 0;
-        _list.Visibility = hasVisible ? ViewStates.Visible : ViewStates.Gone;
-        _scrollBar.Visibility = _list.Visibility;
-        // invalidate หลัง layout รอบนี้ ไม่งั้น thumb ที่วาดไว้ตอน list ยังมีของเก่าจะค้าง
-        _scrollBar.Post(_scrollBar.ResetThumb);
-        _emptyView.Visibility = hasVisible ? ViewStates.Gone : ViewStates.Visible;
         _emptyText.Text = hasMods ? $"No mods match \"{query}\"" : "No mods found.";
         _emptyHint.Text = hasMods ? "Try a different name." : "Tap + to install your first mod.";
     }
 
+    /// <summary>เปลี่ยนโหมดเรียงจากเมนู — เนื้อหาเปลี่ยนลำดับทั้งชุด จึงกลับไปหน้าแรก</summary>
     void ApplySort()
+    {
+        SortVisible();
+        _page = 0;
+        RefreshView(scrollToTop: true);
+    }
+
+    /// <summary>เรียงใหม่หลังคำนวณขนาดเสร็จ โดยอยู่หน้าเดิม (ตำแหน่งในหน้าเปลี่ยนแต่ไม่กระโดดหน้า)</summary>
+    void ApplySortInPlace()
+    {
+        SortVisible();
+        RefreshView(scrollToTop: false);
+    }
+
+    void SortVisible()
     {
         Comparison<ModInfo> ascending = _sortMode switch
         {
@@ -315,9 +342,69 @@ internal sealed class ModManagerPage : LinearLayout
         };
 
         _visibleMods.Sort((a, b) => _sortDescending ? ascending(b, a) : ascending(a, b));
+        _sortButton.Text = $"Sort: {_sortMode} {(_sortDescending ? "↓" : "↑")}";
+    }
+
+    // ===== Paging =====
+
+    void GoToPage(int page)
+    {
+        int pageCount = PageCount;
+        if (page < 0 || page >= pageCount || page == _page)
+            return;
+
+        _page = page;
+        RefreshView(scrollToTop: true);
+    }
+
+    int PageCount => Math.Max(1, (int)Math.Ceiling(_visibleMods.Count / (double)PageSize));
+
+    /// <summary>ไปหน้าสุดท้ายแล้วเลื่อนถึง mod สุดท้ายของหน้านั้น</summary>
+    void GoToLastMod()
+    {
+        int lastPage = PageCount - 1;
+        if (_page != lastPage)
+        {
+            _page = lastPage;
+            RefreshView(scrollToTop: false);
+        }
+
+        if (_pageMods.Count > 0)
+            _list.ScrollToPosition(_pageMods.Count - 1);
+    }
+
+    /// <summary>แสดงเฉพาะ mod ของหน้าปัจจุบัน + อัปเดต pager/empty state</summary>
+    void RefreshView(bool scrollToTop)
+    {
+        int pageCount = PageCount;
+        if (_page >= pageCount)
+            _page = pageCount - 1;
+        if (_page < 0)
+            _page = 0;
+
+        int start = _page * PageSize;
+        int count = Math.Min(PageSize, Math.Max(0, _visibleMods.Count - start));
+
+        _pageMods.Clear();
+        for (int i = 0; i < count; i++)
+            _pageMods.Add(_visibleMods[start + i]);
         _adapter.NotifyDataSetChanged();
         _scrollBar.ResetThumb();
-        _sortButton.Text = $"Sort: {_sortMode} {(_sortDescending ? "↓" : "↑")}";
+
+        bool hasVisible = count > 0;
+        _list.Visibility = hasVisible ? ViewStates.Visible : ViewStates.Gone;
+        _scrollBar.Visibility = _list.Visibility;
+        // invalidate หลัง layout รอบนี้ ไม่งั้น thumb ที่วาดไว้ตอน list ยังมีของเก่าจะค้าง
+        _scrollBar.Post(_scrollBar.ResetThumb);
+        _emptyView.Visibility = hasVisible ? ViewStates.Gone : ViewStates.Visible;
+
+        _pager.SetPage(
+            hasVisible ? $"{_page + 1}/{pageCount} · {start + 1}-{start + count}" : "0/0",
+            _page > 0,
+            _page < pageCount - 1);
+
+        if (scrollToTop)
+            _list.ScrollToPosition(0);
     }
 
     void RefreshMods()
@@ -363,7 +450,7 @@ internal sealed class ModManagerPage : LinearLayout
             foreach (var mod in snapshot)
                 mod.ComputeSize();
 
-            MainThread.BeginInvokeOnMainThread(ApplySort);
+            MainThread.BeginInvokeOnMainThread(ApplySortInPlace);
         });
     }
 
@@ -405,7 +492,7 @@ internal sealed class ModManagerPage : LinearLayout
     {
         mod.Enabled = !mod.Enabled;
 
-        int position = _visibleMods.IndexOf(mod);
+        int position = _pageMods.IndexOf(mod);
         if (position >= 0)
             _adapter.NotifyItemChanged(position);
     }
