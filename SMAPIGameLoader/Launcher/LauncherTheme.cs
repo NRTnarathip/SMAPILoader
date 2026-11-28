@@ -66,6 +66,9 @@ internal static class LauncherTheme
     public static string WarningTextHex { get; private set; } = "#E8C07D";
     public static string LogContinuationHex { get; private set; } = "#C3CBD6";
 
+    /// <summary>พื้นปุ่ม "Update" ใน SMAPI card (สีส้ม = มีเวอร์ชันใหม่)</summary>
+    public const string UpdateButtonHex = "#E07B39";
+
     // scrollbar
     public static string ScrollThumbHex { get; private set; } = "#66707E";
 

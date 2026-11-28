@@ -174,9 +174,6 @@ internal static class SMAPIInstaller
             }
 
             InstallSMAPIFromZipFile(pick.FullPath);
-
-            DialogTool.Show("Successfully Install SMAPI",
-                "done installed SMAPI from zip file: " + pick.FileName);
             OnInstalledSMAPI?.Invoke();
 
         }

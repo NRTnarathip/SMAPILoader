@@ -1,20 +1,28 @@
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using Octokit;
 using System;
+using System.Text.RegularExpressions;
 
 namespace SMAPIGameLoader.Launcher;
 
 public class SMAPIInfoCard : InfoCard
 {
+    const string NexusUrl = "https://www.nexusmods.com/stardewvalley/mods/44436";
+
+    enum UpdateState { Idle, Checking, Update, Latest }
+
     readonly TextView _version;
     readonly TextView _buildCode;
     readonly TextView _buildDate;
     readonly TextView _status;
     readonly Button _installButton;
     readonly Button _uninstallButton;
+    readonly Button _updateButton;
+    UpdateState _updateState;
 
     public SMAPIInfoCard(Context context) : base(context)
     {
@@ -42,6 +50,12 @@ public class SMAPIInfoCard : InfoCard
 
         Content.AddView(actions);
 
+        _updateButton = CreateActionButton("Check Update", OnClickCheckUpdate, primary: false);
+        _updateButton.LayoutParameters = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
+        { TopMargin = UI.Dp(Context, 10) };
+        Content.AddView(_updateButton);
+
         Refresh();
     }
 
@@ -58,6 +72,106 @@ public class SMAPIInfoCard : InfoCard
         _installButton.Text = installed ? "Reinstall" : "Install";
         _uninstallButton.Enabled = installed;
         _uninstallButton.Alpha = installed ? 1f : 0.4f;
+
+        // ข้อมูล release เก่าอาจไม่ตรงกับเวอร์ชันที่เพิ่งติดตั้ง ให้เช็คใหม่ก่อนเสมอ
+        SetUpdateState(UpdateState.Idle);
+    }
+
+    async void OnClickCheckUpdate(object sender, EventArgs e)
+    {
+        if (_updateState == UpdateState.Update)
+        {
+            OpenUpdateLink();
+            return;
+        }
+
+        if (_updateState != UpdateState.Idle)
+            return;
+
+        SetUpdateState(UpdateState.Checking);
+        try
+        {
+            var github = new GitHubClient(new ProductHeaderValue("SMAPI-Android-Launcher"));
+            var release = await github.Repository.Release.GetLatest(
+                SMAPIInstaller.GithubOwner, SMAPIInstaller.GithubRepoName);
+
+            var latest = ParseVersion(release.TagName);
+            if (latest is null)
+            {
+                SetUpdateState(UpdateState.Idle);
+                return;
+            }
+
+            SetUpdateState(latest > SMAPIInstaller.GetCurrentVersion()
+                ? UpdateState.Update
+                : UpdateState.Latest);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Check SMAPI update failed: " + ex);
+            SetUpdateState(UpdateState.Idle);
+            Toast.MakeText(Context, "Failed to check update", ToastLength.Short)?.Show();
+        }
+    }
+
+    void SetUpdateState(UpdateState state)
+    {
+        _updateState = state;
+
+        string text, backgroundHex, textHex;
+        bool enabled = true;
+        switch (state)
+        {
+            case UpdateState.Checking:
+                text = "Checking…";
+                backgroundHex = LauncherTheme.SurfaceVariantHex;
+                textHex = LauncherTheme.TextSecondaryHex;
+                enabled = false;
+                break;
+            case UpdateState.Update:
+                text = "Update";
+                backgroundHex = LauncherTheme.UpdateButtonHex;
+                textHex = LauncherTheme.TextOnPrimaryHex;
+                break;
+            case UpdateState.Latest:
+                text = "Latest";
+                backgroundHex = LauncherTheme.SurfaceVariantHex;
+                textHex = LauncherTheme.TextSecondaryHex;
+                enabled = false;
+                break;
+            default:
+                text = "Check Update";
+                backgroundHex = LauncherTheme.SurfaceVariantHex;
+                textHex = LauncherTheme.TextPrimaryHex;
+                break;
+        }
+
+        _updateButton.Text = text;
+        _updateButton.Enabled = enabled;
+        _updateButton.Alpha = enabled ? 1f : 0.6f;
+        _updateButton.SetTextColor(LauncherTheme.Parse(textHex));
+        _updateButton.Background = UI.CreateRippleDrawable(
+            Context, backgroundHex, LauncherTheme.ChipRadiusDp);
+    }
+
+    void OpenUpdateLink()
+    {
+        try
+        {
+            Context.StartActivity(new Intent(
+                Intent.ActionView, Android.Net.Uri.Parse(NexusUrl)));
+        }
+        catch (Exception)
+        {
+            Toast.MakeText(Context, "No app can open this link", ToastLength.Short)?.Show();
+        }
+    }
+
+    /// <summary>tag บางตัวมี prefix เช่น "SMAPI-4.3.2.1-(1762834431)" — ดึงเอาเลขเวอร์ชันแรก</summary>
+    static Version ParseVersion(string tag)
+    {
+        var match = Regex.Match(tag ?? "", @"\d+(?:\.\d+)+");
+        return match.Success && Version.TryParse(match.Value, out var version) ? version : null;
     }
 
     void OnClickUninstall(object sender, EventArgs e)
