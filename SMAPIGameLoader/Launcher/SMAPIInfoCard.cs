@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
@@ -13,12 +14,14 @@ public class SMAPIInfoCard : InfoCard
 {
     const string NexusUrl = "https://www.nexusmods.com/stardewvalley/mods/44436";
 
-    enum UpdateState { Idle, Checking, Update, Latest }
+    enum UpdateState { Idle, Checking, CanUpdate, Latest }
 
-    readonly TextView _version;
+    readonly TextView _currentVersion;
+    readonly TextView _gitLatestVersion;
     readonly TextView _buildCode;
     readonly TextView _buildDate;
     readonly TextView _status;
+    readonly TextView _newVersionBadge;
     readonly Button _installButton;
     readonly Button _uninstallButton;
     readonly Button _updateButton;
@@ -27,9 +30,18 @@ public class SMAPIInfoCard : InfoCard
     public SMAPIInfoCard(Context context) : base(context)
     {
         _status = AddHeader("SMAPI");
+
+        _newVersionBadge = AddHeaderBadge(_status);
+        _newVersionBadge.Text = "New Version";
+        _newVersionBadge.SetTextColor(LauncherTheme.Parse(LauncherTheme.TextOnPrimaryHex));
+        if (_newVersionBadge.Background is GradientDrawable badgeBg)
+            badgeBg.SetColor(LauncherTheme.Parse(LauncherTheme.UpdateButtonHex));
+        _newVersionBadge.Visibility = ViewStates.Gone;
+
         AddDivider();
 
-        _version = AddRow("Version");
+        _currentVersion = AddRow("Installed Version");
+        _gitLatestVersion = AddRow("Download Latest Version");
         _buildCode = AddRow("Build Code");
         _buildDate = AddRow("Build Date");
 
@@ -41,20 +53,21 @@ public class SMAPIInfoCard : InfoCard
         actions.AddView(_uninstallButton, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
         {
-            RightMargin = UI.Dp(Context, 10)
+            RightMargin = UI.Dp(Context, 8)
         });
 
         _installButton = CreateActionButton("Install", OnClickInstall, primary: true);
         actions.AddView(_installButton, new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent)
+        {
+            RightMargin = UI.Dp(Context, 8)
+        });
+
+        _updateButton = CreateActionButton("Check Update", OnClickCheckUpdate, primary: false);
+        actions.AddView(_updateButton, new LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
 
         Content.AddView(actions);
-
-        _updateButton = CreateActionButton("Check Update", OnClickCheckUpdate, primary: false);
-        _updateButton.LayoutParameters = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent)
-        { TopMargin = UI.Dp(Context, 10) };
-        Content.AddView(_updateButton);
 
         Refresh();
     }
@@ -64,7 +77,8 @@ public class SMAPIInfoCard : InfoCard
         var installed = SMAPIInstaller.IsInstalled;
         var buildCode = SMAPIInstaller.GetBuildCode();
 
-        _version.Text = SMAPIInstaller.GetCurrentVersion().ToString();
+        _currentVersion.Text = SMAPIInstaller.GetCurrentVersion().ToString();
+        _gitLatestVersion.Text = "unknow";
         _buildCode.Text = buildCode.ToString();
         _buildDate.Text = FormatBuildDate(buildCode);
         SetStatus(_status, installed, "Installed", "Missing");
@@ -75,11 +89,12 @@ public class SMAPIInfoCard : InfoCard
 
         // ข้อมูล release เก่าอาจไม่ตรงกับเวอร์ชันที่เพิ่งติดตั้ง ให้เช็คใหม่ก่อนเสมอ
         SetUpdateState(UpdateState.Idle);
+        OnClickCheckUpdate(null, null);
     }
 
     async void OnClickCheckUpdate(object sender, EventArgs e)
     {
-        if (_updateState == UpdateState.Update)
+        if (_updateState == UpdateState.CanUpdate)
         {
             OpenUpdateLink();
             return;
@@ -91,19 +106,15 @@ public class SMAPIInfoCard : InfoCard
         SetUpdateState(UpdateState.Checking);
         try
         {
-            var github = new GitHubClient(new ProductHeaderValue("SMAPI-Android-Launcher"));
-            var release = await github.Repository.Release.GetLatest(
-                SMAPIInstaller.GithubOwner, SMAPIInstaller.GithubRepoName);
-
-            var latest = ParseVersion(release.TagName);
-            if (latest is null)
+            var latestVersion = await SMAPIInstaller.AsyncGetGitLatestVersion();
+            if (latestVersion == null)
             {
                 SetUpdateState(UpdateState.Idle);
                 return;
             }
-
-            SetUpdateState(latest > SMAPIInstaller.GetCurrentVersion()
-                ? UpdateState.Update
+            _gitLatestVersion.Text = latestVersion.ToString();
+            SetUpdateState(latestVersion > SMAPIInstaller.GetCurrentVersion()
+                ? UpdateState.CanUpdate
                 : UpdateState.Latest);
         }
         catch (Exception ex)
@@ -128,8 +139,8 @@ public class SMAPIInfoCard : InfoCard
                 textHex = LauncherTheme.TextSecondaryHex;
                 enabled = false;
                 break;
-            case UpdateState.Update:
-                text = "Update";
+            case UpdateState.CanUpdate:
+                text = $"Download";
                 backgroundHex = LauncherTheme.UpdateButtonHex;
                 textHex = LauncherTheme.TextOnPrimaryHex;
                 break;
@@ -145,6 +156,9 @@ public class SMAPIInfoCard : InfoCard
                 textHex = LauncherTheme.TextPrimaryHex;
                 break;
         }
+
+        _newVersionBadge.Visibility =
+            state == UpdateState.CanUpdate ? ViewStates.Visible : ViewStates.Gone;
 
         _updateButton.Text = text;
         _updateButton.Enabled = enabled;
@@ -165,13 +179,6 @@ public class SMAPIInfoCard : InfoCard
         {
             Toast.MakeText(Context, "No app can open this link", ToastLength.Short)?.Show();
         }
-    }
-
-    /// <summary>tag บางตัวมี prefix เช่น "SMAPI-4.3.2.1-(1762834431)" — ดึงเอาเลขเวอร์ชันแรก</summary>
-    static Version ParseVersion(string tag)
-    {
-        var match = Regex.Match(tag ?? "", @"\d+(?:\.\d+)+");
-        return match.Success && Version.TryParse(match.Value, out var version) ? version : null;
     }
 
     void OnClickUninstall(object sender, EventArgs e)
@@ -195,12 +202,13 @@ public class SMAPIInfoCard : InfoCard
         button.SetTextColor(primary
             ? LauncherTheme.Parse(LauncherTheme.TextOnPrimaryHex)
             : LauncherTheme.Parse(LauncherTheme.TextPrimaryHex));
-        button.SetMinWidth(UI.Dp(Context, 96));
+        // สามปุ่มต้องอยู่บรรทัดเดียวกัน: ลด padding/min width ให้ "Check Update" พอดีการ์ด
+        button.SetMinWidth(UI.Dp(Context, 80));
         button.SetMinHeight(UI.Dp(Context, 44));
         button.StateListAnimator = null;
         button.SetPadding(
-            UI.Dp(Context, 18), 0,
-            UI.Dp(Context, 18), 0);
+            UI.Dp(Context, 12), 0,
+            UI.Dp(Context, 12), 0);
         button.Background = primary
             ? UI.CreateRippleDrawable(Context, LauncherTheme.PrimaryHex, LauncherTheme.ChipRadiusDp)
             : UI.CreateRippleDrawable(Context, LauncherTheme.SurfaceVariantHex, LauncherTheme.ChipRadiusDp);

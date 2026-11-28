@@ -3,11 +3,13 @@ using SMAPIGameLoader.Tool;
 using StardewValley.Network;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 
@@ -61,75 +63,27 @@ internal static class SMAPIInstaller
         }
     }
 
-
-#if false
-    public static async void OnClickInstallSMAPIOnline()
+    public async static Task<Version?> AsyncGetGitLatestVersion()
     {
         try
         {
-            TaskTool.Run(ActivityTool.CurrentActivity, async () =>
-            {
-                try
-                {
-                    TaskTool.SetTitle("Install SMAPI Online");
-                    var github = new GitHubClient(new ProductHeaderValue("SMPAI-Installer"));
-                    TaskTool.NewLine("try get all release..");
-                    var releases = await github.Repository.Release.GetAll(GithubOwner, GithubRepoName);
-                    TaskTool.NewLine("found release count: " + releases.Count);
-                    var latestRelease = releases.FirstOrDefault();
-                    if (latestRelease is null)
-                    {
-                        ErrorDialogTool.Show(new Exception("Failed install SMAPI, not found any release file"));
-                        return;
-                    }
+            var github = new GitHubClient(new ProductHeaderValue("SMAPI-Android-Launcher"));
+            var release = await github.Repository.Release.GetLatest(
+                SMAPIInstaller.GithubOwner, SMAPIInstaller.GithubRepoName);
 
-                    var smapiAssetFile = latestRelease.Assets.FirstOrDefault(
-                         asset => asset.Name.StartsWith("SMAPI-")
-                         && asset.Name.EndsWith(".zip"));
-
-                    if (smapiAssetFile != null)
-                    {
-                        TaskTool.NewLine("found SMAPI latest file: " + smapiAssetFile.Name);
-                        var smapiZipFilePath = Path.Combine(FileTool.ExternalFilesDir, smapiAssetFile.Name);
-                        TaskTool.NewLine("starting download & install");
-                        TaskTool.NewLine($"file size: {FileTool.ConvertBytesToMB(smapiAssetFile.Size):F2} MB");
-
-                        using (var netClient = new HttpClient())
-                        {
-                            Console.WriteLine($"Retrieving {smapiAssetFile.Name}");
-                            var fileData = await netClient.GetByteArrayAsync(smapiAssetFile.BrowserDownloadUrl);
-                            File.WriteAllBytes(smapiZipFilePath, fileData);
-                            Console.WriteLine("done save zip file at: " + smapiZipFilePath + ", file size: " + fileData.Length);
-                        }
-
-                        InstallSMAPIFromZipFile(smapiZipFilePath);
-
-                        TaskTool.NewLine("Successfully install SMAPI: " + smapiAssetFile.Name);
-                        DialogTool.Show("Successfully Install SMAPI",
-                            $"done install zip: {smapiAssetFile.Name}." +
-                            $"\nyou can close this");
-                    }
-                    else
-                    {
-                        TaskTool.NewLine("Not found any SMAPI");
-                    }
-
-                    await Task.Delay(1000);
-                }
-                catch (Exception ex)
-                {
-                    ErrorDialogTool.Show(ex);
-                    Console.WriteLine("error try to install SMAPI Zip: " + ex);
-                }
-            });
+            return ParseVersion(release.TagName);
         }
-        catch (Exception ex)
+        catch
         {
-            ErrorDialogTool.Show(ex);
-            Console.WriteLine("error try to install SMAPI Zip: " + ex);
         }
+        return null;
     }
-#endif
+
+    public static Version ParseVersion(string tag)
+    {
+        var match = Regex.Match(tag ?? "", @"\d+(?:\.\d+)+");
+        return match.Success && Version.TryParse(match.Value, out var version) ? version : null;
+    }
 
     static bool IsSMAPIZipFromPickFile(FileResult pick)
     {

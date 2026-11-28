@@ -56,6 +56,23 @@ public abstract class InfoCard : CardView
         return status;
     }
 
+    /// <summary>
+    /// เพิ่ม badge เสริมใน header ทางซ้ายของ status badge (เช่น "New Version")
+    /// คืน TextView มาให้หน้าที่เรียกตั้งสี/ข้อความ/visibility เอง
+    /// </summary>
+    protected TextView AddHeaderBadge(TextView status)
+    {
+        var badge = CreateStatusBadge(Context);
+        if (status.Parent is LinearLayout header)
+        {
+            header.AddView(badge, header.IndexOfChild(status), new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WrapContent,
+                ViewGroup.LayoutParams.WrapContent)
+            { RightMargin = UI.Dp(Context, 8) });
+        }
+        return badge;
+    }
+
     protected static void SetStatus(
         TextView status, bool isActive, string activeText, string inactiveText)
     {
